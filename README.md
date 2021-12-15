@@ -1,2 +1,3 @@
 # iptools
-Various IP functionality as part of learning
+
+This is a learning experience for things like IP subnetting.
