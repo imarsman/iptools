@@ -11,5 +11,8 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
+# Test build
+cmd/iptools/iptools
+
 # Dependency directories (remove the comment below to include it)
-# vendor/
+vendor/
