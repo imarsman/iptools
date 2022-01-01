@@ -40,7 +40,8 @@ func newSubnet(pfx netaddr.IPPrefix) (*subnet, error) {
 		return nil, errors.New("subnet too large")
 	}
 
-	subnet.hosts = uint64(math.Pow(2, float64(subnet.prefix.Bits())))
+	// subnet.hosts = uint64(math.Pow(2, float64(subnet.prefix.Bits())))
+	subnet.hosts = uint64(math.Pow(2, float64(pfx.IP().BitLen()-subnet.prefix.Bits())))
 
 	return subnet, nil
 }
@@ -74,13 +75,14 @@ type SubnetCmd struct {
 	Value string `arg:"positional"`
 }
 
+// args cli args
 type args struct {
 	Subnet  *SubnetCmd `arg:"subcommand:subnet"`
 	Verbose bool       `arg:"-v"`
 }
 
 func (args) Description() string {
-	return "this program does this and that"
+	return "a tool to deal with IP subnets and splitting subnets"
 }
 
 func (args) Version() string {

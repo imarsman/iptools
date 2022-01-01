@@ -58,6 +58,20 @@ func TestRange(t *testing.T) {
 	is.True(true == true)
 }
 
+func TestBits(t *testing.T) {
+	is := is.New(t)
+
+	pfx, err := netaddr.ParseIPPrefix("192.168.0.1/21")
+	subnet, err := newSubnet(pfx)
+	is.NoErr(err)
+
+	t.Log("prefix", pfx.String())
+	t.Log("partial bits", subnet.partialBits())
+	t.Log("partial remainder bits", subnet.partialRemainderBits())
+	t.Log("prefix bits", pfx.Bits())
+	t.Log("hosts", subnet.hosts)
+}
+
 func BenchmarkPathParts(b *testing.B) {
 	is := is.New(b)
 
