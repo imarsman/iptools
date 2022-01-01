@@ -1,0 +1,28 @@
+version: "3"
+
+vars:
+  hostList: >
+    google.com cisco.com ibm.com microsoft.com aws.com www.gov.za amazon.com
+  targetbin: ~/bin
+  buildname: iptools
+
+tasks:
+  copy:
+    desc: copy build file to local bin
+    dir: .
+    cmds:
+      - cmd: rm {{.targetbin}}/{{.buildname}} && cp ./build/{{.buildname}} {{.targetbin}}
+        ignore_error: true
+  build:
+    desc: build app
+    dir: cmd/{{.buildname}}
+    cmds:
+      - rm -f ../../build/{{.buildname}}
+      - go build -o ../../build/{{.buildname}} .
+      - task: copy
+  test:
+    desc: test app
+    dir: build
+    cmds:
+      - task: build
+      - go test -v ../...
