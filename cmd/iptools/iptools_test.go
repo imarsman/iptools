@@ -3,6 +3,7 @@ package main
 import (
 	"testing"
 
+	"github.com/imarsman/iptools/pkg/subnet"
 	"github.com/matryer/is"
 	"inet.af/netaddr"
 )
@@ -35,7 +36,7 @@ func TestRange(t *testing.T) {
 	pfx, err := netaddr.ParseIPPrefix("192.168.0.1/16")
 	is.NoErr(err)
 
-	subnet, err := NewSubnet(pfx)
+	subnet, err := subnet.NewSubnet(pfx)
 	is.NoErr(err)
 	subnet.Prefix = pfx
 
@@ -64,7 +65,7 @@ func TestBits(t *testing.T) {
 	is := is.New(t)
 
 	pfx, err := netaddr.ParseIPPrefix("99.236.0.0/21")
-	subnet, err := NewSubnet(pfx)
+	subnet, err := subnet.NewSubnet(pfx)
 	is.NoErr(err)
 
 	t.Log("prefix", pfx.String())
