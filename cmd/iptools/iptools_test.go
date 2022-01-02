@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/binary"
 	"testing"
 
 	"github.com/imarsman/iptools/pkg/subnet"
@@ -39,7 +41,7 @@ func TestRange(t *testing.T) {
 	s, err := subnet.NewSubnet("192.168.0.1/16")
 	is.NoErr(err)
 
-	t.Log("hosts", s.DivisionHosts)
+	t.Log("hosts", s.DivisionIncrement)
 
 	t.Log("ip", s.Prefix.IP())
 	t.Log("range", s.Prefix.Range())
@@ -48,9 +50,9 @@ func TestRange(t *testing.T) {
 	t.Log("bitlen", s.Prefix.IP().BitLen())
 	t.Log("mask", s.Prefix.IPNet().Mask)
 	t.Log("single IP", s.Prefix.IsSingleIP())
-	t.Log("hosts", s.DivisionHosts)
-	t.Log("subnetsize", s.TotalHosts)
-	t.Log("equal subnets", s.EqualRanges())
+	t.Log("hosts", s.DivisionIncrement)
+	t.Log("subnetsize", s.SubnetHosts)
+	t.Log("equal subnets", s.TotalDivisions)
 
 	var b netaddr.IPSetBuilder
 	b.AddPrefix(s.Prefix)
@@ -63,7 +65,7 @@ func TestRange(t *testing.T) {
 func TestBits(t *testing.T) {
 	is := is.New(t)
 
-	prefixes := []string{"99.236.32.255/21", "223.255.89.0/24", "99.236.255.255/21"}
+	prefixes := []string{"99.236.32.255/21", "99.236.32.255/22", "99.236.32.255/16", "99.236.32.255/17", "223.255.89.0/24", "99.236.255.255/21"}
 
 	for _, p := range prefixes {
 		// pfx, err := netaddr.ParseIPPrefix(p)
@@ -71,23 +73,36 @@ func TestBits(t *testing.T) {
 		is.NoErr(err)
 		t.Log("valid", s.Prefix.Valid())
 
-		t.Log("hosts", s.DivisionHosts)
+		t.Log("hosts", s.DivisionIncrement)
 		t.Log("prefix", s.Prefix.String())
 		t.Log("active byte", s.ClassByte())
 		t.Log("ip range", s.Prefix.Range())
 		t.Log("subnet usable ip range", subnet.UsableRange(s.Prefix.Range()))
 		t.Log("partial bits", s.ClassPartialBits())
-		t.Log("partial remainder bits", s.ClassHostBits())
+		t.Log("host bits", s.ClassHostBits())
 		t.Log("prefix bits", s.Prefix.Bits())
-		t.Log("hosts", s.DivisionHosts)
-		t.Log("subnetsize", s.TotalHosts)
-		t.Log("equal subnets", s.EqualRanges())
-		t.Log("subnet 3")
+		t.Log("hosts", s.DivisionIncrement)
+		t.Log("subnet hosts", s.SubnetHosts)
+		t.Log("division increment", s.DivisionIncrement)
+		t.Log("total divisions", s.TotalDivisions)
+		t.Log("division hosts", s.DivisionIncrement)
 		t.Log(s.Divisions)
-		bytes, err := s.YAML()
-		is.NoErr(err)
-		t.Log(string(bytes))
 	}
+}
+
+func read_int32(data []byte) (ret int32) {
+	buf := bytes.NewBuffer(data)
+	binary.Read(buf, binary.LittleEndian, &ret)
+	return
+}
+
+func TestShift(t *testing.T) {
+	b := []byte{1}
+	t.Log("bytes", b)
+	b = subnet.ShiftLeft(b, 7)
+	t.Log("bytes", b)
+	t.Log(0 << 0)
+	t.Log(1 << 8)
 }
 
 func BenchmarkPathParts(b *testing.B) {
