@@ -1,9 +1,12 @@
 package subnet
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"math"
 
+	"gopkg.in/yaml.v2"
 	"inet.af/netaddr"
 )
 
@@ -16,16 +19,21 @@ const (
 // https://www.calculator.net/ip-Subnet-calculator.html?cclass=any&csubnet=16&cip=10.0.0.0&ctype=ipv4&printit=0&x=43&y=21
 // https://www.calculator.net/ip-Subnet-calculator.html
 type Subnet struct {
-	Prefix          netaddr.IPPrefix
-	Hosts           uint64
-	IPAddr          netaddr.IP
-	SubnetSize      uint64
-	subnetDivisions []netaddr.IPRange
+	Prefix        netaddr.IPPrefix  `json:"prefix" yaml:"prefix"`
+	IP            netaddr.IP        `json:"ipaddr" yaml:"ipaddr"`
+	TotalHosts    uint              `json:"totalhosts" yaml:"totalhosts"`
+	DivisionHosts uint64            `json:"divisionhosts" yaml:"divisionhosts"`
+	Divisions     []netaddr.IPRange `json:"divisions" yaml:"divisions"`
 }
 
 // NewSubnet create new subnet from prefix
-func NewSubnet(pfx netaddr.IPPrefix) (*Subnet, error) {
-	subnet := new(Subnet)
+func NewSubnet(prefix string) (subnet *Subnet, err error) {
+	subnet = new(Subnet)
+
+	pfx, err := netaddr.ParseIPPrefix(prefix)
+	if err != nil {
+		return
+	}
 
 	if !pfx.IsValid() {
 		return nil, errors.New("invalid prefix")
@@ -36,16 +44,17 @@ func NewSubnet(pfx netaddr.IPPrefix) (*Subnet, error) {
 	}
 
 	subnet.Prefix = pfx
+	subnet.IP = pfx.IP()
 
 	// Hosts is 2^[non-mask bits]
-	subnet.Hosts = uint64(math.Pow(2,
+	subnet.DivisionHosts = uint64(math.Pow(2,
 		float64(
 			pfx.IP().BitLen()-subnet.Prefix.Bits(),
 		)))
 
-	subnet.SubnetSize = uint64(
-		math.Pow(2, float64(subnet.ClassHostBits())),
-	)
+	subnet.TotalHosts = uint(subnet.DivisionHosts * uint64(subnet.EqualRanges()))
+
+	subnet.Divisions = subnet.getDivisions()
 
 	return subnet, nil
 }
@@ -55,6 +64,26 @@ func UsableRange(r netaddr.IPRange) netaddr.IPRange {
 	r2 := netaddr.IPRangeFrom(r.From().Next(), r.To().Prior())
 
 	return r2
+}
+
+// JSON get JSON for subnet
+func (s *Subnet) JSON() (bytes []byte, err error) {
+	bytes, err = json.MarshalIndent(s, "", "  ")
+	if err != nil {
+		return
+	}
+
+	return bytes, nil
+}
+
+// YAML get YAML for subnet
+func (s *Subnet) YAML() (bytes []byte, err error) {
+	bytes, err = yaml.Marshal(s)
+	if err != nil {
+		return
+	}
+
+	return bytes, nil
 }
 
 // ClassByte byte used for subnet
@@ -89,8 +118,8 @@ func (s *Subnet) ClassHostBits() uint8 {
 	return 8 - s.ClassPartialBits()
 }
 
-// EqualSubnets how many equal sized subnets can prefix be split into?
-func (s *Subnet) EqualSubnets() uint {
+// EqualRanges how many equal sized subnets can prefix be split into?
+func (s *Subnet) EqualRanges() uint {
 	// return s.EqualSubnets
 	// fmt.Println("partial remainder bits", s.PartialRemainderBits())
 	// fmt.Println(math.Pow(2, float64(s.PartialRemainderBits())))
@@ -98,30 +127,31 @@ func (s *Subnet) EqualSubnets() uint {
 }
 
 // SubnetDivisions the set of equally sized subnet divisions for subnet
-func (s *Subnet) SubnetDivisions() (r []netaddr.IPRange) {
-	r = make([]netaddr.IPRange, 0, s.EqualSubnets()-1)
+func (s *Subnet) getDivisions() (r []netaddr.IPRange) {
+	r = make([]netaddr.IPRange, 0, s.EqualRanges()-1)
 
-	// Return generated ranges if they have already been calculated
-	if len(s.subnetDivisions) > 0 {
-		return s.subnetDivisions
-	}
-
-	subnetCount := s.EqualSubnets()
+	// Whatever the IP used to create the subnet range, use the subnet's first IP
+	subnetBaseIP := s.Prefix.Range().From().As4()
+	fmt.Println("base ip", subnetBaseIP)
+	subnetRanges := s.EqualRanges()
 
 	getIPRange := func(number int) netaddr.IPRange {
 		classByte := s.ClassByte()
-		allBytes := s.Prefix.IP().As4()
+		allBytes := subnetBaseIP
 
-		byteToUse := s.Prefix.IP().As4()[classByte]
+		byteToUse := subnetBaseIP[classByte]
 		currentByte := byteToUse
 
-		ipFirstNewByte := uint(currentByte) + ((uint(number)) * uint(s.SubnetSize))
-		ipLastNewByte := uint(currentByte) + (uint(number+1) * uint(s.SubnetSize))
+		// In decimal terms, increment each by 2^host bits
+		decimalIncrement := math.Pow(2, float64(s.ClassHostBits()))
 
-		ipFirst := allBytes
+		// Will be for first
+		ipFirstNewByte := uint(currentByte) + ((uint(number)) * uint(decimalIncrement))
+		ipLastNewByte := uint(currentByte) + (uint(number+1) * uint(decimalIncrement))
+
+		ipFirst, ipLast := allBytes, allBytes
 		ipFirst[classByte] = byte(ipFirstNewByte)
 
-		ipLast := allBytes
 		ipLast[classByte] = byte(ipLastNewByte)
 
 		if byteToUse < octets {
@@ -138,16 +168,16 @@ func (s *Subnet) SubnetDivisions() (r []netaddr.IPRange) {
 		return netaddr.IPRangeFrom(netaddr.IPFrom4(ipFirst), netaddr.IPFrom4(ipLast))
 	}
 
-	if subnetCount == 1 {
+	if subnetRanges == 1 {
 		r = append(r, getIPRange(0))
 	} else {
 
 		// produce all subnet IP ranges
-		for subNetNo := 0; subNetNo < int(subnetCount-1); subNetNo++ {
+		for subNetNo := 0; subNetNo < int(subnetRanges-1); subNetNo++ {
 			r = append(r, getIPRange(subNetNo))
 		}
 	}
-	s.subnetDivisions = r
+	s.Divisions = r
 
 	return
 }

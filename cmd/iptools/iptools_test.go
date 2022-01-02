@@ -33,28 +33,27 @@ const (
 func TestRange(t *testing.T) {
 	is := is.New(t)
 
-	pfx, err := netaddr.ParseIPPrefix("192.168.0.1/16")
+	// pfx, err := netaddr.ParseIPPrefix("192.168.0.1/16")
+	// is.NoErr(err)
+
+	s, err := subnet.NewSubnet("192.168.0.1/16")
 	is.NoErr(err)
 
-	s, err := subnet.NewSubnet(pfx)
-	is.NoErr(err)
-	s.Prefix = pfx
+	t.Log("hosts", s.DivisionHosts)
 
-	t.Log("hosts", s.Hosts)
-
-	t.Log("ip", pfx.IP())
-	t.Log("range", pfx.Range())
-	t.Log("bits", pfx.Bits())
-	t.Log("ipnet", pfx.IPNet())
-	t.Log("bitlen", pfx.IP().BitLen())
-	t.Log("mask", pfx.IPNet().Mask)
-	t.Log("single IP", pfx.IsSingleIP())
-	t.Log("hosts", s.Hosts)
-	t.Log("subnetsize", s.SubnetSize)
-	t.Log("equal subnets", s.EqualSubnets())
+	t.Log("ip", s.Prefix.IP())
+	t.Log("range", s.Prefix.Range())
+	t.Log("bits", s.Prefix.Bits())
+	t.Log("ipnet", s.Prefix.IPNet())
+	t.Log("bitlen", s.Prefix.IP().BitLen())
+	t.Log("mask", s.Prefix.IPNet().Mask)
+	t.Log("single IP", s.Prefix.IsSingleIP())
+	t.Log("hosts", s.DivisionHosts)
+	t.Log("subnetsize", s.TotalHosts)
+	t.Log("equal subnets", s.EqualRanges())
 
 	var b netaddr.IPSetBuilder
-	b.AddPrefix(pfx)
+	b.AddPrefix(s.Prefix)
 	ipSet, _ := b.IPSet()
 	t.Log(ipSet.Ranges())
 
@@ -64,26 +63,30 @@ func TestRange(t *testing.T) {
 func TestBits(t *testing.T) {
 	is := is.New(t)
 
-	prefixes := []string{"99.236.0.0/21", "223.255.89.0/24"}
+	prefixes := []string{"99.236.32.255/21", "223.255.89.0/24", "99.236.255.255/21"}
 
 	for _, p := range prefixes {
-		pfx, err := netaddr.ParseIPPrefix(p)
-		s, err := subnet.NewSubnet(pfx)
+		// pfx, err := netaddr.ParseIPPrefix(p)
+		s, err := subnet.NewSubnet(p)
 		is.NoErr(err)
+		t.Log("valid", s.Prefix.Valid())
 
-		t.Log("prefix", pfx.String())
+		t.Log("hosts", s.DivisionHosts)
+		t.Log("prefix", s.Prefix.String())
 		t.Log("active byte", s.ClassByte())
-		t.Log("ip range", pfx.Range())
+		t.Log("ip range", s.Prefix.Range())
 		t.Log("subnet usable ip range", subnet.UsableRange(s.Prefix.Range()))
 		t.Log("partial bits", s.ClassPartialBits())
 		t.Log("partial remainder bits", s.ClassHostBits())
-		t.Log("prefix bits", pfx.Bits())
-		t.Log("hosts", s.Hosts)
-		t.Log("subnetsize", s.SubnetSize)
-		t.Log("equal subnets", s.EqualSubnets())
+		t.Log("prefix bits", s.Prefix.Bits())
+		t.Log("hosts", s.DivisionHosts)
+		t.Log("subnetsize", s.TotalHosts)
+		t.Log("equal subnets", s.EqualRanges())
 		t.Log("subnet 3")
-		t.Log(s.SubnetDivisions())
-		t.Log(s.SubnetDivisions())
+		t.Log(s.Divisions)
+		bytes, err := s.YAML()
+		is.NoErr(err)
+		t.Log(string(bytes))
 	}
 }
 
