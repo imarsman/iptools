@@ -7,6 +7,11 @@ import (
 	"inet.af/netaddr"
 )
 
+const (
+	octets   = 4
+	octetMax = 255
+)
+
 // Subnet an IP subnet
 // https://www.calculator.net/ip-Subnet-calculator.html?cclass=any&csubnet=16&cip=10.0.0.0&ctype=ipv4&printit=0&x=43&y=21
 // https://www.calculator.net/ip-Subnet-calculator.html
@@ -119,15 +124,15 @@ func (s *Subnet) SubnetDivisions() (r []netaddr.IPRange) {
 		ipLast := allBytes
 		ipLast[classByte] = byte(ipLastNewByte)
 
-		if byteToUse < 4 {
-			for i := classByte + 1; i < 4; i++ {
+		if byteToUse < octets {
+			for i := classByte + 1; i < octets; i++ {
 				ipFirst[i] = 0
 			}
-			for i := classByte + 1; i < 4; i++ {
-				ipLast[i] = 255
+			for i := classByte + 1; i < octets; i++ {
+				ipLast[i] = octetMax
 			}
 		} else {
-			ipLast[3] = 255
+			ipLast[3] = octetMax
 		}
 
 		return netaddr.IPRangeFrom(netaddr.IPFrom4(ipFirst), netaddr.IPFrom4(ipLast))

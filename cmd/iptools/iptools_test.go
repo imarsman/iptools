@@ -64,7 +64,7 @@ func TestRange(t *testing.T) {
 func TestBits(t *testing.T) {
 	is := is.New(t)
 
-	prefixes := []string{"99.236.0.0/21", "223.255.255.0/24"}
+	prefixes := []string{"99.236.0.0/21", "223.255.89.0/24"}
 
 	for _, p := range prefixes {
 		pfx, err := netaddr.ParseIPPrefix(p)
