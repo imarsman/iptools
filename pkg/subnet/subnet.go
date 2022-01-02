@@ -103,16 +103,15 @@ func (s *Subnet) SubnetDivisions() (r []netaddr.IPRange) {
 
 	subnetCount := s.EqualSubnets()
 
-	// produce all subnet IP ranges
-	for subNetNo := 0; subNetNo < int(subnetCount-1); subNetNo++ {
+	getIPRange := func(number int) netaddr.IPRange {
 		classByte := s.ClassByte()
 		allBytes := s.Prefix.IP().As4()
 
 		byteToUse := s.Prefix.IP().As4()[classByte]
 		currentByte := byteToUse
 
-		ipFirstNewByte := uint(currentByte) + ((uint(subNetNo)) * uint(s.SubnetSize))
-		ipLastNewByte := uint(currentByte) + (uint(subNetNo+1) * uint(s.SubnetSize))
+		ipFirstNewByte := uint(currentByte) + ((uint(number)) * uint(s.SubnetSize))
+		ipLastNewByte := uint(currentByte) + (uint(number+1) * uint(s.SubnetSize))
 
 		ipFirst := allBytes
 		ipFirst[classByte] = byte(ipFirstNewByte)
@@ -127,10 +126,21 @@ func (s *Subnet) SubnetDivisions() (r []netaddr.IPRange) {
 			for i := classByte + 1; i < 4; i++ {
 				ipLast[i] = 255
 			}
+		} else {
+			ipLast[3] = 255
 		}
 
-		rNew := netaddr.IPRangeFrom(netaddr.IPFrom4(ipFirst), netaddr.IPFrom4(ipLast))
-		r = append(r, rNew)
+		return netaddr.IPRangeFrom(netaddr.IPFrom4(ipFirst), netaddr.IPFrom4(ipLast))
+	}
+
+	if subnetCount == 1 {
+		r = append(r, getIPRange(0))
+	} else {
+
+		// produce all subnet IP ranges
+		for subNetNo := 0; subNetNo < int(subnetCount-1); subNetNo++ {
+			r = append(r, getIPRange(subNetNo))
+		}
 	}
 	s.subnetDivisions = r
 
