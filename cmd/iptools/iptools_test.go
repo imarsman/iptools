@@ -35,11 +35,11 @@ func TestRange(t *testing.T) {
 	pfx, err := netaddr.ParseIPPrefix("192.168.0.1/16")
 	is.NoErr(err)
 
-	subnet, err := newSubnet(pfx)
+	subnet, err := NewSubnet(pfx)
 	is.NoErr(err)
-	subnet.prefix = pfx
+	subnet.Prefix = pfx
 
-	t.Log("hosts", subnet.hosts)
+	t.Log("hosts", subnet.Hosts)
 
 	t.Log("ip", pfx.IP())
 	t.Log("range", pfx.Range())
@@ -48,7 +48,9 @@ func TestRange(t *testing.T) {
 	t.Log("bitlen", pfx.IP().BitLen())
 	t.Log("mask", pfx.IPNet().Mask)
 	t.Log("single IP", pfx.IsSingleIP())
-	t.Log("hosts", subnet.hosts)
+	t.Log("hosts", subnet.Hosts)
+	t.Log("subnetsize", subnet.SubnetSize)
+	t.Log("equal subnets", subnet.EqualSubnets())
 
 	var b netaddr.IPSetBuilder
 	b.AddPrefix(pfx)
@@ -61,15 +63,23 @@ func TestRange(t *testing.T) {
 func TestBits(t *testing.T) {
 	is := is.New(t)
 
-	pfx, err := netaddr.ParseIPPrefix("192.168.0.1/21")
-	subnet, err := newSubnet(pfx)
+	pfx, err := netaddr.ParseIPPrefix("99.236.0.0/21")
+	subnet, err := NewSubnet(pfx)
 	is.NoErr(err)
 
 	t.Log("prefix", pfx.String())
-	t.Log("partial bits", subnet.partialBits())
-	t.Log("partial remainder bits", subnet.partialRemainderBits())
+	t.Log("active byte", subnet.ClassByte())
+	t.Log("ip range", pfx.Range())
+	t.Log("subnet usable ip range", UsableRange(subnet.Prefix.Range()))
+	t.Log("partial bits", subnet.ClassPartialBits())
+	t.Log("partial remainder bits", subnet.ClassHostBits())
 	t.Log("prefix bits", pfx.Bits())
-	t.Log("hosts", subnet.hosts)
+	t.Log("hosts", subnet.Hosts)
+	t.Log("subnetsize", subnet.SubnetSize)
+	t.Log("equal subnets", subnet.EqualSubnets())
+	t.Log("subnet 3")
+	t.Log(subnet.SubnetDivisions())
+	t.Log(subnet.SubnetDivisions())
 }
 
 func BenchmarkPathParts(b *testing.B) {
