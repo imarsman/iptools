@@ -32,30 +32,9 @@ release:
   # Header template for the release body.
   # Defaults to empty.
   header: |
-    ## slvmmask ({{ .Date }})
+    ## iptools ({{ .Date }})
 
-    slvmmask translates between a mask value and a JSON encoded version of the mask value
-
-    v0.1.6
-    Got rid of quotes around encoded CIDR address
-
-    v0.1.5
-    Added mask from range
-
-    v0.1.4
-    Added verbose flag
-
-    v0.1.3
-    Added func to decode as base64
-
-    v0.1.2
-    Decoding now working
-
-    v0.1.1
-    Cleanup and research on masks
-
-    v0.1.0
-    Working but it’s weird
+    iptools is a set of IP and network tools
 
   # Footer template for the release body.
   # Defaults to empty.
@@ -102,10 +81,10 @@ builds:
         -X main.GitExactTag={{.Tag}}
         -X main.Date={{.Date}}
 
-    id: slvmmask
+    id: iptools
     dir: .
-    main: ./cmd/slvmmask
-    binary: slvmmask
+    main: ./cmd/iptools
+    binary: iptools
     goos:
       - linux
       - darwin

@@ -1,4 +1,4 @@
-package main
+package tools
 
 import (
 	"encoding/base64"
@@ -71,11 +71,12 @@ func TestEncodeIP(t *testing.T) {
 	t.Log("ip key from resulting map", obj[`ip`])
 }
 
+// TestDecodeBytes test base64 decoding
 func TestDecodeBytes(t *testing.T) {
 	is := is.New(t)
 	encoded := `"///wAA=="`
 
-	cidr, err := DecodeMaskLen(encoded, true)
+	cidr, err := DecodeCIDRIP(encoded, true)
 	is.NoErr(err)
 
 	t.Logf("cidr %d\n", cidr)
@@ -92,5 +93,12 @@ func TestFromHex(t *testing.T) {
 	ipMask := net.IPMask(netAddrIP.IPAddr().IP.To4())
 	cidr, _ := ipMask.Size()
 	t.Log("cidr", cidr)
+}
 
+func TestPrefix(t *testing.T) {
+	is := is.New(t)
+	p, err := netaddr.ParseIPPrefix("250.250.250.250/26")
+	is.NoErr(err)
+	t.Logf("Mask IP %s", p.Masked())
+	t.Logf("bits %d", p.Bits())
 }
