@@ -1,0 +1,48 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  GREETING: "to list tasks: task -l"
+  APPNAME: iptools
+  targetbin: ~/bin
+  buildname: iptools
+  completionmsg: |
+
+    If this is the first time you are using iptools you need to add
+      complete -o nospace -C /[base path for binary]/slvmmask slvmmask
+
+    to the end of ~/.zshrc. Following this run 
+      source ~/.zshrc.
+tasks:
+  default:
+    cmds:
+      - echo "{{.GREETING}}"
+    silent: true
+  clean:
+    dir: ./cmd/{{.APPNAME}}
+    desc: clear out build
+    cmds:
+      - rm -f ./{{.APPNAME}}
+  build:
+    dir: .
+    cmds:
+      - goreleaser release --snapshot --rm-dist
+  install:
+    dir: ./dist/{{.buildname}}_darwin_amd64/
+    desc: "install in local bin directory"
+    cmds:
+      - task: build
+      - cmd: rm {{.targetbin}}/{{.buildname}}
+        ignore_error: true
+      - cp ./{{.buildname}} {{.targetbin}}
+      - cmd: echo "{{.completionmsg}}"
+        silent: true
+  release:
+    dir: .
+    desc: release to github using goreleaser
+    cmds:
+      - goreleaser release --rm-dist
+  clean-cache:
+    cmds:
+      - go clean -testcache

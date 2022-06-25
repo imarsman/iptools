@@ -11,6 +11,10 @@ require (
 
 require (
 	github.com/alexflint/go-scalar v1.0.0 // indirect
+	github.com/hashicorp/errwrap v1.0.0 // indirect
+	github.com/hashicorp/go-multierror v1.0.0 // indirect
+	github.com/posener/complete/v2 v2.0.1-alpha.13 // indirect
+	github.com/posener/script v1.1.5 // indirect
 	go4.org/intern v0.0.0-20211027215823-ae77deb06f29 // indirect
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20211027215541-db492cf91b37 // indirect
 )
