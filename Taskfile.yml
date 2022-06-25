@@ -10,7 +10,7 @@ vars:
   completionmsg: |
 
     If this is the first time you are using iptools you need to add
-      complete -o nospace -C /[base path for binary]/slvmmask slvmmask
+      complete -o nospace -C /[base path for binary]/iptools iptools
 
     to the end of ~/.zshrc. Following this run 
       source ~/.zshrc.
@@ -29,7 +29,7 @@ tasks:
     cmds:
       - goreleaser release --snapshot --rm-dist
   install:
-    dir: ./dist/{{.buildname}}_darwin_amd64/
+    dir: ./dist/{{.buildname}}_{{OS}}_{{ARCH}}/
     desc: "install in local bin directory"
     cmds:
       - task: build
