@@ -38,7 +38,7 @@ func TestRange(t *testing.T) {
 	// pfx, err := netaddr.ParseIPPrefix("192.168.0.1/16")
 	// is.NoErr(err)
 
-	s, err := subnet.NewSubnet("192.168.0.1/16")
+	s, err := subnet.NewSubnet("192.168.0.1/16", true)
 	is.NoErr(err)
 
 	t.Log("hosts", s.DivisionIncrement)
@@ -55,7 +55,7 @@ func TestRange(t *testing.T) {
 	t.Log("equal subnets", s.TotalDivisions)
 
 	var b netaddr.IPSetBuilder
-	b.AddPrefix(s.Prefix)
+	// b.AddPrefix(s.Prefix)
 	ipSet, _ := b.IPSet()
 	t.Log(ipSet.Ranges())
 
@@ -69,17 +69,17 @@ func TestBits(t *testing.T) {
 
 	for _, p := range prefixes {
 		// pfx, err := netaddr.ParseIPPrefix(p)
-		s, err := subnet.NewSubnet(p)
+		s, err := subnet.NewSubnet(p, true)
 		is.NoErr(err)
 		t.Log("valid", s.Prefix.Valid())
 
 		t.Log("hosts", s.DivisionIncrement)
 		t.Log("prefix", s.Prefix.String())
-		t.Log("active byte", s.ClassByte())
+		t.Log("active byte", s.ClassBits())
 		t.Log("ip range", s.Prefix.Range())
-		t.Log("subnet usable ip range", subnet.UsableRange(s.Prefix.Range()))
+		// t.Log("subnet usable ip range", subnet.UsableRange(s.Prefix.Range()))
 		t.Log("partial bits", s.ClassPartialBits())
-		t.Log("host bits", s.ClassHostBits())
+		// t.Log("host bits", s.ClassHots())
 		t.Log("prefix bits", s.Prefix.Bits())
 		t.Log("hosts", s.DivisionIncrement)
 		t.Log("subnet hosts", s.SubnetHosts)
@@ -99,7 +99,7 @@ func read_int32(data []byte) (ret int32) {
 func TestShift(t *testing.T) {
 	b := []byte{1}
 	t.Log("bytes", b)
-	b = subnet.ShiftLeft(b, 7)
+	// b = subnet.ShiftLeft(b, 7)
 	t.Log("bytes", b)
 	t.Log(0 << 0)
 	t.Log(1 << 8)

@@ -3,6 +3,7 @@ package tools
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"net"
 	"testing"
 
@@ -74,9 +75,9 @@ func TestEncodeIP(t *testing.T) {
 // TestDecodeBytes test base64 decoding
 func TestDecodeBytes(t *testing.T) {
 	is := is.New(t)
-	encoded := `"///wAA=="`
+	encoded := `///wAA==`
 
-	cidr, err := DecodeCIDRIP(encoded, true)
+	cidr, err := DecodeMaskBase64(encoded, true)
 	is.NoErr(err)
 
 	t.Logf("cidr %d\n", cidr)
@@ -101,4 +102,52 @@ func TestPrefix(t *testing.T) {
 	is.NoErr(err)
 	t.Logf("Mask IP %s", p.Masked())
 	t.Logf("bits %d", p.Bits())
+}
+
+func TestIPPrefix(t *testing.T) {
+	is := is.New(t)
+	ip, err := netaddr.ParseIP("255.255.255.255")
+	is.NoErr(err)
+	ipPrefix := netaddr.IPPrefixFrom(ip, 23)
+	t.Log("range", ipPrefix.Range())
+	// ip2, err := netaddr.ParseIP("255.255.255.255")
+	// t.Log("start", ipPrefix.Masked())
+
+	// https://www.calculator.net/ip-subnet-calculator.html?cclass=any&csubnet=23&cip=255.255.254.0&ctype=ipv4&printit=0&x=79&y=18
+	// 2^9 = 512
+	// http://www.sput.nl/internet/netmask-table.html
+	// https://www.ittsystems.com/introduction-to-subnetting/#wbounce-modal
+	// 2^required subnets size - reference block size
+	// so /23 is 2^24-23=1
+	for i := 0; i < 8; i += 2 {
+		ip2, err := netaddr.ParseIP("255.255.255.255")
+		is.NoErr(err)
+		testIP, err := ip2.Prefix(23 + uint8(i))
+		fmt.Println("next", testIP.Masked())
+	}
+
+	// // ipPrefix2 := netaddr.IPPrefixFrom(ip2, 24)
+	// testIP, err := ipPrefix2.IP().Prefix(26)
+	// is.NoErr(err)
+	// t.Log("added", testIP.Masked())
+	// t.Log("range", testIP.Range())
+	// t.Log(ipPrefix2.Masked())
+
+	t.Log(ipPrefix.Masked())
+	t.Log(ipPrefix.IsValid())
+
+	var b netaddr.IPSetBuilder
+	b.AddPrefix(ipPrefix)
+
+	s, _ := b.IPSet()
+
+	fmt.Println("Ranges:")
+	for _, r := range s.Ranges() {
+		fmt.Printf("  %s - %s\n", r.From(), r.To())
+	}
+
+	fmt.Println("Prefixes:")
+	for _, p := range s.Prefixes() {
+		fmt.Printf("  %s\n", p)
+	}
 }
