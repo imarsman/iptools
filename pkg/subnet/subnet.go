@@ -295,7 +295,6 @@ func (s *IPV4Subnet) Range() (r netaddr.IPRange, err error) {
 }
 
 func (s *IPV4Subnet) networkRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
-	// errMsg := "empty ip list in subnet range"
 	// Can't subdivide to smaller prefixed subnet
 	if childSubnet.Prefix.Bits() < s.Prefix.Bits() {
 		err = fmt.Errorf("Subnet to split to has more bits %d than parent %d", s.Prefix.Bits(), childSubnet.Prefix.Bits())
@@ -343,6 +342,7 @@ func (s *IPV4Subnet) String() string {
 	return s.Prefix.String()
 }
 
+// https://gist.github.com/ammario/649d4c0da650162efd404af23e25b86b
 func int2ip(ipInt uint32) (netaddr.IP, bool) {
 	ip := make(net.IP, 4)
 	binary.BigEndian.PutUint32(ip, ipInt)
@@ -364,61 +364,60 @@ func addToIP(startIP netaddr.IP, add int32) (newIP netaddr.IP, err error) {
 	return newIP, nil
 }
 
-// Subdivide subnet into child network sized networks
-func (s *IPV4Subnet) networks(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
-	// errMsg := "empty ip list in subnet range"
-	// Can't subdivide to smaller prefixed subnet
-	if childSubnet.Prefix.Bits() < s.Prefix.Bits() {
-		err = fmt.Errorf("Subnet to split to has more bits %d than parent %d", s.Prefix.Bits(), childSubnet.Prefix.Bits())
-		return
-	}
+// // Subdivide subnet into child network sized networks
+// func (s *IPV4Subnet) networks(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
+// 	// Can't subdivide to smaller prefixed subnet
+// 	if childSubnet.Prefix.Bits() < s.Prefix.Bits() {
+// 		err = fmt.Errorf("Subnet to split to has more bits %d than parent %d", s.Prefix.Bits(), childSubnet.Prefix.Bits())
+// 		return
+// 	}
 
-	if s.Prefix.Bits() == 1 {
-		err = fmt.Errorf("Can't subdivide")
-		return
-	}
-	ip := s.Prefix.IP()
-	ipStart := ip
+// 	if s.Prefix.Bits() == 1 {
+// 		err = fmt.Errorf("Can't subdivide")
+// 		return
+// 	}
+// 	ip := s.Prefix.IP()
+// 	ipStart := ip
 
-	bytes := s.Prefix.IP().As4()
-	// slice := []byte{}
-	slice := bytes[:]
-	ipValue := binary.BigEndian.Uint32(slice)
-	ipValue += uint32(childSubnet.Hosts())
+// 	bytes := s.Prefix.IP().As4()
+// 	// slice := []byte{}
+// 	slice := bytes[:]
+// 	ipValue := binary.BigEndian.Uint32(slice)
+// 	ipValue += uint32(childSubnet.Hosts())
 
-	ratio := int(math.Exp2(float64(childSubnet.Prefix.Bits() - s.Prefix.Bits())))
-	for j := 0; j < int(s.NetworkCount()); j++ {
-		for r := 0; r < ratio; r++ {
-			ip, err = addToIP(ip, int32(childSubnet.Hosts()))
-			if err != nil {
-				return
-			}
-			// for j := 0; j < int(childSubnet.Hosts()); j++ {
-			// 	ip = ip.Next()
-			// 	if (ip == netaddr.IP{}) {
-			// 		err = errors.New(errMsg)
-			// 		subnets = []*IPV4Subnet{}
-			// 		return
-			// 	}
-			// }
-			subnet, err := newSubnet(ipStart.String(), childSubnet.Prefix.Bits(), false)
-			if err != nil {
-				return []*IPV4Subnet{}, err
-			}
-			ipStart = ip
-			subnets = append(subnets, subnet)
-		}
-	}
+// 	ratio := int(math.Exp2(float64(childSubnet.Prefix.Bits() - s.Prefix.Bits())))
+// 	for j := 0; j < int(s.NetworkCount()); j++ {
+// 		for r := 0; r < ratio; r++ {
+// 			ip, err = addToIP(ip, int32(childSubnet.Hosts()))
+// 			if err != nil {
+// 				return
+// 			}
+// 			// for j := 0; j < int(childSubnet.Hosts()); j++ {
+// 			// 	ip = ip.Next()
+// 			// 	if (ip == netaddr.IP{}) {
+// 			// 		err = errors.New(errMsg)
+// 			// 		subnets = []*IPV4Subnet{}
+// 			// 		return
+// 			// 	}
+// 			// }
+// 			subnet, err := newSubnet(ipStart.String(), childSubnet.Prefix.Bits(), false)
+// 			if err != nil {
+// 				return []*IPV4Subnet{}, err
+// 			}
+// 			ipStart = ip
+// 			subnets = append(subnets, subnet)
+// 		}
+// 	}
 
-	return
-}
+// 	return
+// }
 
 // NetworksInSubnets get networks split into child subnet sized networks
-func (s *IPV4Subnet) NetworksInSubnets(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
-	return s.networks(childSubnet)
-}
+// func (s *IPV4Subnet) NetworksInSubnets(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
+// 	return s.networks(childSubnet)
+// }
 
 // Networks get all networks for subnet in subnet sized networks
-func (s *IPV4Subnet) Networks() (subnets []*IPV4Subnet, err error) {
-	return s.networks(s)
-}
+// func (s *IPV4Subnet) Networks() (subnets []*IPV4Subnet, err error) {
+// 	return s.networks(s)
+// }
