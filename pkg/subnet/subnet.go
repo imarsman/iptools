@@ -154,7 +154,6 @@ func (s *IPV4Subnet) Hosts() int64 {
 	if s.Prefix.Bits()%8 == 0 {
 		return int64((math.Exp2(float64(32) - float64(s.Prefix.Bits()))) / float64(s.NetworkCount()))
 	}
-	// return int64((math.Exp2(float64(32 - s.Prefix.Bits()))) / float64(s.NetworkCount()))
 	return int64((math.Exp2(float64(32 - s.Prefix.Bits()))))
 }
 
@@ -310,27 +309,15 @@ func (s *IPV4Subnet) String() string {
 	return s.Prefix.String()
 }
 
-// func (s *IPV4Subnet) IncrementPerNetwork() (total int64) {
-// 	if s.Hosts() == 0 {
-// 		return 0
-// 	}
-// 	//int64((math.Exp2(float64(32 - s.Prefix.Bits())))
-// 	total = int64(math.Log(float64(s.Hosts())) / math.Log(2)) // ln(16,384)/ln(2)
-// 	return total
-// 	// return int64((math.Exp2(float64(32 - s.Prefix.Bits()))))
-// }
-
 // Networks get all networks for subnet
 func (s *IPV4Subnet) Networks() (subnets []*IPV4Subnet, err error) {
 	if s.Prefix.Bits() == 1 {
 		err = fmt.Errorf("Can't subdivide")
 		return
 	}
-	// r = []netaddr.IPRange{}
 	ip := s.Prefix.IP()
 	ipStart := ip
 
-	fmt.Println("network count", s.NetworkCount(), s)
 	for j := 0; j < int(s.NetworkCount()); j++ {
 		for j := 0; j < int(s.Hosts()); j++ {
 			ip = ip.Next()
@@ -340,9 +327,7 @@ func (s *IPV4Subnet) Networks() (subnets []*IPV4Subnet, err error) {
 				return
 			}
 		}
-		// fmt.Println(ipStart)
-		subnet, err := newSubnet(ipStart.String(), s.Prefix.Bits()+1, false)
-		// fmt.Println(subnet)
+		subnet, err := newSubnet(ipStart.String(), s.Prefix.Bits(), false)
 		if err != nil {
 			return []*IPV4Subnet{}, err
 		}
