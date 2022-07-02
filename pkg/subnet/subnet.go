@@ -21,6 +21,7 @@ const (
 // https://www.calculator.net/ip-IPV4Subnet-calculator.html?cclass=any&csubnet=16&cip=10.0.0.0&ctype=ipv4&printit=0&x=43&y=21
 // https://www.calculator.net/ip-IPV4Subnet-calculator.html
 type IPV4Subnet struct {
+	Name   string
 	Prefix *netaddr.IPPrefix `json:"prefix" yaml:"prefix"`
 }
 
@@ -309,6 +310,7 @@ func (s *IPV4Subnet) String() string {
 	return s.Prefix.String()
 }
 
+// Subdivide subnet into child network sized networks
 func (s *IPV4Subnet) networks(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
 	fmt.Println(s.Prefix.Bits(), childSubnet.Prefix.Bits())
 	if s.Prefix.Bits() > childSubnet.Prefix.Bits() {
@@ -347,37 +349,12 @@ func (s *IPV4Subnet) networks(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, e
 	return
 }
 
-// NetworksInSubnets get networks split into child subnet sizes
+// NetworksInSubnets get networks split into child subnet sized networks
 func (s *IPV4Subnet) NetworksInSubnets(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
 	return s.networks(childSubnet)
 }
 
-// Networks get all networks for subnet
+// Networks get all networks for subnet in subnet sized networks
 func (s *IPV4Subnet) Networks() (subnets []*IPV4Subnet, err error) {
 	return s.networks(s)
-	// if s.Prefix.Bits() == 1 {
-	// 	err = fmt.Errorf("Can't subdivide")
-	// 	return
-	// }
-	// ip := s.Prefix.IP()
-	// ipStart := ip
-
-	// for j := 0; j < int(s.NetworkCount()); j++ {
-	// 	for j := 0; j < int(s.Hosts()); j++ {
-	// 		ip = ip.Next()
-	// 		if (ip == netaddr.IP{}) {
-	// 			err = errors.New("empty ip list in subnet range")
-	// 			subnets = []*IPV4Subnet{}
-	// 			return
-	// 		}
-	// 	}
-	// 	subnet, err := newSubnet(ipStart.String(), s.Prefix.Bits(), false)
-	// 	if err != nil {
-	// 		return []*IPV4Subnet{}, err
-	// 	}
-	// 	ipStart = ip
-	// 	subnets = append(subnets, subnet)
-	// }
-
-	// return
 }
