@@ -1,10 +1,12 @@
 package subnet
 
 import (
+	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
+	"net"
 	"strconv"
 	"strings"
 
@@ -337,9 +339,29 @@ func (s *IPV4Subnet) String() string {
 	return s.Prefix.String()
 }
 
+func int2ip(ipInt uint64) (netaddr.IP, bool) {
+	ip := make(net.IP, 4)
+	binary.BigEndian.PutUint64(ip, ipInt)
+	addr, ok := netaddr.FromStdIP(ip)
+	return addr, ok
+}
+
+func addToIP(startIP netaddr.IP, add int32) (newIP netaddr.IP, err error) {
+	bytes := startIP.As4()
+	slice := bytes[:]
+	ipValue := binary.BigEndian.Uint64(slice)
+	ipValue += uint64(add)
+	newIP, ok := int2ip(ipValue)
+	if !ok {
+		err = fmt.Errorf("problem after adding %d to IP %v", add, startIP)
+		return
+	}
+	return newIP, nil
+}
+
 // Subdivide subnet into child network sized networks
 func (s *IPV4Subnet) networks(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
-	errMsg := "empty ip list in subnet range"
+	// errMsg := "empty ip list in subnet range"
 	// Can't subdivide to smaller prefixed subnet
 	if childSubnet.Prefix.Bits() < s.Prefix.Bits() {
 		err = fmt.Errorf("Subnet to split to has more bits %d than parent %d", s.Prefix.Bits(), childSubnet.Prefix.Bits())
@@ -353,18 +375,32 @@ func (s *IPV4Subnet) networks(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, e
 	ip := s.Prefix.IP()
 	ipStart := ip
 
+	bytes := s.Prefix.IP().As4()
+	// slice := []byte{}
+	slice := bytes[:]
+	ipValue := binary.BigEndian.Uint32(slice)
+	ipValue += uint32(childSubnet.Hosts())
+	// start := time.Now()
+	// fmt.Println("added", int2ip(ipValue))
+	// fmt.Println(time.Since(start))
+
+	// ipTest += childSubnet.Hosts()
 	// ratio := int(math.Exp2(float64(s.NetworkCount()) - float64(childSubnet.NetworkCount())))
 	ratio := int(math.Exp2(float64(childSubnet.Prefix.Bits() - s.Prefix.Bits())))
 	for j := 0; j < int(s.NetworkCount()); j++ {
 		for r := 0; r < ratio; r++ {
-			for j := 0; j < int(childSubnet.Hosts()); j++ {
-				ip = ip.Next()
-				if (ip == netaddr.IP{}) {
-					err = errors.New(errMsg)
-					subnets = []*IPV4Subnet{}
-					return
-				}
+			ip, err = addToIP(ip, int32(childSubnet.Hosts()))
+			if err != nil {
+				return
 			}
+			// for j := 0; j < int(childSubnet.Hosts()); j++ {
+			// 	ip = ip.Next()
+			// 	if (ip == netaddr.IP{}) {
+			// 		err = errors.New(errMsg)
+			// 		subnets = []*IPV4Subnet{}
+			// 		return
+			// 	}
+			// }
 			subnet, err := newSubnet(ipStart.String(), childSubnet.Prefix.Bits(), false)
 			if err != nil {
 				return []*IPV4Subnet{}, err

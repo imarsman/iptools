@@ -3,6 +3,7 @@ package subnet
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/matryer/is"
 	"inet.af/netaddr"
@@ -80,6 +81,7 @@ func TestChildSubnets(t *testing.T) {
 	for _, item := range parentChildSet {
 		prefix := fmt.Sprintf("%s/%d", item.subnetIP, item.parent)
 		subnet, err := NewFromPrefix(prefix)
+
 		prefix = fmt.Sprintf("%s/%d", item.subnetIP, item.child)
 		childSubnet, err := NewFromPrefix(prefix)
 		is.NoErr(err)
@@ -88,8 +90,10 @@ func TestChildSubnets(t *testing.T) {
 		t.Log("hosts per network", subnet.Hosts())
 		t.Log("child subnet hosts per network", childSubnet.Hosts())
 		t.Log("network count", subnet.NetworkCount())
+		start := time.Now()
 		networks, err := subnet.NetworksInSubnets(childSubnet)
 		is.NoErr(err)
+		t.Log("run took", time.Since(start))
 		t.Log("total networks", len(networks))
 		t.Log("networks", networks)
 		t.Log()
