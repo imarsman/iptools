@@ -38,10 +38,10 @@ func TestRange(t *testing.T) {
 	// pfx, err := netaddr.ParseIPPrefix("192.168.0.1/16")
 	// is.NoErr(err)
 
-	s, err := subnet.NewSubnet("192.168.0.1/16", true)
+	s, err := subnet.NewDefaultFromPrefix("192.168.0.1/16")
 	is.NoErr(err)
 
-	t.Log("hosts", s.DivisionIncrement)
+	// t.Log("hosts", s.DivisionIncrement)
 
 	t.Log("ip", s.Prefix.IP())
 	t.Log("range", s.Prefix.Range())
@@ -50,9 +50,9 @@ func TestRange(t *testing.T) {
 	t.Log("bitlen", s.Prefix.IP().BitLen())
 	t.Log("mask", s.Prefix.IPNet().Mask)
 	t.Log("single IP", s.Prefix.IsSingleIP())
-	t.Log("hosts", s.DivisionIncrement)
-	t.Log("subnetsize", s.SubnetHosts)
-	t.Log("equal subnets", s.TotalDivisions)
+	// t.Log("hosts", s.DivisionIncrement)
+	// t.Log("subnetsize", s.SubnetHosts)
+	// t.Log("equal subnets", s.TotalDivisions)
 
 	var b netaddr.IPSetBuilder
 	// b.AddPrefix(s.Prefix)
@@ -69,28 +69,28 @@ func TestBits(t *testing.T) {
 
 	for _, p := range prefixes {
 		// pfx, err := netaddr.ParseIPPrefix(p)
-		s, err := subnet.NewSubnet(p, true)
+		s, err := subnet.NewDefaultFromPrefix(p)
 		is.NoErr(err)
 		t.Log("valid", s.Prefix.Valid())
 
-		t.Log("hosts", s.DivisionIncrement)
+		// t.Log("hosts", s.DivisionIncrement)
 		t.Log("prefix", s.Prefix.String())
-		t.Log("active byte", s.ClassBits())
+		t.Log("active byte", s.PrefixBits())
 		t.Log("ip range", s.Prefix.Range())
 		// t.Log("subnet usable ip range", subnet.UsableRange(s.Prefix.Range()))
-		t.Log("partial bits", s.ClassPartialBits())
+		t.Log("partial bits", s.ClassNetworkPrefixBits())
 		// t.Log("host bits", s.ClassHots())
 		t.Log("prefix bits", s.Prefix.Bits())
-		t.Log("hosts", s.DivisionIncrement)
-		t.Log("subnet hosts", s.SubnetHosts)
-		t.Log("division increment", s.DivisionIncrement)
-		t.Log("total divisions", s.TotalDivisions)
-		t.Log("division hosts", s.DivisionIncrement)
-		t.Log(s.Divisions)
+		// t.Log("hosts", s.DivisionIncrement)
+		// t.Log("subnet hosts", s.SubnetHosts)
+		// t.Log("division increment", s.DivisionIncrement)
+		// t.Log("total divisions", s.TotalDivisions)
+		// t.Log("division hosts", s.DivisionIncrement)
+		// t.Log(s.Divisions)
 	}
 }
 
-func read_int32(data []byte) (ret int32) {
+func readInt32(data []byte) (ret int32) {
 	buf := bytes.NewBuffer(data)
 	binary.Read(buf, binary.LittleEndian, &ret)
 	return

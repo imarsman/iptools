@@ -37,9 +37,11 @@ func NewFromMask(mask uint8) (subnet *IPV4Subnet, err error) {
 
 // NewDefaultFromPrefix new default (255.255.255.255) from prefix
 func NewDefaultFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
+	errMsg := "invalid prefix"
+
 	parts := strings.Split(prefix, "/")
 	if len(parts) != 2 {
-		err = errors.New("invalid prefix")
+		err = errors.New(errMsg)
 	}
 	mask, err := strconv.Atoi(parts[1])
 	if err != nil {
@@ -48,11 +50,18 @@ func NewDefaultFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
 	return newSubnet(parts[0], uint8(mask), true)
 }
 
+// NewFromIPAndMask new using incoming prefix ip and mask
+func NewFromIPAndMask(ip string, mask uint8) (subnet *IPV4Subnet, err error) {
+	return newSubnet(ip, uint8(mask), true)
+}
+
 // NewFromPrefix new using incoming prefix
 func NewFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
+	errMsg := "invalid prefix"
+
 	parts := strings.Split(prefix, "/")
 	if len(parts) != 2 {
-		err = errors.New("invalid prefix")
+		err = errors.New(errMsg)
 	}
 	mask, err := strconv.Atoi(parts[1])
 	if err != nil {
@@ -63,6 +72,8 @@ func NewFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
 
 // newSubnet new subnet with prefix string, masked and boolean flag
 func newSubnet(address string, mask uint8, usemasked bool) (subnet *IPV4Subnet, err error) {
+	errMsg := "invalid prefix"
+
 	subnet = new(IPV4Subnet)
 
 	var pfx netaddr.IPPrefix
@@ -84,7 +95,7 @@ func newSubnet(address string, mask uint8, usemasked bool) (subnet *IPV4Subnet, 
 	}
 
 	if !pfx.IsValid() {
-		return nil, errors.New("invalid prefix")
+		return nil, errors.New(errMsg)
 	}
 
 	if pfx.IP().Is6() {
@@ -205,12 +216,6 @@ func (s *IPV4Subnet) maxBitsForClass() uint8 {
 	return 32
 }
 
-// BlockSize get size of blocks
-// func (s *Subnet) BlockSize() uint8 {
-// 	// number of subnets is number of bits past block border
-// 	return uint8(math.Exp2(float64(s.maxBitsForClass() - s.Prefix.Bits())))
-// }
-
 // Class get network class, a, b, or c
 func (s *IPV4Subnet) Class() (class rune) {
 	switch s.maxBitsForClass() {
@@ -235,12 +240,13 @@ func (s *IPV4Subnet) NetworkCount() int64 {
 
 // UsableIPs get usable ips for subnet
 func (s *IPV4Subnet) UsableIPs() (ips []netaddr.IP, err error) {
+	errMsg := "empty ip list for subnet"
 	ips, err = s.IPs()
 	if err != nil {
 		return
 	}
 	if len(ips) == 0 {
-		err = errors.New("empty ip list for subnet")
+		err = errors.New(errMsg)
 		ips = []netaddr.IP{}
 		return
 	}
@@ -251,13 +257,14 @@ func (s *IPV4Subnet) UsableIPs() (ips []netaddr.IP, err error) {
 
 // IPs get ips for subnet
 func (s *IPV4Subnet) IPs() (ips []netaddr.IP, err error) {
+	errMsg := "empty ip list for subnet"
 	ip := s.Prefix.IP()
 	ips = append(ips, ip)
 
 	for j := 0; j < int(s.Hosts()); j++ {
 		ip = ip.Next()
 		if (ip == netaddr.IP{}) {
-			err = errors.New("empty ip list for subnet")
+			err = errors.New(errMsg)
 			ips = []netaddr.IP{}
 			return
 		}
@@ -269,12 +276,13 @@ func (s *IPV4Subnet) IPs() (ips []netaddr.IP, err error) {
 
 // Range get subnet range
 func (s *IPV4Subnet) Range() (r netaddr.IPRange, err error) {
+	errMsg := "empty ip list in subnet range"
 	ip := s.Prefix.IP()
 	startIP := ip
 	for j := 0; j < int(s.Hosts()); j++ {
 		ip = ip.Next()
 		if (ip == netaddr.IP{}) {
-			err = errors.New("empty ip list in subnet range")
+			err = errors.New(errMsg)
 			r = netaddr.IPRange{}
 			return
 		}
@@ -285,6 +293,7 @@ func (s *IPV4Subnet) Range() (r netaddr.IPRange, err error) {
 }
 
 func (s *IPV4Subnet) networkRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
+	errMsg := "empty ip list in subnet range"
 	// Can't subdivide to smaller prefixed subnet
 	if childSubnet.Prefix.Bits() < s.Prefix.Bits() {
 		err = fmt.Errorf("Subnet to split to has more bits %d than parent %d", s.Prefix.Bits(), childSubnet.Prefix.Bits())
@@ -300,7 +309,7 @@ func (s *IPV4Subnet) networkRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IP
 			for j := 0; j < int(childSubnet.Hosts()); j++ {
 				ip = ip.Next()
 				if (ip == netaddr.IP{}) {
-					err = errors.New("empty ip list in subnet range")
+					err = errors.New(errMsg)
 					ranges = []netaddr.IPRange{}
 					return
 				}
@@ -313,21 +322,24 @@ func (s *IPV4Subnet) networkRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IP
 	return
 }
 
-func (s *IPV4Subnet) NetworkRangesInSubnets(childSubnet *IPV4Subnet) (r []netaddr.IPRange, err error) {
+// NetworkRangesInSubnets set of ranges in the context of subnets of a specified size
+func (s *IPV4Subnet) NetworkRangesInSubnets(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
 	return s.networkRanges(s)
 }
 
 // NetworkRanges the set of equally sized subnet blocks for subnet
-func (s *IPV4Subnet) NetworkRanges() (r []netaddr.IPRange, err error) {
+func (s *IPV4Subnet) NetworkRanges() (ranges []netaddr.IPRange, err error) {
 	return s.networkRanges(s)
 }
 
+// String get string representing subnet (cidr notation)
 func (s *IPV4Subnet) String() string {
 	return s.Prefix.String()
 }
 
 // Subdivide subnet into child network sized networks
 func (s *IPV4Subnet) networks(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
+	errMsg := "empty ip list in subnet range"
 	// Can't subdivide to smaller prefixed subnet
 	if childSubnet.Prefix.Bits() < s.Prefix.Bits() {
 		err = fmt.Errorf("Subnet to split to has more bits %d than parent %d", s.Prefix.Bits(), childSubnet.Prefix.Bits())
@@ -348,7 +360,7 @@ func (s *IPV4Subnet) networks(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, e
 			for j := 0; j < int(childSubnet.Hosts()); j++ {
 				ip = ip.Next()
 				if (ip == netaddr.IP{}) {
-					err = errors.New("empty ip list in subnet range")
+					err = errors.New(errMsg)
 					subnets = []*IPV4Subnet{}
 					return
 				}
