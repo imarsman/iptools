@@ -1,7 +1,6 @@
 package subnet
 
 import (
-	"math"
 	"testing"
 
 	"github.com/matryer/is"
@@ -21,13 +20,12 @@ func TestNewSubnet(t *testing.T) {
 		// t.Log("block size", s.BlockSize())
 		t.Log("networks", s.NetworkCount())
 		// hosts per network
-		t.Log("count", float64(s.PrefixBits()), int64((math.Exp2(float64(32 - s.Prefix.Bits())))))
+		// t.Log("count", float64(s.PrefixBits()), int64((math.Exp2(float64(32 - s.Prefix.Bits())))))
 		t.Log("hosts per network", s.Hosts())
 		t.Log("usable hosts per network", s.UsableHosts())
-		t.Log("total per subnet", s.Hosts()*s.NetworkCount())
+		t.Log("total hosts per subnet", s.Hosts()*s.NetworkCount())
 		t.Log("class network prefix bits", s.ClassNetworkPrefixBits())
 		t.Log("class host identifier bits", s.ClassHostItentifierBits())
-		t.Log("increment per network", s.IncrementPerNetwork())
 		t.Log()
 	}
 }
@@ -42,6 +40,18 @@ func TestNetworks(t *testing.T) {
 	networks, err := s.Networks()
 	is.NoErr(err)
 	t.Log(networks)
+}
+
+func TestDifferingSubnets(t *testing.T) {
+	is := is.New(t)
+	s, err := NewFromPrefix("10.0.0.0/23")
+	networks, err := s.Networks()
+	is.NoErr(err)
+	t.Log(networks)
+	s, err = NewFromPrefix("10.0.0.0/22")
+	networks, err = s.Networks()
+	t.Log(networks)
+	is.NoErr(err)
 }
 
 // go test -bench=. -benchmem

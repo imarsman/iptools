@@ -310,13 +310,15 @@ func (s *IPV4Subnet) String() string {
 	return s.Prefix.String()
 }
 
-func (s *IPV4Subnet) IncrementPerNetwork() (total int64) {
-	if s.Hosts() == 0 {
-		return 0
-	}
-	total = int64(math.Log(float64(s.Hosts())) / math.Log(2)) // ln(16,384)/ln(2)
-	return total
-}
+// func (s *IPV4Subnet) IncrementPerNetwork() (total int64) {
+// 	if s.Hosts() == 0 {
+// 		return 0
+// 	}
+// 	//int64((math.Exp2(float64(32 - s.Prefix.Bits())))
+// 	total = int64(math.Log(float64(s.Hosts())) / math.Log(2)) // ln(16,384)/ln(2)
+// 	return total
+// 	// return int64((math.Exp2(float64(32 - s.Prefix.Bits()))))
+// }
 
 // Networks get all networks for subnet
 func (s *IPV4Subnet) Networks() (subnets []*IPV4Subnet, err error) {
@@ -328,6 +330,7 @@ func (s *IPV4Subnet) Networks() (subnets []*IPV4Subnet, err error) {
 	ip := s.Prefix.IP()
 	ipStart := ip
 
+	fmt.Println("network count", s.NetworkCount(), s)
 	for j := 0; j < int(s.NetworkCount()); j++ {
 		for j := 0; j < int(s.Hosts()); j++ {
 			ip = ip.Next()
@@ -338,7 +341,7 @@ func (s *IPV4Subnet) Networks() (subnets []*IPV4Subnet, err error) {
 			}
 		}
 		// fmt.Println(ipStart)
-		subnet, err := newSubnet(ipStart.String(), s.Prefix.Bits()-1, false)
+		subnet, err := newSubnet(ipStart.String(), s.Prefix.Bits()+1, false)
 		// fmt.Println(subnet)
 		if err != nil {
 			return []*IPV4Subnet{}, err
