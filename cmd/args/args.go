@@ -1,9 +1,10 @@
 package args
 
 type SubnetSplit struct {
-	IP     string
-	Mask   int
-	Pretty bool
+	IP      string
+	Mask    int
+	SubMask int
+	Pretty  bool
 }
 
 type Subnet struct {
