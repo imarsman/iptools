@@ -165,13 +165,13 @@ func (s *IPV4Subnet) ClassNetworkPrefixBits() uint8 {
 
 // TotalHosts total hosts in subnet
 func (s *IPV4Subnet) TotalHosts() int64 {
-	return s.Hosts() * s.NetworkCount()
+	return s.Hosts() * s.Networks()
 }
 
 // Hosts bits remaining in mask block
 func (s *IPV4Subnet) Hosts() int64 {
 	if s.Prefix.Bits()%8 == 0 {
-		return int64((math.Exp2(float64(32) - float64(s.Prefix.Bits()))) / float64(s.NetworkCount()))
+		return int64((math.Exp2(float64(32) - float64(s.Prefix.Bits()))) / float64(s.Networks()))
 	}
 	return int64((math.Exp2(float64(32 - s.Prefix.Bits()))))
 }
@@ -181,21 +181,6 @@ func (s *IPV4Subnet) UsableHosts() int64 {
 	if s.Hosts() < 2 {
 		return 0
 	}
-	return s.Hosts() - 2
-}
-
-// TotalUsableHosts total number of usable hosts
-func (s *IPV4Subnet) TotalUsableHosts() int64 {
-	return s.Hosts() - 2
-}
-
-// // Hosts bits remaining in mask block
-// func (s *Subnet) subBlockBits() int64 {
-// 	return int64(s.Prefix.Bits()) - int64(s.ClassPartialBits())
-// }
-
-// ClassUsableHosts how many usable hosts in subnet?
-func (s *IPV4Subnet) ClassUsableHosts() int64 {
 	return s.Hosts() - 2
 }
 
@@ -237,10 +222,9 @@ func (s *IPV4Subnet) Class() (class rune) {
 	}
 }
 
-// NetworkCount number of subnets
-func (s *IPV4Subnet) NetworkCount() int64 {
+// Networks number of subnets
+func (s *IPV4Subnet) Networks() int64 {
 	bits := s.Prefix.Bits() - s.startBitsForClass()
-	// bits := s.Prefix.Bits() - 8
 
 	return int64(math.Exp2(float64(bits)))
 }
@@ -303,8 +287,21 @@ func addToIP(startIP netaddr.IP, add int32) (newIP netaddr.IP, err error) {
 	return newIP, nil
 }
 
-// Range get subnet range
-func (s *IPV4Subnet) Range() (r netaddr.IPRange, err error) {
+// UsableIPRange get range of IPs usable for hosts
+func (s *IPV4Subnet) UsableIPRange() (r netaddr.IPRange, err error) {
+	ip := s.Prefix.IP()
+	startIP := ip
+	ip, err = addToIP(ip, int32(s.TotalHosts()))
+	if err != nil {
+		return
+	}
+	r = netaddr.IPRangeFrom(startIP.Next(), ip.Prior())
+
+	return
+}
+
+// IPRange get subnet range
+func (s *IPV4Subnet) IPRange() (r netaddr.IPRange, err error) {
 	ip := s.Prefix.IP()
 	startIP := ip
 	ip, err = addToIP(ip, int32(s.TotalHosts()))
@@ -327,7 +324,7 @@ func (s *IPV4Subnet) networkRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IP
 	ipStart := ip
 
 	ratio := int(math.Exp2(float64(childSubnet.Prefix.Bits() - s.Prefix.Bits())))
-	for j := 0; j < int(s.NetworkCount()); j++ {
+	for j := 0; j < int(s.Networks()); j++ {
 		for r := 0; r < ratio; r++ {
 			ip, err = addToIP(ip, int32(childSubnet.Hosts()))
 			if err != nil {
