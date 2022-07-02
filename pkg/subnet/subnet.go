@@ -339,18 +339,19 @@ func (s *IPV4Subnet) String() string {
 	return s.Prefix.String()
 }
 
-func int2ip(ipInt uint64) (netaddr.IP, bool) {
+func int2ip(ipInt uint32) (netaddr.IP, bool) {
 	ip := make(net.IP, 4)
-	binary.BigEndian.PutUint64(ip, ipInt)
+	binary.BigEndian.PutUint32(ip, ipInt)
 	addr, ok := netaddr.FromStdIP(ip)
+
 	return addr, ok
 }
 
 func addToIP(startIP netaddr.IP, add int32) (newIP netaddr.IP, err error) {
 	bytes := startIP.As4()
 	slice := bytes[:]
-	ipValue := binary.BigEndian.Uint64(slice)
-	ipValue += uint64(add)
+	ipValue := binary.BigEndian.Uint32(slice)
+	ipValue += uint32(add)
 	newIP, ok := int2ip(ipValue)
 	if !ok {
 		err = fmt.Errorf("problem after adding %d to IP %v", add, startIP)
