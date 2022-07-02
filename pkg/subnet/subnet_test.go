@@ -1,6 +1,7 @@
 package subnet
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/matryer/is"
@@ -61,20 +62,51 @@ func TestDifferingSubnets(t *testing.T) {
 	is.NoErr(err)
 }
 
+type parentChild struct {
+	subnetIP string
+	parent   int
+	child    int
+}
+
 func TestChildSubnets(t *testing.T) {
 	is := is.New(t)
-	s, err := NewFromPrefix("10.0.0.0/23")
-	is.NoErr(err)
-	childSubnet, err := NewFromPrefix("10.0.0.0/24")
-	t.Log("starting from", s)
-	t.Log("child subnet", childSubnet)
-	t.Log("hosts per network", s.Hosts())
-	t.Log("child subnet hosts per network", childSubnet.Hosts())
-	t.Log("network count", s.NetworkCount())
-	networks, err := s.NetworksInSubnets(childSubnet)
-	is.NoErr(err)
-	t.Log("total networks", len(networks))
-	t.Log(networks)
+
+	parentChildSet := []parentChild{}
+	subnetIP := "10.0.0.0"
+	parentChildSet = append(parentChildSet, parentChild{subnetIP: subnetIP, parent: 23, child: 23})
+	parentChildSet = append(parentChildSet, parentChild{subnetIP: subnetIP, parent: 24, child: 24})
+	parentChildSet = append(parentChildSet, parentChild{subnetIP: subnetIP, parent: 23, child: 24})
+
+	for _, item := range parentChildSet {
+		prefix := fmt.Sprintf("%s/%d", item.subnetIP, item.parent)
+		subnet, err := NewFromPrefix(prefix)
+		prefix = fmt.Sprintf("%s/%d", item.subnetIP, item.child)
+		childSubnet, err := NewFromPrefix(prefix)
+		is.NoErr(err)
+		t.Log("starting from", subnet)
+		t.Log("child subnet", childSubnet)
+		t.Log("hosts per network", subnet.Hosts())
+		t.Log("child subnet hosts per network", childSubnet.Hosts())
+		t.Log("network count", subnet.NetworkCount())
+		networks, err := subnet.NetworksInSubnets(childSubnet)
+		is.NoErr(err)
+		t.Log("total networks", len(networks))
+		t.Log("networks", networks)
+		t.Log()
+	}
+
+	// s, err := NewFromPrefix("10.0.0.0/23")
+	// is.NoErr(err)
+	// childSubnet, err := NewFromPrefix("10.0.0.0/24")
+	// t.Log("starting from", s)
+	// t.Log("child subnet", childSubnet)
+	// t.Log("hosts per network", s.Hosts())
+	// t.Log("child subnet hosts per network", childSubnet.Hosts())
+	// t.Log("network count", s.NetworkCount())
+	// networks, err := s.NetworksInSubnets(childSubnet)
+	// is.NoErr(err)
+	// t.Log("total networks", len(networks))
+	// t.Log(networks)
 }
 
 // go test -bench=. -benchmem

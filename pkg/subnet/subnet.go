@@ -312,8 +312,8 @@ func (s *IPV4Subnet) String() string {
 
 // Subdivide subnet into child network sized networks
 func (s *IPV4Subnet) networks(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
-	fmt.Println(s.Prefix.Bits(), childSubnet.Prefix.Bits())
-	if s.Prefix.Bits() > childSubnet.Prefix.Bits() {
+	// Can't subdivide to smaller prefixed subnet
+	if childSubnet.Prefix.Bits() < s.Prefix.Bits() {
 		err = fmt.Errorf("Subnet to split to has more bits %d than parent %d", s.Prefix.Bits(), childSubnet.Prefix.Bits())
 		return
 	}
