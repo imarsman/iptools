@@ -284,26 +284,42 @@ func (s *IPV4Subnet) Range() (r netaddr.IPRange, err error) {
 	return
 }
 
-// NetworkRanges the set of equally sized subnet blocks for subnet
-func (s *IPV4Subnet) NetworkRanges() (r []netaddr.IPRange, err error) {
-	r = []netaddr.IPRange{}
+func (s *IPV4Subnet) networkRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
+	// Can't subdivide to smaller prefixed subnet
+	if childSubnet.Prefix.Bits() < s.Prefix.Bits() {
+		err = fmt.Errorf("Subnet to split to has more bits %d than parent %d", s.Prefix.Bits(), childSubnet.Prefix.Bits())
+		return
+	}
+	ranges = []netaddr.IPRange{}
 	ip := s.Prefix.IP()
 	ipStart := ip
 
+	ratio := int(math.Exp2(float64(childSubnet.Prefix.Bits() - s.Prefix.Bits())))
 	for j := 0; j < int(s.NetworkCount()); j++ {
-		for j := 0; j < int(s.Hosts()); j++ {
-			ip = ip.Next()
-			if (ip == netaddr.IP{}) {
-				err = errors.New("empty ip list in subnet range")
-				r = []netaddr.IPRange{}
-				return
+		for r := 0; r < ratio; r++ {
+			for j := 0; j < int(childSubnet.Hosts()); j++ {
+				ip = ip.Next()
+				if (ip == netaddr.IP{}) {
+					err = errors.New("empty ip list in subnet range")
+					ranges = []netaddr.IPRange{}
+					return
+				}
 			}
+			ranges = append(ranges, netaddr.IPRangeFrom(ipStart, ip))
+			ipStart = ip.Next()
 		}
-		r = append(r, netaddr.IPRangeFrom(ipStart, ip))
-		ipStart = ip.Next()
 	}
 
 	return
+}
+
+func (s *IPV4Subnet) NetworkRangesInSubnets(childSubnet *IPV4Subnet) (r []netaddr.IPRange, err error) {
+	return s.networkRanges(s)
+}
+
+// NetworkRanges the set of equally sized subnet blocks for subnet
+func (s *IPV4Subnet) NetworkRanges() (r []netaddr.IPRange, err error) {
+	return s.networkRanges(s)
 }
 
 func (s *IPV4Subnet) String() string {
