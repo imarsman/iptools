@@ -165,23 +165,23 @@ func (s *IPV4Subnet) ClassNetworkPrefixBits() uint8 {
 
 // TotalHosts total hosts in subnet
 func (s *IPV4Subnet) TotalHosts() int64 {
-	return s.Hosts() * s.Networks()
+	return s.NetworkHosts() * s.Networks()
 }
 
-// Hosts bits remaining in mask block
-func (s *IPV4Subnet) Hosts() int64 {
+// NetworkHosts bits remaining in mask block
+func (s *IPV4Subnet) NetworkHosts() int64 {
 	if s.Prefix.Bits()%8 == 0 {
 		return int64((math.Exp2(float64(32) - float64(s.Prefix.Bits()))) / float64(s.Networks()))
 	}
 	return int64((math.Exp2(float64(32 - s.Prefix.Bits()))))
 }
 
-// UsableHosts number of usable hosts
-func (s *IPV4Subnet) UsableHosts() int64 {
-	if s.Hosts() < 2 {
+// UsableNetworkHosts number of usable hosts
+func (s *IPV4Subnet) UsableNetworkHosts() int64 {
+	if s.NetworkHosts() < 2 {
 		return 0
 	}
-	return s.Hosts() - 2
+	return s.NetworkHosts() - 2
 }
 
 // maxBitsForClass maximum bits for subnet range for the class
@@ -326,7 +326,7 @@ func (s *IPV4Subnet) networkRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IP
 	ratio := int(math.Exp2(float64(childSubnet.Prefix.Bits() - s.Prefix.Bits())))
 	for j := 0; j < int(s.Networks()); j++ {
 		for r := 0; r < ratio; r++ {
-			ip, err = addToIP(ip, int32(childSubnet.Hosts()))
+			ip, err = addToIP(ip, int32(childSubnet.NetworkHosts()))
 			if err != nil {
 				return
 			}
