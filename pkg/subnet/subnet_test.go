@@ -45,17 +45,35 @@ func TestNetworks(t *testing.T) {
 func TestDifferingSubnets(t *testing.T) {
 	is := is.New(t)
 	s, err := NewFromPrefix("10.0.0.0/23")
+	is.NoErr(err)
 	t.Log("starting from", s)
 	t.Log("hosts per network", s.Hosts())
+	t.Log("network count", s.NetworkCount())
 	networks, err := s.Networks()
 	is.NoErr(err)
 	t.Log(networks)
-	s, err = NewFromPrefix("10.0.0.0/22")
+	s, err = NewFromPrefix("10.0.0.0/24")
 	t.Log("starting from", s)
 	t.Log("hosts per network", s.Hosts())
+	t.Log("network count", s.NetworkCount())
 	networks, err = s.Networks()
 	t.Log(networks)
 	is.NoErr(err)
+}
+
+func TestChildSubnets(t *testing.T) {
+	is := is.New(t)
+	s, err := NewFromPrefix("10.0.0.0/23")
+	is.NoErr(err)
+	childSubnet, err := NewFromPrefix("10.0.0.0/24")
+	t.Log("starting from", s)
+	t.Log("hosts per network", s.Hosts())
+	t.Log("child per network", childSubnet.Hosts())
+	t.Log("network count", s.NetworkCount())
+	networks, err := s.NetworksInSubnets(childSubnet)
+	is.NoErr(err)
+	t.Log("total networks", len(networks))
+	t.Log(networks)
 }
 
 // go test -bench=. -benchmem

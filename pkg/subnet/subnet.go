@@ -309,8 +309,13 @@ func (s *IPV4Subnet) String() string {
 	return s.Prefix.String()
 }
 
-// Networks get all networks for subnet
-func (s *IPV4Subnet) Networks() (subnets []*IPV4Subnet, err error) {
+func (s *IPV4Subnet) networks(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
+	fmt.Println(s.Prefix.Bits(), childSubnet.Prefix.Bits())
+	if s.Prefix.Bits() > childSubnet.Prefix.Bits() {
+		err = fmt.Errorf("Subnet to split to has more bits %d than parent %d", s.Prefix.Bits(), childSubnet.Prefix.Bits())
+		return
+	}
+
 	if s.Prefix.Bits() == 1 {
 		err = fmt.Errorf("Can't subdivide")
 		return
@@ -318,22 +323,61 @@ func (s *IPV4Subnet) Networks() (subnets []*IPV4Subnet, err error) {
 	ip := s.Prefix.IP()
 	ipStart := ip
 
+	// ratio := int(math.Exp2(float64(s.NetworkCount()) - float64(childSubnet.NetworkCount())))
+	ratio := int(math.Exp2(float64(childSubnet.Prefix.Bits() - s.Prefix.Bits())))
 	for j := 0; j < int(s.NetworkCount()); j++ {
-		for j := 0; j < int(s.Hosts()); j++ {
-			ip = ip.Next()
-			if (ip == netaddr.IP{}) {
-				err = errors.New("empty ip list in subnet range")
-				subnets = []*IPV4Subnet{}
-				return
+		for r := 0; r < ratio; r++ {
+			for j := 0; j < int(childSubnet.Hosts()); j++ {
+				ip = ip.Next()
+				if (ip == netaddr.IP{}) {
+					err = errors.New("empty ip list in subnet range")
+					subnets = []*IPV4Subnet{}
+					return
+				}
 			}
+			subnet, err := newSubnet(ipStart.String(), childSubnet.Prefix.Bits(), false)
+			if err != nil {
+				return []*IPV4Subnet{}, err
+			}
+			ipStart = ip
+			subnets = append(subnets, subnet)
 		}
-		subnet, err := newSubnet(ipStart.String(), s.Prefix.Bits(), false)
-		if err != nil {
-			return []*IPV4Subnet{}, err
-		}
-		ipStart = ip
-		subnets = append(subnets, subnet)
 	}
 
 	return
+}
+
+// NetworksInSubnets get networks split into child subnet sizes
+func (s *IPV4Subnet) NetworksInSubnets(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
+	return s.networks(childSubnet)
+}
+
+// Networks get all networks for subnet
+func (s *IPV4Subnet) Networks() (subnets []*IPV4Subnet, err error) {
+	return s.networks(s)
+	// if s.Prefix.Bits() == 1 {
+	// 	err = fmt.Errorf("Can't subdivide")
+	// 	return
+	// }
+	// ip := s.Prefix.IP()
+	// ipStart := ip
+
+	// for j := 0; j < int(s.NetworkCount()); j++ {
+	// 	for j := 0; j < int(s.Hosts()); j++ {
+	// 		ip = ip.Next()
+	// 		if (ip == netaddr.IP{}) {
+	// 			err = errors.New("empty ip list in subnet range")
+	// 			subnets = []*IPV4Subnet{}
+	// 			return
+	// 		}
+	// 	}
+	// 	subnet, err := newSubnet(ipStart.String(), s.Prefix.Bits(), false)
+	// 	if err != nil {
+	// 		return []*IPV4Subnet{}, err
+	// 	}
+	// 	ipStart = ip
+	// 	subnets = append(subnets, subnet)
+	// }
+
+	// return
 }
