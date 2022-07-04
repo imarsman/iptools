@@ -1,17 +1,28 @@
 package args
 
 import (
-"github.com/posener/complete/v2"
- 	"github.com/posener/complete/v2/predict"
+	"github.com/posener/complete/v2"
+	"github.com/posener/complete/v2/predict"
 )
 
-
 var cmd = &complete.Command{
-	 	Flags: map[string]complete.Predictor{
- 			"name":      predict.Set{"foo", "bar", "foo bar"},
- 			"something": predict.Something,
- 			"nothing":   predict.Nothing,
- 		},
- 	}
- 	// Run the completion - provide it with the binary name.
- 	cmd.Complete("iptools")
+	Sub: map[string]*complete.Command{
+		"subnet": {
+			Sub: map[string]*complete.Command{
+				// Scheduler health for an environment
+				"divide": {
+					Flags: map[string]complete.Predictor{
+						"ip":       predict.Nothing,
+						"mask":     predict.Nothing,
+						"sub-mask": predict.Nothing,
+					},
+				},
+			},
+		},
+	},
+}
+
+func InitializeCompletion() {
+	// Run the completion - provide it with the binary name.
+	cmd.Complete("iptools")
+}

@@ -1,12 +1,16 @@
 package args
 
-type SubnetSplit struct {
-	IP      string
-	Mask    int
-	SubMask int
-	Pretty  bool
+type SubnetDivide struct {
+	IP      string `arg:"-i,--ip" help:""`
+	Mask    int    `arg:"-m,--mask" help:""`
+	SubMask int    `arg:"-s,--sub-mask" help:""`
+	Pretty  bool   `arg:"-p,--pretty" help:""`
 }
 
 type Subnet struct {
-	SubnetSplit *SubnetSplit
+	SubnetDivide *SubnetDivide `arg:"subcommand:divide" help:""`
+}
+
+type Args struct {
+	Subnet *Subnet `arg:"subcommand:subnet" help:"Get networks for subnet"`
 }

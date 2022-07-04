@@ -73,13 +73,13 @@ func NewFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
 }
 
 // newSubnet new subnet with prefix string, masked and boolean flag
-func newSubnet(address string, mask uint8, usemasked bool) (subnet *IPV4Subnet, err error) {
+func newSubnet(address string, mask uint8, usemask bool) (subnet *IPV4Subnet, err error) {
 	errMsg := "invalid prefix"
 
 	subnet = new(IPV4Subnet)
 
 	var pfx netaddr.IPPrefix
-	if usemasked {
+	if usemask {
 		prefixStr := fmt.Sprintf("%s/%d", address, mask)
 		var pfxPre netaddr.IPPrefix
 		pfxPre, err = netaddr.ParseIPPrefix(prefixStr)
@@ -340,7 +340,7 @@ func (s *IPV4Subnet) networkRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IP
 
 // NetworkRangesInSubnets set of ranges in the context of subnets of a specified size
 func (s *IPV4Subnet) NetworkRangesInSubnets(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
-	return s.networkRanges(s)
+	return s.networkRanges(childSubnet)
 }
 
 // NetworkRanges the set of equally sized subnet blocks for subnet
