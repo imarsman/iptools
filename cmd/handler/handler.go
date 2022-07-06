@@ -61,7 +61,7 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet IP")},
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.IP.String())},
 		}
-		if mask != secondaryMask {
+		if secondaryMask != 0 {
 			r = []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary subnet")},
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.Prefix.String())},
@@ -85,21 +85,25 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s.Networks())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
-			r = []*simpletable.Cell{
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary networks")},
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s2.Networks())},
+			if secondaryMask != 0 {
+				r = []*simpletable.Cell{
+					{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary networks")},
+					{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s2.Networks())},
+				}
+				table.Body.Cells = append(table.Body.Cells, r)
 			}
-			table.Body.Cells = append(table.Body.Cells, r)
 			r = []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Network hosts")},
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s.NetworkHosts())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
-			r = []*simpletable.Cell{
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Sub Network hosts")},
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s2.NetworkHosts())},
+			if secondaryMask != 0 {
+				r = []*simpletable.Cell{
+					{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Sub Network hosts")},
+					{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s2.NetworkHosts())},
+				}
+				table.Body.Cells = append(table.Body.Cells, r)
 			}
-			table.Body.Cells = append(table.Body.Cells, r)
 		}
 		fmt.Println()
 		table.SetStyle(simpletable.StyleCompactLite)
