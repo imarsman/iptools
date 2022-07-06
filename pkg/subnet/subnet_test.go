@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/imarsman/iptools/pkg/util"
 	"github.com/matryer/is"
 	"inet.af/netaddr"
 )
@@ -111,6 +112,14 @@ func TestChildSubnets(t *testing.T) {
 	// is.NoErr(err)
 	// t.Log("total networks", len(networks))
 	// t.Log(networks)
+}
+
+func TestBitString(t *testing.T) {
+	is := is.New(t)
+	ip, err := netaddr.ParseIP("127.0.0.1")
+	is.NoErr(err)
+	bitStr := util.BitStr4(ip)
+	t.Log(bitStr)
 }
 
 // go test -bench=. -benchmem

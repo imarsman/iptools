@@ -109,6 +109,18 @@ func SubnetDescribe(ip string, mask uint8) {
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
+	r = []*simpletable.Cell{
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Binary Subnet Mask")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.BinarySubnetMask())},
+	}
+	table.Body.Cells = append(table.Body.Cells, r)
+
+	r = []*simpletable.Cell{
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Binary ID")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.BinaryID())},
+	}
+	table.Body.Cells = append(table.Body.Cells, r)
+
 	fmt.Println(table.String())
 }
 

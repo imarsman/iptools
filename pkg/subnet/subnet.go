@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/imarsman/iptools/pkg/util"
 	"gopkg.in/yaml.v2"
 	"inet.af/netaddr"
 )
@@ -107,6 +108,18 @@ func newSubnet(ip string, mask uint8, usemask bool) (subnet *IPV4Subnet, err err
 	subnet.Prefix = pfx
 
 	return subnet, nil
+}
+
+func (s *IPV4Subnet) BinarySubnetMask() (subnetMask string) {
+	subnetMask = util.BitStr4(s.Prefix.Masked().IP())
+
+	return
+}
+
+func (s *IPV4Subnet) BinaryID() (subnetMask string) {
+	subnetMask = strings.ReplaceAll(util.BitStr4(s.IP), ".", "")
+
+	return
 }
 
 func (s *IPV4Subnet) classMask() int {
