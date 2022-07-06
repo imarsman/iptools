@@ -93,6 +93,11 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 				table.Body.Cells = append(table.Body.Cells, r)
 			}
 			r = []*simpletable.Cell{
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Effective networks")},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", len(ranges))},
+			}
+			table.Body.Cells = append(table.Body.Cells, r)
+			r = []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Network hosts")},
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s.NetworkHosts())},
 			}
