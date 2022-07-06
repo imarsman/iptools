@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/imarsman/iptools/pkg/subnet"
 	"inet.af/netaddr"
@@ -9,23 +10,34 @@ import (
 
 // SubnetDivide divide a subnet into ranges
 func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
-	// prefix := fmt.Sprintf("%s/d", ip, mask)
-	s, err := subnet.NewFromIPAndMask(ip, mask)
+	var err error
+	var s *subnet.IPV4Subnet
+	prefix := fmt.Sprintf("%s/%d", ip, mask)
+	s, err = subnet.NewFromPrefix(prefix)
 	if err != nil {
-
+		fmt.Println(err)
+		os.Exit(1)
 	}
+
 	ranges := []netaddr.IPRange{}
 	if secondaryMask != 0 {
-		s2, err := subnet.NewFromIPAndMask(ip, secondaryMask)
+		var s2 *subnet.IPV4Subnet
+		prefix := fmt.Sprintf("%s/%d", ip, secondaryMask)
+		s2, err = subnet.NewFromPrefix(prefix)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 		ranges, err = s.NetworkRangesInSubnets(s2)
 		if err != nil {
-
+			fmt.Println(err)
+			os.Exit(1)
 		}
-		// fmt.Println("secondary mask", secondaryMask, s2, ranges)
 	} else {
 		ranges, err = s.NetworkRanges()
 		if err != nil {
-
+			fmt.Println(err)
+			os.Exit(1)
 		}
 	}
 	for _, r := range ranges {

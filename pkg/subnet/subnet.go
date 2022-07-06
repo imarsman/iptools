@@ -24,7 +24,8 @@ const (
 // https://www.calculator.net/ip-IPV4Subnet-calculator.html
 type IPV4Subnet struct {
 	Name   string
-	Prefix *netaddr.IPPrefix `json:"prefix" yaml:"prefix"`
+	Prefix netaddr.IPPrefix `json:"prefix" yaml:"prefix"`
+	IP     netaddr.IP
 }
 
 // NewDefaultFromMask parse for 255.255.255.255 starting mask
@@ -73,28 +74,28 @@ func NewFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
 }
 
 // newSubnet new subnet with prefix string, masked and boolean flag
-func newSubnet(address string, mask uint8, usemask bool) (subnet *IPV4Subnet, err error) {
+func newSubnet(ip string, mask uint8, usemask bool) (subnet *IPV4Subnet, err error) {
 	errMsg := "invalid prefix"
 
 	subnet = new(IPV4Subnet)
-
-	var pfx netaddr.IPPrefix
-	if usemask {
-		prefixStr := fmt.Sprintf("%s/%d", address, mask)
-		var pfxPre netaddr.IPPrefix
-		pfxPre, err = netaddr.ParseIPPrefix(prefixStr)
-		if err != nil {
-			return
-		}
-		prefixStr = fmt.Sprintf("%s/%d", pfxPre.Masked().IP().String(), mask)
-		pfx, err = netaddr.ParseIPPrefix(pfxPre.Masked().String())
-		if err != nil {
-			return
-		}
-	} else {
-		prefixStr := fmt.Sprintf("%s/%d", address, mask)
-		pfx, err = netaddr.ParseIPPrefix(prefixStr)
+	addressIP, err := netaddr.ParseIP(ip)
+	if err != nil {
+		return
 	}
+	subnet.IP = addressIP
+
+	// subnetAddress := "255.255.255.255"
+	var pfx netaddr.IPPrefix
+	// if usemask {
+	prefixStr := fmt.Sprintf("%s/%d", ip, mask)
+	var pfxPre netaddr.IPPrefix
+	pfxPre, err = netaddr.ParseIPPrefix(prefixStr)
+	if err != nil {
+		return
+	}
+	prefixStr = fmt.Sprintf("%s/%d", pfxPre.Masked().IP().String(), mask)
+	pfx = pfxPre.Masked()
+	subnet.IP = pfxPre.Masked().IP()
 
 	if !pfx.IsValid() {
 		return nil, errors.New(errMsg)
@@ -104,7 +105,7 @@ func newSubnet(address string, mask uint8, usemask bool) (subnet *IPV4Subnet, er
 		return nil, errors.New("subnet too large for current implementation")
 	}
 
-	subnet.Prefix = &pfx
+	subnet.Prefix = pfx
 
 	return subnet, nil
 }
@@ -326,7 +327,7 @@ func (s *IPV4Subnet) networkRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IP
 	ratio := int(math.Exp2(float64(childSubnet.Prefix.Bits() - s.Prefix.Bits())))
 	for j := 0; j < int(s.Networks()); j++ {
 		for r := 0; r < ratio; r++ {
-			ip, err = addToIP(ip, int32(childSubnet.NetworkHosts()))
+			ip, err = addToIP(ipStart, int32(childSubnet.NetworkHosts()-1))
 			if err != nil {
 				return
 			}

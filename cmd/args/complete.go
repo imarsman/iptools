@@ -5,6 +5,8 @@ import (
 	"github.com/posener/complete/v2/predict"
 )
 
+var IPs = []string{"99.236.32.0", "255.255.255.255"}
+
 var cmd = &complete.Command{
 	Sub: map[string]*complete.Command{
 		"subnet": {
@@ -12,7 +14,7 @@ var cmd = &complete.Command{
 				// Scheduler health for an environment
 				"divide": {
 					Flags: map[string]complete.Predictor{
-						"ip":       predict.Nothing,
+						"ip":       predict.Set(IPs),
 						"mask":     predict.Nothing,
 						"sub-mask": predict.Nothing,
 					},
