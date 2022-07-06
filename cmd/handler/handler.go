@@ -10,6 +10,87 @@ import (
 	"inet.af/netaddr"
 )
 
+// SubnetDescribe describe a subnet
+func SubnetDescribe(ip string, mask uint8) {
+	var err error
+	var s *subnet.IPV4Subnet
+	prefix := fmt.Sprintf("%s/%d", ip, mask)
+	s, err = subnet.NewFromPrefix(prefix)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	table := simpletable.New()
+
+	table.Header = &simpletable.Header{
+		Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Text: "Category"},
+			{Align: simpletable.AlignCenter, Text: "Value"},
+		},
+	}
+
+	ranges, err := s.NetworkRanges()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	if len(ranges) > 0 {
+		last := ranges[len(ranges)-1]
+		r := []*simpletable.Cell{
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "IP Address")},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", last.To().String())},
+		}
+		table.Body.Cells = append(table.Body.Cells, r)
+		first := ranges[0]
+		r = []*simpletable.Cell{
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Network Address")},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", first.From().String())},
+		}
+		table.Body.Cells = append(table.Body.Cells, r)
+	}
+
+	r := []*simpletable.Cell{
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet prefix")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.Prefix.String())},
+	}
+	table.Body.Cells = append(table.Body.Cells, r)
+
+	r = []*simpletable.Cell{
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet hosts")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s.NetworkHosts())},
+	}
+	table.Body.Cells = append(table.Body.Cells, r)
+
+	r = []*simpletable.Cell{
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Total hosts")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s.TotalHosts())},
+	}
+	table.Body.Cells = append(table.Body.Cells, r)
+
+	class := string(s.Class())
+	if class == `0` {
+		class = "subnet"
+	}
+	r = []*simpletable.Cell{
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "IP Class")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", class)},
+	}
+	table.Body.Cells = append(table.Body.Cells, r)
+
+	ipType := "Public"
+	if s.IP.IsPrivate() {
+		ipType = "Private"
+	}
+	r = []*simpletable.Cell{
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "IP type")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", ipType)},
+	}
+	table.Body.Cells = append(table.Body.Cells, r)
+
+	fmt.Println(table.String())
+}
+
 // SubnetDivide divide a subnet into ranges
 func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 	var err error

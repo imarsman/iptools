@@ -36,7 +36,17 @@ func main() {
 
 	if args.CLIArgs.Subnet != nil {
 		if args.CLIArgs.Subnet.SubnetDivide != nil {
-			handler.SubnetDivide(args.CLIArgs.Subnet.SubnetDivide.IP, uint8(args.CLIArgs.Subnet.SubnetDivide.Mask), uint8(args.CLIArgs.Subnet.SubnetDivide.SubMask))
+			handler.SubnetDivide(
+				args.CLIArgs.Subnet.SubnetDivide.IP,
+				uint8(args.CLIArgs.Subnet.SubnetDivide.Mask),
+				uint8(args.CLIArgs.Subnet.SubnetDivide.SubMask),
+			)
+		}
+		if args.CLIArgs.Subnet.SubnetDescribe != nil {
+			handler.SubnetDescribe(
+				args.CLIArgs.Subnet.SubnetDescribe.IP,
+				uint8(args.CLIArgs.Subnet.SubnetDescribe.Mask),
+			)
 		}
 	}
 }

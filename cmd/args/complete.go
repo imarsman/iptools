@@ -5,7 +5,8 @@ import (
 	"github.com/posener/complete/v2/predict"
 )
 
-var IPs = []string{"99.236.32.0", "255.255.255.255"}
+// IPs list of subnet IPs to make life easier
+var IPs = []string{"99.236.32.0", "255.255.255.255", "10.32.0.0"}
 
 var cmd = &complete.Command{
 	Sub: map[string]*complete.Command{
@@ -18,6 +19,12 @@ var cmd = &complete.Command{
 						"mask":     predict.Nothing,
 						"sub-mask": predict.Nothing,
 						"pretty":   predict.Nothing,
+					},
+				},
+				"describe": {
+					Flags: map[string]complete.Predictor{
+						"ip":   predict.Set(IPs),
+						"mask": predict.Nothing,
 					},
 				},
 			},

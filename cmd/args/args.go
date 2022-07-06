@@ -1,5 +1,10 @@
 package args
 
+type SubnetDescribe struct {
+	IP   string `arg:"-i,--ip" help:""`
+	Mask int    `arg:"-m,--mask" help:""`
+}
+
 type SubnetDivide struct {
 	IP      string `arg:"-i,--ip" help:""`
 	Mask    int    `arg:"-m,--mask" help:""`
@@ -8,7 +13,8 @@ type SubnetDivide struct {
 }
 
 type Subnet struct {
-	SubnetDivide *SubnetDivide `arg:"subcommand:divide" help:""`
+	SubnetDivide   *SubnetDivide   `arg:"subcommand:divide" help:"divide a subnet into ranges"`
+	SubnetDescribe *SubnetDescribe `arg:"subcommand:describe" help:"describe a subnet"`
 }
 
 type Args struct {
