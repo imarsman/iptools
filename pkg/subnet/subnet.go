@@ -222,6 +222,19 @@ func (s *IPV4Subnet) Class() (class rune) {
 	}
 }
 
+func (s *IPV4Subnet) NetworkAddress() (ip netaddr.IP, err error) {
+	return s.IPAddress()
+}
+
+func (s *IPV4Subnet) IPAddress() (ip netaddr.IP, err error) {
+	ip, err = addToIP(s.IP, int32(s.TotalHosts()-1))
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 // Networks number of subnets
 func (s *IPV4Subnet) Networks() int64 {
 	bits := s.Prefix.Bits() - s.startBitsForClass()

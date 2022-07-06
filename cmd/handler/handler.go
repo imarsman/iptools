@@ -42,10 +42,21 @@ func SubnetDescribe(ip string, mask uint8) {
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", last.To().String())},
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
+		// first := ranges[0]
+		networkAddress, err := s.NetworkAddress()
+		if err != nil {
+			return
+		}
 		first := ranges[0]
 		r = []*simpletable.Cell{
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Network Address")},
+			// {Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", networkAddress.String())},
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", first.From().String())},
+		}
+		table.Body.Cells = append(table.Body.Cells, r)
+		r = []*simpletable.Cell{
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Broadcast Address")},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", networkAddress.String())},
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
 	}
