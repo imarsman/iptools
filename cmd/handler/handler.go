@@ -71,12 +71,6 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 		}
-		// table.Body.Cells = append(table.Body.Cells, r)
-		// r = []*simpletable.Cell{
-		// 	{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Networks")},
-		// 	{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s.Networks())},
-		// }
-		// table.Body.Cells = append(table.Body.Cells, r)
 		if mask == secondaryMask {
 			r = []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Networks")},
@@ -84,7 +78,7 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 			r = []*simpletable.Cell{
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Network Hosts")},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Network hosts")},
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s.NetworkHosts())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
@@ -95,17 +89,17 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 			r = []*simpletable.Cell{
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Networks")},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary networks")},
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s2.Networks())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 			r = []*simpletable.Cell{
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Network Hosts")},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Network hosts")},
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s.NetworkHosts())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 			r = []*simpletable.Cell{
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Sub Network Hosts")},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Sub Network hosts")},
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s2.NetworkHosts())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
