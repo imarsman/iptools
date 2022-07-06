@@ -36,6 +36,9 @@ release:
 
     iptools is a set of IP and network tools
 
+    v0.1.0
+    Initial release with subnetting
+
   # Footer template for the release body.
   # Defaults to empty.
   footer: |
