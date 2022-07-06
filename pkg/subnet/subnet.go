@@ -95,7 +95,6 @@ func newSubnet(ip string, mask uint8, usemask bool) (subnet *IPV4Subnet, err err
 	}
 	prefixStr = fmt.Sprintf("%s/%d", pfxPre.Masked().IP().String(), mask)
 	pfx = pfxPre.Masked()
-	// subnet.IP = pfxPre.Masked().IP()
 
 	if !pfx.IsValid() {
 		return nil, errors.New(errMsg)
