@@ -29,9 +29,9 @@ type IPV4Subnet struct {
 }
 
 // NewDefaultFromMask parse for 255.255.255.255 starting mask
-func NewDefaultFromMask(mask uint8) (subnet *IPV4Subnet, err error) {
-	return newSubnet("255.255.255.255", mask, true)
-}
+// func NewDefaultFromMask(mask uint8) (subnet *IPV4Subnet, err error) {
+// 	return newSubnet("255.255.255.255", mask, true)
+// }
 
 // NewFromMask new subnet with prefix 255.255.255.255 from incoming mask
 func NewFromMask(mask uint8) (subnet *IPV4Subnet, err error) {
@@ -39,19 +39,19 @@ func NewFromMask(mask uint8) (subnet *IPV4Subnet, err error) {
 }
 
 // NewDefaultFromPrefix new default (255.255.255.255) from prefix
-func NewDefaultFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
-	errMsg := "invalid prefix"
+// func NewDefaultFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
+// 	errMsg := "invalid prefix"
 
-	parts := strings.Split(prefix, "/")
-	if len(parts) != 2 {
-		err = errors.New(errMsg)
-	}
-	mask, err := strconv.Atoi(parts[1])
-	if err != nil {
-		return
-	}
-	return newSubnet(parts[0], uint8(mask), true)
-}
+// 	parts := strings.Split(prefix, "/")
+// 	if len(parts) != 2 {
+// 		err = errors.New(errMsg)
+// 	}
+// 	mask, err := strconv.Atoi(parts[1])
+// 	if err != nil {
+// 		return
+// 	}
+// 	return newSubnet(parts[0], uint8(mask), true)
+// }
 
 // NewFromIPAndMask new using incoming prefix ip and mask
 func NewFromIPAndMask(ip string, mask uint8) (subnet *IPV4Subnet, err error) {
@@ -84,10 +84,10 @@ func newSubnet(ip string, mask uint8, usemask bool) (subnet *IPV4Subnet, err err
 	}
 	subnet.IP = addressIP
 
-	// subnetAddress := "255.255.255.255"
+	subnetAddress := "255.255.255.0"
 	var pfx netaddr.IPPrefix
 	// if usemask {
-	prefixStr := fmt.Sprintf("%s/%d", ip, mask)
+	prefixStr := fmt.Sprintf("%s/%d", subnetAddress, mask)
 	var pfxPre netaddr.IPPrefix
 	pfxPre, err = netaddr.ParseIPPrefix(prefixStr)
 	if err != nil {
@@ -95,7 +95,7 @@ func newSubnet(ip string, mask uint8, usemask bool) (subnet *IPV4Subnet, err err
 	}
 	prefixStr = fmt.Sprintf("%s/%d", pfxPre.Masked().IP().String(), mask)
 	pfx = pfxPre.Masked()
-	subnet.IP = pfxPre.Masked().IP()
+	// subnet.IP = pfxPre.Masked().IP()
 
 	if !pfx.IsValid() {
 		return nil, errors.New(errMsg)
@@ -325,7 +325,8 @@ func (s *IPV4Subnet) networkRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IP
 		return
 	}
 	ranges = []netaddr.IPRange{}
-	ip := s.Prefix.IP()
+	// ip := s.Prefix.IP()
+	ip := s.IP
 	ipStart := ip
 
 	ratio := int(math.Exp2(float64(childSubnet.Prefix.Bits() - s.Prefix.Bits())))

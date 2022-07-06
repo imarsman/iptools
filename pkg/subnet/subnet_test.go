@@ -13,7 +13,7 @@ func TestNewSubnet(t *testing.T) {
 	for i := 1; i <= 32; i++ {
 		// subnetMask := fmt.Sprintf("255.255.255.0/%d", i)
 		is := is.New(t)
-		s, err := NewDefaultFromMask(uint8(i))
+		s, err := NewFromMask(uint8(i))
 		is.NoErr(err)
 		t.Log("masked", s.Prefix.Masked())
 		t.Log("class mask", s.classMask())
@@ -116,7 +116,7 @@ func TestChildSubnets(t *testing.T) {
 // go test -bench=. -benchmem
 func BenchmarkBlocks(b *testing.B) {
 	is := is.New(b)
-	s, err := NewDefaultFromMask(28)
+	s, err := NewFromMask(28)
 	is.NoErr(err)
 	s.NetworkRanges()
 }

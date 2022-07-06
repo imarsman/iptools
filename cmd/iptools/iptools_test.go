@@ -38,7 +38,7 @@ func TestRange(t *testing.T) {
 	// pfx, err := netaddr.ParseIPPrefix("192.168.0.1/16")
 	// is.NoErr(err)
 
-	s, err := subnet.NewDefaultFromPrefix("192.168.0.1/16")
+	s, err := subnet.NewFromPrefix("192.168.0.1/16")
 	is.NoErr(err)
 
 	// t.Log("hosts", s.DivisionIncrement)
@@ -69,7 +69,7 @@ func TestBits(t *testing.T) {
 
 	for _, p := range prefixes {
 		// pfx, err := netaddr.ParseIPPrefix(p)
-		s, err := subnet.NewDefaultFromPrefix(p)
+		s, err := subnet.NewFromPrefix(p)
 		is.NoErr(err)
 		t.Log("valid", s.Prefix.Valid())
 
