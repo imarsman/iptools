@@ -222,11 +222,19 @@ func (s *IPV4Subnet) Class() (class rune) {
 	}
 }
 
+// NetworkAddress get last IP for subnet
 func (s *IPV4Subnet) NetworkAddress() (ip netaddr.IP, err error) {
-	return s.IPAddress()
+	return s.Last()
 }
 
-func (s *IPV4Subnet) IPAddress() (ip netaddr.IP, err error) {
+// First get first IP for subnet
+func (s *IPV4Subnet) First() (ip netaddr.IP, err error) {
+	ip = s.IP
+	return
+}
+
+// Last get last IP for subnet
+func (s *IPV4Subnet) Last() (ip netaddr.IP, err error) {
 	ip, err = addToIP(s.IP, int32(s.TotalHosts()-1))
 	if err != nil {
 		return
@@ -234,6 +242,15 @@ func (s *IPV4Subnet) IPAddress() (ip netaddr.IP, err error) {
 
 	return
 }
+
+// func (s *IPV4Subnet) IPAddress() (ip netaddr.IP, err error) {
+// 	ip, err = addToIP(s.IP, int32(s.TotalHosts()-1))
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	return
+// }
 
 // Networks number of subnets
 func (s *IPV4Subnet) Networks() int64 {
