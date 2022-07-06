@@ -14,3 +14,5 @@ type Subnet struct {
 type Args struct {
 	Subnet *Subnet `arg:"subcommand:subnet" help:"Get networks for subnet"`
 }
+
+var CLIArgs Args

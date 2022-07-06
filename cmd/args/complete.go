@@ -17,6 +17,7 @@ var cmd = &complete.Command{
 						"ip":       predict.Set(IPs),
 						"mask":     predict.Nothing,
 						"sub-mask": predict.Nothing,
+						"pretty":   predict.Nothing,
 					},
 				},
 			},

@@ -31,12 +31,12 @@ func printHelp(p *arg.Parser) {
 func main() {
 	args.InitializeCompletion()
 
-	var args args.Args
-	arg.MustParse(&args)
+	// var Args args.Args
+	arg.MustParse(&args.CLIArgs)
 
-	if args.Subnet != nil {
-		if args.Subnet.SubnetDivide != nil {
-			handler.SubnetDivide(args.Subnet.SubnetDivide.IP, uint8(args.Subnet.SubnetDivide.Mask), uint8(args.Subnet.SubnetDivide.SubMask))
+	if args.CLIArgs.Subnet != nil {
+		if args.CLIArgs.Subnet.SubnetDivide != nil {
+			handler.SubnetDivide(args.CLIArgs.Subnet.SubnetDivide.IP, uint8(args.CLIArgs.Subnet.SubnetDivide.Mask), uint8(args.CLIArgs.Subnet.SubnetDivide.SubMask))
 		}
 	}
 }
