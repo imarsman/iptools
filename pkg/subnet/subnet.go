@@ -276,6 +276,10 @@ func int2ip(ipInt uint32) (netaddr.IP, bool) {
 }
 
 func addToIP(startIP netaddr.IP, add int32) (newIP netaddr.IP, err error) {
+	if !startIP.Next().IsValid() {
+		err = fmt.Errorf("ip %v is already max", startIP)
+		return
+	}
 	bytes := startIP.As4()
 	slice := bytes[:]
 	ipValue := binary.BigEndian.Uint32(slice)
