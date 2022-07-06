@@ -36,15 +36,12 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 			os.Exit(1)
 		}
 	} else {
+		s2 = s
 		ranges, err = s.NetworkRanges()
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-	}
-
-	for _, r := range ranges {
-		fmt.Println(r.String())
 	}
 	if args.CLIArgs.Subnet.SubnetDivide.Pretty {
 		table := simpletable.New()
@@ -107,5 +104,30 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 		fmt.Println()
 		table.SetStyle(simpletable.StyleCompactLite)
 		fmt.Println(table.String())
+	}
+
+	if args.CLIArgs.Subnet.SubnetDivide.Pretty {
+		fmt.Println()
+		table := simpletable.New()
+
+		table.Header = &simpletable.Header{
+			Cells: []*simpletable.Cell{
+				{Align: simpletable.AlignCenter, Text: "Start"},
+				{Align: simpletable.AlignCenter, Text: "End"},
+			},
+		}
+		for _, r := range ranges {
+			cell := []*simpletable.Cell{
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", r.From().String())},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", r.To().String())},
+			}
+			table.Body.Cells = append(table.Body.Cells, cell)
+		}
+		table.SetStyle(simpletable.StyleCompactLite)
+		fmt.Println(table.String())
+	} else {
+		for _, r := range ranges {
+			fmt.Println(r.String())
+		}
 	}
 }
