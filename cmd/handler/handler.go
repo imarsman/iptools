@@ -42,16 +42,6 @@ func SubnetDescribe(ip string, mask uint8) {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		r := []*simpletable.Cell{
-			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "IP Address")},
-			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", last.String())},
-		}
-		table.Body.Cells = append(table.Body.Cells, r)
-		// first := ranges[0]
-		networkAddress, err := s.NetworkAddress()
-		if err != nil {
-			return
-		}
 		// Get first address for subnet
 		first, err := s.First()
 		if err != nil {
@@ -64,6 +54,16 @@ func SubnetDescribe(ip string, mask uint8) {
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", first.String())},
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
+		r = []*simpletable.Cell{
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "IP Address")},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", last.String())},
+		}
+		table.Body.Cells = append(table.Body.Cells, r)
+		// first := ranges[0]
+		networkAddress, err := s.NetworkAddress()
+		if err != nil {
+			return
+		}
 		r = []*simpletable.Cell{
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Broadcast Address")},
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", networkAddress.String())},
