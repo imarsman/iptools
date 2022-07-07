@@ -173,7 +173,7 @@ func (s *IPV4Subnet) UsableNetworkHosts() int64 {
 	return s.NetworkHosts() - 2
 }
 
-// maxBitsForClass maximum bits for subnet range for the class
+// startBitsForClass starting bits for subnet range for the class
 func (s *IPV4Subnet) startBitsForClass() uint8 {
 	if s.Prefix.Bits() < 8 {
 		return 0
@@ -238,15 +238,6 @@ func (s *IPV4Subnet) Last() (ip netaddr.IP, err error) {
 
 	return
 }
-
-// func (s *IPV4Subnet) IPAddress() (ip netaddr.IP, err error) {
-// 	ip, err = addToIP(s.IP, int32(s.TotalHosts()-1))
-// 	if err != nil {
-// 		return
-// 	}
-
-// 	return
-// }
 
 // Networks number of subnets
 func (s *IPV4Subnet) Networks() int64 {
