@@ -31,7 +31,7 @@ func SubnetDescribe(ip string, mask uint8) {
 	}
 
 	r := []*simpletable.Cell{
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet prefix")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet Prefix")},
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.Prefix.String())},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
@@ -79,13 +79,13 @@ func SubnetDescribe(ip string, mask uint8) {
 	table.Body.Cells = append(table.Body.Cells, r)
 
 	r = []*simpletable.Cell{
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Network hosts")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Network Hosts")},
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s.NetworkHosts())},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
 	r = []*simpletable.Cell{
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Total hosts")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Total Hosts")},
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s.TotalHosts())},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
@@ -105,7 +105,7 @@ func SubnetDescribe(ip string, mask uint8) {
 		ipType = "Private"
 	}
 	r = []*simpletable.Cell{
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "IP type")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "IP Type")},
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", ipType)},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
