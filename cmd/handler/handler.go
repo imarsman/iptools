@@ -7,6 +7,7 @@ import (
 	"github.com/alexeyco/simpletable"
 	"github.com/imarsman/iptools/cmd/args"
 	"github.com/imarsman/iptools/pkg/subnet"
+	"github.com/imarsman/iptools/pkg/util"
 	"inet.af/netaddr"
 )
 
@@ -78,7 +79,7 @@ func SubnetDescribe(ip string, mask uint8) {
 	table.Body.Cells = append(table.Body.Cells, r)
 
 	r = []*simpletable.Cell{
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet hosts")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Network hosts")},
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s.NetworkHosts())},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
@@ -118,6 +119,29 @@ func SubnetDescribe(ip string, mask uint8) {
 	r = []*simpletable.Cell{
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Binary ID")},
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.BinaryID())},
+	}
+	table.Body.Cells = append(table.Body.Cells, r)
+
+	last, err := s.Last()
+	if err != nil {
+		return
+	}
+
+	r = []*simpletable.Cell{
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Hex ID")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("Ox%s", util.IPToHexStr(last))},
+	}
+	table.Body.Cells = append(table.Body.Cells, r)
+
+	r = []*simpletable.Cell{
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "in-addr.arpa")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s.in-addr.arpa", util.InAddrArpa(s.IP))},
+	}
+	table.Body.Cells = append(table.Body.Cells, r)
+
+	r = []*simpletable.Cell{
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Wildcard Mask")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMask(s.Prefix.IP()))},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 

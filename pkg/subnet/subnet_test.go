@@ -118,7 +118,7 @@ func TestBitString(t *testing.T) {
 	is := is.New(t)
 	ip, err := netaddr.ParseIP("127.0.0.1")
 	is.NoErr(err)
-	bitStr := util.BitStr4(ip)
+	bitStr := util.BitStr4(ip, ".")
 	t.Log(bitStr)
 }
 

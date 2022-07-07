@@ -1,12 +1,10 @@
 package subnet
 
 import (
-	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
-	"net"
 	"strconv"
 	"strings"
 
@@ -21,38 +19,16 @@ const (
 )
 
 // IPV4Subnet an IP subnet
-// https://www.calculator.net/ip-IPV4Subnet-calculator.html?cclass=any&csubnet=16&cip=10.0.0.0&ctype=ipv4&printit=0&x=43&y=21
-// https://www.calculator.net/ip-IPV4Subnet-calculator.html
 type IPV4Subnet struct {
 	Name   string
 	Prefix netaddr.IPPrefix `json:"prefix" yaml:"prefix"`
 	IP     netaddr.IP
 }
 
-// NewDefaultFromMask parse for 255.255.255.255 starting mask
-// func NewDefaultFromMask(mask uint8) (subnet *IPV4Subnet, err error) {
-// 	return newSubnet("255.255.255.255", mask, true)
-// }
-
 // NewFromMask new subnet with prefix 255.255.255.255 from incoming mask
 func NewFromMask(mask uint8) (subnet *IPV4Subnet, err error) {
 	return newSubnet("255.255.255.255", mask, true)
 }
-
-// NewDefaultFromPrefix new default (255.255.255.255) from prefix
-// func NewDefaultFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
-// 	errMsg := "invalid prefix"
-
-// 	parts := strings.Split(prefix, "/")
-// 	if len(parts) != 2 {
-// 		err = errors.New(errMsg)
-// 	}
-// 	mask, err := strconv.Atoi(parts[1])
-// 	if err != nil {
-// 		return
-// 	}
-// 	return newSubnet(parts[0], uint8(mask), true)
-// }
 
 // NewFromIPAndMask new using incoming prefix ip and mask
 func NewFromIPAndMask(ip string, mask uint8) (subnet *IPV4Subnet, err error) {
@@ -110,16 +86,16 @@ func newSubnet(ip string, mask uint8, usemask bool) (subnet *IPV4Subnet, err err
 	return subnet, nil
 }
 
+// BinarySubnetMask get dot delimited subnet mask in binary
 func (s *IPV4Subnet) BinarySubnetMask() (subnetMask string) {
-	subnetMask = util.BitStr4(s.Prefix.Masked().IP())
+	subnetMask = util.BitStr4(s.Prefix.Masked().IP(), `.`)
 
 	return
 }
 
+// BinaryID get the starting IP for subnet as binary
 func (s *IPV4Subnet) BinaryID() (subnetMask string) {
-	subnetMask = strings.ReplaceAll(util.BitStr4(s.IP), ".", "")
-
-	return
+	return util.BitStr4(s.IP, ``)
 }
 
 func (s *IPV4Subnet) classMask() int {
@@ -248,7 +224,7 @@ func (s *IPV4Subnet) First() (ip netaddr.IP, err error) {
 
 // Last get last IP for subnet
 func (s *IPV4Subnet) Last() (ip netaddr.IP, err error) {
-	ip, err = addToIP(s.IP, int32(s.TotalHosts()-1))
+	ip, err = util.AddToIP(s.IP, int32(s.TotalHosts()-1))
 	if err != nil {
 		return
 	}
@@ -308,37 +284,11 @@ func (s *IPV4Subnet) IPs() (ips []netaddr.IP, err error) {
 	return
 }
 
-// https://gist.github.com/ammario/649d4c0da650162efd404af23e25b86b
-func int2ip(ipInt uint32) (netaddr.IP, bool) {
-	ip := make(net.IP, 4)
-	binary.BigEndian.PutUint32(ip, ipInt)
-	addr, ok := netaddr.FromStdIP(ip)
-
-	return addr, ok
-}
-
-func addToIP(startIP netaddr.IP, add int32) (newIP netaddr.IP, err error) {
-	if !startIP.Next().IsValid() {
-		err = fmt.Errorf("ip %v is already max", startIP)
-		return
-	}
-	bytes := startIP.As4()
-	slice := bytes[:]
-	ipValue := binary.BigEndian.Uint32(slice)
-	ipValue += uint32(add)
-	newIP, ok := int2ip(ipValue)
-	if !ok {
-		err = fmt.Errorf("problem after adding %d to IP %v", add, startIP)
-		return
-	}
-	return newIP, nil
-}
-
 // UsableIPRange get range of IPs usable for hosts
 func (s *IPV4Subnet) UsableIPRange() (r netaddr.IPRange, err error) {
 	ip := s.Prefix.IP()
 	startIP := ip
-	ip, err = addToIP(ip, int32(s.TotalHosts()))
+	ip, err = util.AddToIP(ip, int32(s.TotalHosts()))
 	if err != nil {
 		return
 	}
@@ -351,7 +301,7 @@ func (s *IPV4Subnet) UsableIPRange() (r netaddr.IPRange, err error) {
 func (s *IPV4Subnet) IPRange() (r netaddr.IPRange, err error) {
 	ip := s.Prefix.IP()
 	startIP := ip
-	ip, err = addToIP(ip, int32(s.TotalHosts()))
+	ip, err = util.AddToIP(ip, int32(s.TotalHosts()))
 	if err != nil {
 		return
 	}
@@ -374,7 +324,7 @@ func (s *IPV4Subnet) networkRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IP
 	ratio := int(math.Exp2(float64(childSubnet.Prefix.Bits() - s.Prefix.Bits())))
 	for j := 0; j < int(s.Networks()); j++ {
 		for r := 0; r < ratio; r++ {
-			ip, err = addToIP(ipStart, int32(childSubnet.NetworkHosts()-1))
+			ip, err = util.AddToIP(ipStart, int32(childSubnet.NetworkHosts()-1))
 			if err != nil {
 				return
 			}
