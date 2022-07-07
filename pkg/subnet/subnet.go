@@ -199,16 +199,23 @@ func (s *IPV4Subnet) maxBitsForClass() uint8 {
 
 // Class get network class, a, b, or c
 func (s *IPV4Subnet) Class() (class rune) {
-	switch s.maxBitsForClass() {
-	case 8:
+	parts := s.IP.As4()
+	bitStr := fmt.Sprintf("%08b", parts[0])
+
+	// https://stackoverflow.com/a/34257287/2694971
+	if strings.HasPrefix(bitStr, `0`) {
 		return 'A'
-	case 16:
+	} else if strings.HasPrefix(bitStr, `10`) {
 		return 'B'
-	case 24:
+	} else if strings.HasPrefix(bitStr, `110`) {
 		return 'C'
-	default:
-		return '0'
+	} else if strings.HasPrefix(bitStr, `1110`) {
+		return 'D'
+	} else if strings.HasPrefix(bitStr, `1111`) {
+		return 'E'
 	}
+
+	return '0'
 }
 
 // NetworkAddress get last IP for subnet
