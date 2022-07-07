@@ -35,23 +35,23 @@ $ iptools subnet divide -ip 99.236.32.0 -mask 16 -sub-mask 18 -pretty
 
 Subnet details
 ```
-$ iptools subnet describe -ip 99.236.32.0 -mask 18
+$ iptools subnet describe -ip 99.236.0.0 -mask 16
 +--------------------+-------------------------------------+
 |      Category      |                Value                |
 +--------------------+-------------------------------------+
-| Subnet Prefix      | 255.255.192.0/18                    |
-| Network Address    | 99.236.32.0                         |
-| IP Address         | 99.237.31.255                       |
-| Broadcast Address  | 99.237.31.255                       |
-| Networks           | 4                                   |
-| Network Hosts      | 16384                               |
+| Subnet Prefix      | 255.255.0.0/16                      |
+| Network Address    | 99.236.0.0                          |
+| IP Address         | 99.236.255.255                      |
+| Broadcast Address  | 99.236.255.255                      |
+| Networks           | 1                                   |
+| Network Hosts      | 65536                               |
 | Total Hosts        | 65536                               |
-| IP Class           | C                                   |
+| IP Class           | A                                   |
 | IP Type            | Public                              |
-| Binary Subnet Mask | 11111111.11111111.11000000.00000000 |
-| Binary ID          | 01100011111011000010000000000000    |
-| Hex ID             | Ox63ed1fff                          |
-| in-addr.arpa       | 0.32.236.99.in-addr.arpa            |
-| Wildcard Mask      | 0.0.58.250                          |
+| Binary Subnet Mask | 11111111.11111111.00000000.00000000 |
+| Binary ID          | 01100011111011000000000000000000    |
+| Hex ID             | Ox63ecffff                          |
+| in-addr.arpa       | 0.0.236.99.in-addr.arpa             |
+| Wildcard Mask      | 0.0.250.250                         |
 +--------------------+-------------------------------------+
 ```
