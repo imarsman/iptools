@@ -4,6 +4,8 @@ This is a learning experience for things like IP subnetting. Mostly I am interes
 ranges and defining things like the network ID and broadcast address for subnets. This is a way for me to better
 establish my knowledge of this subject.
 
+This utility can have completion enabled by typing `COMP_INSTALL=1 iptools`.
+
 This utility currently does two things. It splits a subnet into networks and into networks by a differing subnet size,
 and it gives summary information for a subnet.
 
