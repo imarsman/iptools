@@ -201,7 +201,7 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 		}
 		if secondaryMask != 0 {
 			r = []*simpletable.Cell{
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary subnet")},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet")},
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.Prefix.String())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
@@ -213,7 +213,7 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 			r = []*simpletable.Cell{
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Network hosts")},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Network Hosts")},
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s.NetworkHosts())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
@@ -225,24 +225,24 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 			table.Body.Cells = append(table.Body.Cells, r)
 			if secondaryMask != 0 {
 				r = []*simpletable.Cell{
-					{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary networks")},
+					{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Networks")},
 					{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s2.Networks())},
 				}
 				table.Body.Cells = append(table.Body.Cells, r)
 			}
 			r = []*simpletable.Cell{
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Effective networks")},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Effective Networks")},
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", len(ranges))},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 			r = []*simpletable.Cell{
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Network hosts")},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Network Hosts")},
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s.NetworkHosts())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 			if secondaryMask != 0 {
 				r = []*simpletable.Cell{
-					{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Sub Network hosts")},
+					{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Sub Network Hosts")},
 					{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s2.NetworkHosts())},
 				}
 				table.Body.Cells = append(table.Body.Cells, r)
