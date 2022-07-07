@@ -6,7 +6,7 @@ import (
 )
 
 // IPs list of subnet IPs to make life easier
-var IPs = []string{"99.236.32.0", "255.255.255.255", "10.32.0.0"}
+var IPs = []string{"99.236.32.0", "10.32.0.0"}
 
 var cmd = &complete.Command{
 	Sub: map[string]*complete.Command{
