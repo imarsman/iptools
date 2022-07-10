@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"strconv"
 	"strings"
 
 	"github.com/imarsman/iptools/pkg/util"
@@ -25,38 +24,23 @@ type IPV4Subnet struct {
 	IP     netaddr.IP
 }
 
-// NewFromMask new subnet with prefix 255.255.255.255 from incoming mask
-func NewFromMask(mask uint8) (subnet *IPV4Subnet, err error) {
-	return newSubnet("255.255.255.255", mask, true)
-}
-
 // NewFromIPAndMask new using incoming prefix ip and mask
 func NewFromIPAndMask(ip string, mask uint8) (subnet *IPV4Subnet, err error) {
-	return newSubnet(ip, uint8(mask), true)
-}
-
-// NewFromIPAndMaskUseMask new using incoming prefix ip and mask
-func NewFromIPAndMaskUseMask(ip string, mask uint8) (subnet *IPV4Subnet, err error) {
-	return newSubnet(ip, uint8(mask), false)
+	return newSubnet(ip, uint8(mask))
 }
 
 // NewFromPrefix new using incoming prefix
 func NewFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
-	errMsg := "invalid prefix"
-
-	parts := strings.Split(prefix, "/")
-	if len(parts) != 2 {
-		err = errors.New(errMsg)
-	}
-	mask, err := strconv.Atoi(parts[1])
+	p, err := netaddr.ParseIPPrefix(prefix)
 	if err != nil {
 		return
 	}
-	return newSubnet(parts[0], uint8(mask), true)
+
+	return newSubnet(p.IP().String(), p.Bits())
 }
 
 // newSubnet new subnet with prefix string, masked and boolean flag
-func newSubnet(ip string, mask uint8, usemask bool) (subnet *IPV4Subnet, err error) {
+func newSubnet(ip string, mask uint8) (subnet *IPV4Subnet, err error) {
 	errMsg := "invalid prefix"
 
 	subnet = new(IPV4Subnet)
@@ -68,28 +52,16 @@ func newSubnet(ip string, mask uint8, usemask bool) (subnet *IPV4Subnet, err err
 
 	var subnetAddress string
 
-	if usemask {
-		subnetAddress = "255.255.255.0"
-	} else {
-		subnetAddress = ip
-	}
+	subnetAddress = ip
 	var pfx netaddr.IPPrefix
-	// var prefixStr string
-	// if usemask {
 	prefixStr := fmt.Sprintf("%s/%d", subnetAddress, mask)
 	var pfxPre netaddr.IPPrefix
 	pfxPre, err = netaddr.ParseIPPrefix(prefixStr)
 	if err != nil {
 		return
 	}
-	// if usemask {
 	prefixStr = fmt.Sprintf("%s/%d", pfxPre.Masked().IP().String(), mask)
 	pfx = pfxPre.Masked()
-	// } else {
-	// 	prefixStr = fmt.Sprintf("%s/%d", pfxPre.IP().String(), mask)
-	// 	fmt.Println(prefixStr)
-	// 	pfx = pfxPre
-	// }
 
 	if !pfx.IsValid() {
 		return nil, errors.New(errMsg)
@@ -102,6 +74,13 @@ func newSubnet(ip string, mask uint8, usemask bool) (subnet *IPV4Subnet, err err
 	subnet.Prefix = pfx
 
 	return subnet, nil
+}
+
+// Mask get mask
+func (s *IPV4Subnet) Mask() (mask string) {
+	mask = s.Prefix.Masked().String()
+
+	return
 }
 
 // BinarySubnetMask get dot delimited subnet mask in binary
@@ -129,11 +108,11 @@ func (s *IPV4Subnet) classMask() int {
 	return int(bits[3])
 }
 
-// UsableRange omit first and last IPs
-func UsableRange() (usableRange netaddr.IPRange) {
+// // UsableRange omit first and last IPs
+// func UsableRange() (usableRange netaddr.IPRange) {
 
-	return
-}
+// 	return
+// }
 
 // JSON get JSON for subnet
 func (s *IPV4Subnet) JSON() (bytes []byte, err error) {
@@ -178,7 +157,9 @@ func (s *IPV4Subnet) TotalHosts() int64 {
 // NetworkHosts bits remaining in mask block
 func (s *IPV4Subnet) NetworkHosts() int64 {
 	if s.Prefix.Bits()%8 == 0 {
-		return int64((math.Exp2(float64(32) - float64(s.Prefix.Bits()))) / float64(s.Networks()))
+		return int64(
+			(math.Exp2(float64(32) - float64(s.Prefix.Bits()))) / float64(s.Networks()),
+		)
 	}
 	return int64((math.Exp2(float64(32 - s.Prefix.Bits()))))
 }
@@ -333,7 +314,6 @@ func (s *IPV4Subnet) networkRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IP
 		return
 	}
 	ranges = []netaddr.IPRange{}
-	// ip := s.Prefix.IP()
 	ip := s.IP
 	ipStart := ip
 
