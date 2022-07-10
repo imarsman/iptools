@@ -36,6 +36,9 @@ release:
 
     iptools is a set of IP and network tools
 
+    v0.1.5
+    Added subnet splitting to subnets
+
     v0.1.4
     More subnet details
 
