@@ -24,9 +24,9 @@ type IPV4Subnet struct {
 	IP     netaddr.IP       `json:"ip" yaml:"ip"`
 }
 
-// NewFromIPAndMask new using incoming prefix ip and mask
-func NewFromIPAndMask(ip string, mask uint8) (subnet *IPV4Subnet, err error) {
-	return newSubnet(ip, uint8(mask))
+// NewFromIPAndMask new using incoming prefix ip and network bits
+func NewFromIPAndMask(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
+	return newSubnet(ip, uint8(bits))
 }
 
 // NewFromPrefix new using incoming prefix
@@ -39,8 +39,8 @@ func NewFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
 	return newSubnet(p.IP().String(), p.Bits())
 }
 
-// newSubnet new subnet with prefix string, masked and boolean flag
-func newSubnet(ip string, mask uint8) (subnet *IPV4Subnet, err error) {
+// newSubnet new subnet with prefix ip and network bits
+func newSubnet(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
 	errMsg := "invalid prefix"
 
 	subnet = new(IPV4Subnet)
@@ -54,13 +54,13 @@ func newSubnet(ip string, mask uint8) (subnet *IPV4Subnet, err error) {
 
 	subnetAddress = ip
 	var pfx netaddr.IPPrefix
-	prefixStr := fmt.Sprintf("%s/%d", subnetAddress, mask)
+	prefixStr := fmt.Sprintf("%s/%d", subnetAddress, bits)
 	var pfxPre netaddr.IPPrefix
 	pfxPre, err = netaddr.ParseIPPrefix(prefixStr)
 	if err != nil {
 		return
 	}
-	prefixStr = fmt.Sprintf("%s/%d", pfxPre.Masked().IP().String(), mask)
+	prefixStr = fmt.Sprintf("%s/%d", pfxPre.Masked().IP().String(), bits)
 	pfx = pfxPre.Masked()
 
 	if !pfx.IsValid() {
@@ -76,13 +76,13 @@ func newSubnet(ip string, mask uint8) (subnet *IPV4Subnet, err error) {
 	return subnet, nil
 }
 
-// BroadcastAddress get broadcast address for subnet
+// BroadcastAddress get broadcast address for subnet, i.e. the max IP
 func (s *IPV4Subnet) BroadcastAddress() (ip netaddr.IP, err error) {
 	return s.Last()
 }
 
-// Mask get mask
-func (s *IPV4Subnet) Mask() (mask string) {
+// CIDR get CIDR notation for subnet
+func (s *IPV4Subnet) CIDR() (mask string) {
 	mask = s.Prefix.Masked().String()
 
 	return
@@ -100,7 +100,7 @@ func (s *IPV4Subnet) BinaryID() (subnetMask string) {
 	return util.BitStr4(s.IP, ``)
 }
 
-func (s *IPV4Subnet) classMask() int {
+func (s *IPV4Subnet) classOctet() int {
 	bits := s.Prefix.Masked().IP().As4()
 
 	if s.maxBitsForClass() == 8 {
@@ -112,12 +112,6 @@ func (s *IPV4Subnet) classMask() int {
 	}
 	return int(bits[3])
 }
-
-// // UsableRange omit first and last IPs
-// func UsableRange() (usableRange netaddr.IPRange) {
-
-// 	return
-// }
 
 // JSON get JSON for subnet
 func (s *IPV4Subnet) JSON() (bytes []byte, err error) {
@@ -144,13 +138,13 @@ func (s *IPV4Subnet) PrefixBits() uint8 {
 	return s.Prefix.Bits()
 }
 
-// ClassHostItentifierBits bits not used in mask block
-func (s *IPV4Subnet) ClassHostItentifierBits() uint8 {
+// ClassNetworkBits bits not used for hosts in class block
+func (s *IPV4Subnet) ClassNetworkBits() uint8 {
 	return s.Prefix.Bits() - s.startBitsForClass()
 }
 
-// ClassNetworkPrefixBits bits used in mask block
-func (s *IPV4Subnet) ClassNetworkPrefixBits() uint8 {
+// ClassHostBits bits used for network in class block
+func (s *IPV4Subnet) ClassHostBits() uint8 {
 	return s.maxBitsForClass() - s.Prefix.Bits()
 }
 

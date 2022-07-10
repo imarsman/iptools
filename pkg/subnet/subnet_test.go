@@ -17,9 +17,9 @@ func TestNewSubnet(t *testing.T) {
 		s, err := NewFromIPAndMask("10.32.0.0", uint8(i))
 		is.NoErr(err)
 		t.Log("masked", s.Prefix.Masked())
-		t.Log("class mask", s.classMask())
-		t.Log("subnet max bits", s.maxBitsForClass())
-		t.Log("subnet start bits", s.startBitsForClass())
+		t.Log("class bits", s.classOctet())
+		t.Log("subnet max bits for class", s.maxBitsForClass())
+		t.Log("subnet start bits for class", s.startBitsForClass())
 		// t.Log("block size", s.BlockSize())
 		t.Log("networks", s.Networks())
 		// hosts per network
@@ -27,8 +27,8 @@ func TestNewSubnet(t *testing.T) {
 		t.Log("hosts per network", s.Hosts())
 		t.Log("usable hosts per network", s.UsableHosts())
 		t.Log("total hosts per subnet", s.Hosts()*s.Networks())
-		t.Log("class network prefix bits", s.ClassNetworkPrefixBits())
-		t.Log("class host identifier bits", s.ClassHostItentifierBits())
+		t.Log("class network bits", s.ClassNetworkBits())
+		t.Log("class host bits", s.ClassHostBits())
 		t.Log()
 	}
 }

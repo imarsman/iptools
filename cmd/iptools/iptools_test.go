@@ -78,7 +78,7 @@ func TestBits(t *testing.T) {
 		t.Log("active byte", s.PrefixBits())
 		t.Log("ip range", s.Prefix.Range())
 		// t.Log("subnet usable ip range", subnet.UsableRange(s.Prefix.Range()))
-		t.Log("partial bits", s.ClassNetworkPrefixBits())
+		t.Log("partial bits", s.ClassHostBits())
 		// t.Log("host bits", s.ClassHots())
 		t.Log("prefix bits", s.Prefix.Bits())
 		// t.Log("hosts", s.DivisionIncrement)
