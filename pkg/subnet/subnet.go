@@ -105,24 +105,27 @@ func (s *IPV4Subnet) BroadcastAddress() (ip netaddr.IP, err error) {
 }
 
 // CIDR get CIDR notation for subnet
-func (s *IPV4Subnet) CIDR() (mask string) {
-	mask = s.Prefix.Masked().String()
+func (s *IPV4Subnet) CIDR() (cidr string) {
+	cidr = s.Prefix.Masked().String()
 
 	return
 }
 
 // BinarySubnetMask get dot delimited subnet mask in binary
-func (s *IPV4Subnet) BinarySubnetMask() (subnetMask string) {
-	subnetMask = util.BitStr4(s.Prefix.Masked().IP(), `.`)
+func (s *IPV4Subnet) BinarySubnetMask() (mask string) {
+	mask = util.BitStr4(s.Prefix.Masked().IP(), `.`)
 
 	return
 }
 
 // BinaryID get the starting IP for subnet as binary
-func (s *IPV4Subnet) BinaryID() (subnetMask string) {
-	return util.BitStr4(s.IP, ``)
+func (s *IPV4Subnet) BinaryID() (mask string) {
+	mask = util.BitStr4(s.IP, ``)
+
+	return
 }
 
+// classOcted get octet for prefix IP
 func (s *IPV4Subnet) classOctet() int {
 	bits := s.Prefix.Masked().IP().As4()
 
@@ -309,7 +312,7 @@ func (s *IPV4Subnet) IPRange() (r netaddr.IPRange, err error) {
 	return
 }
 
-// NetworkSubnetsInSubnet set of subnets in the context of subnets of a specified size
+// NetworkSubnetsInSubnet set of subnets in the context of parent subnet
 func (s *IPV4Subnet) NetworkSubnetsInSubnet(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
 	return s.networkSubnets(childSubnet)
 }
@@ -319,6 +322,7 @@ func (s *IPV4Subnet) NetworkSubnets() (subnets []*IPV4Subnet, err error) {
 	return s.networkSubnets(s)
 }
 
+// networkSubnets split a subnet into smaller child subnets
 func (s *IPV4Subnet) networkSubnets(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
 	ranges, err := s.networkIPRanges(childSubnet)
 	if err != nil {
@@ -338,16 +342,17 @@ func (s *IPV4Subnet) networkSubnets(childSubnet *IPV4Subnet) (subnets []*IPV4Sub
 	return
 }
 
-// NetworkIPRangesInSubnet set of ranges in the context of subnets of a specified size
+// NetworkIPRangesInSubnet set of ranges in the context of parent subnet
 func (s *IPV4Subnet) NetworkIPRangesInSubnet(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
 	return s.networkIPRanges(childSubnet)
 }
 
-// NetworkIPRanges the set of equally sized subnet blocks for subnet
+// NetworkIPRanges the set of equally sized ranges for subnet
 func (s *IPV4Subnet) NetworkIPRanges() (ranges []netaddr.IPRange, err error) {
 	return s.networkIPRanges(s)
 }
 
+// networkIPRanges get the ranges for a subnet splitting by child subnet (can be self)
 func (s *IPV4Subnet) networkIPRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
 	// Can't subdivide to smaller prefixed subnet
 	if childSubnet.Prefix.Bits() < s.Prefix.Bits() {
