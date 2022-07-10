@@ -19,9 +19,9 @@ const (
 
 // IPV4Subnet an IP subnet
 type IPV4Subnet struct {
-	Name   string
+	Name   string           `json:"name" yaml:"name"`
 	Prefix netaddr.IPPrefix `json:"prefix" yaml:"prefix"`
-	IP     netaddr.IP
+	IP     netaddr.IP       `json:"ip" yaml:"ip"`
 }
 
 // NewFromIPAndMask new using incoming prefix ip and mask
@@ -74,6 +74,11 @@ func newSubnet(ip string, mask uint8) (subnet *IPV4Subnet, err error) {
 	subnet.Prefix = pfx
 
 	return subnet, nil
+}
+
+// BroadcastAddress get broadcast address for subnet
+func (s *IPV4Subnet) BroadcastAddress() (ip netaddr.IP, err error) {
+	return s.Last()
 }
 
 // Mask get mask
@@ -151,11 +156,11 @@ func (s *IPV4Subnet) ClassNetworkPrefixBits() uint8 {
 
 // TotalHosts total hosts in subnet
 func (s *IPV4Subnet) TotalHosts() int64 {
-	return s.NetworkHosts() * s.Networks()
+	return s.Hosts() * s.Networks()
 }
 
-// NetworkHosts bits remaining in mask block
-func (s *IPV4Subnet) NetworkHosts() int64 {
+// Hosts bits remaining in mask block
+func (s *IPV4Subnet) Hosts() int64 {
 	if s.Prefix.Bits()%8 == 0 {
 		return int64(
 			(math.Exp2(float64(32) - float64(s.Prefix.Bits()))) / float64(s.Networks()),
@@ -164,12 +169,12 @@ func (s *IPV4Subnet) NetworkHosts() int64 {
 	return int64((math.Exp2(float64(32 - s.Prefix.Bits()))))
 }
 
-// UsableNetworkHosts number of usable hosts
-func (s *IPV4Subnet) UsableNetworkHosts() int64 {
-	if s.NetworkHosts() < 2 {
+// UsableHosts number of usable hosts
+func (s *IPV4Subnet) UsableHosts() int64 {
+	if s.Hosts() < 2 {
 		return 0
 	}
-	return s.NetworkHosts() - 2
+	return s.Hosts() - 2
 }
 
 // startBitsForClass starting bits for subnet range for the class
@@ -320,7 +325,7 @@ func (s *IPV4Subnet) networkRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IP
 	ratio := int(math.Exp2(float64(childSubnet.Prefix.Bits() - s.Prefix.Bits())))
 	for j := 0; j < int(s.Networks()); j++ {
 		for r := 0; r < ratio; r++ {
-			ip, err = util.AddToIP(ipStart, int32(childSubnet.NetworkHosts()-1))
+			ip, err = util.AddToIP(ipStart, int32(childSubnet.Hosts()-1))
 			if err != nil {
 				return
 			}
