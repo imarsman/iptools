@@ -15,18 +15,18 @@ var cmd = &complete.Command{
 				// Scheduler health for an environment
 				"ranges": {
 					Flags: map[string]complete.Predictor{
-						"ip":       predict.Set(IPs),
-						"mask":     predict.Nothing,
-						"sub-mask": predict.Nothing,
-						"pretty":   predict.Nothing,
+						"ip":                    predict.Set(IPs),
+						"prefix-bits":           predict.Nothing,
+						"secondary-prefix-bits": predict.Nothing,
+						"pretty":                predict.Nothing,
 					},
 				},
 				"divide": {
 					Flags: map[string]complete.Predictor{
-						"ip":       predict.Set(IPs),
-						"mask":     predict.Nothing,
-						"sub-mask": predict.Nothing,
-						"pretty":   predict.Nothing,
+						"ip":                    predict.Set(IPs),
+						"prefix-bits":           predict.Nothing,
+						"secondary-prefix-bits": predict.Nothing,
+						"pretty":                predict.Nothing,
 					},
 				},
 				"describe": {
