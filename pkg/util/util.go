@@ -4,6 +4,8 @@ import (
 	"encoding/binary"
 	"fmt"
 	"net"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"inet.af/netaddr"
@@ -19,6 +21,40 @@ func BitStr4(ip netaddr.IP, separator string) string {
 	}
 
 	return strings.Join(list, separator)
+}
+
+// BinaryIP4StrToBytes convert a binary IP string for an IPV4 IP to a set of 4 bytes
+func BinaryIP4StrToBytes(ip string) (list []byte, err error) {
+	var parts []string
+	if !strings.Contains(ip, ".") {
+		if len(ip) != 32 {
+			err = fmt.Errorf("invalid binary ip %s", ip)
+			return
+		}
+		var matches bool
+		matches, err = regexp.MatchString(`[01]`, ip)
+		if err != nil {
+			return
+		}
+		if !matches {
+			err = fmt.Errorf("invalid binary ip %s", ip)
+			return
+		}
+		parts = []string{ip[0:8], ip[8:16], ip[16:24], ip[25:32]}
+	} else {
+		parts = strings.Split(ip, ".")
+	}
+
+	for _, part := range parts {
+		var i int64
+		i, err = strconv.ParseInt(part, 2, 32)
+		if err != nil {
+			return
+		}
+		list = append(list, byte(i))
+	}
+
+	return
 }
 
 // IntToHexStr get hex string from int32
@@ -68,17 +104,24 @@ func AddToIP(startIP netaddr.IP, add int32) (newIP netaddr.IP, err error) {
 	return newIP, nil
 }
 
+// For fun with generics
+func reverse[T any](s []T) {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
+}
+
+// InAddrArpa get the InAddrArpa version of an IP
 func InAddrArpa(ip netaddr.IP) string {
 	ipStr := ip.String()
 	parts := strings.Split(ipStr, `.`)
 
-	for i, j := 0, len(parts)-1; i < j; i, j = i+1, j-1 {
-		parts[i], parts[j] = parts[j], parts[i]
-	}
+	reverse(parts)
 
 	return strings.Join(parts, ".")
 }
 
+// IPToHexStr convert an IP4 address to a hex string
 func IPToHexStr(ip netaddr.IP) string {
 	bytes := ip.As4()
 	slice := bytes[:]

@@ -122,6 +122,53 @@ func TestBitString(t *testing.T) {
 	t.Log(bitStr)
 }
 
+func TestIPString(t *testing.T) {
+	is := is.New(t)
+	start := "127.0.0.1"
+	ip, err := netaddr.ParseIP(start)
+	is.NoErr(err)
+
+	bitStr := util.BitStr4(ip, ".")
+	t.Log("bitStr for 127.0.0.1", bitStr)
+
+	bytes, err := util.BinaryIP4StrToBytes(bitStr)
+	is.NoErr(err)
+
+	list := make([]byte, 0, 0)
+
+	for _, b := range bytes {
+		list = append(list, b)
+	}
+	t.Logf("Started with %s got bytes %v", start, list)
+
+	start = "99.236.32.0"
+	bitStr = "01100011.11101100.00100000.00000000"
+	t.Log("bitStr for 99.236.32.0", bitStr)
+	bytes, err = util.BinaryIP4StrToBytes(bitStr)
+	is.NoErr(err)
+
+	list = make([]byte, 0, 0)
+
+	for _, b := range bytes {
+		list = append(list, b)
+	}
+	t.Logf("Started with %s got bytes %v", start, list)
+}
+
+// TestIPStringSplit test split of IP4 binary string to 4 byte slice
+func TestIPStringSplit(t *testing.T) {
+	is := is.New(t)
+
+	list := []string{"01100011.11101100.00100000.00000000", "01100011111011000010000000000000"}
+
+	for _, bitStr := range list {
+		// bitStr := "01100011.11101100.00100000.00000000"
+		bytes, err := util.BinaryIP4StrToBytes(bitStr)
+		is.NoErr(err)
+		t.Log(bytes)
+	}
+}
+
 // go test -bench=. -benchmem
 func BenchmarkBlocks(b *testing.B) {
 	is := is.New(b)
