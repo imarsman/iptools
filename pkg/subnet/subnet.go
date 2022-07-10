@@ -24,6 +24,11 @@ type IPV4Subnet struct {
 	IP     netaddr.IP       `json:"ip" yaml:"ip"`
 }
 
+// String get string representing subnet (cidr notation)
+func (s *IPV4Subnet) String() string {
+	return s.Prefix.String()
+}
+
 // JSON get JSON for subnet
 func (s *IPV4Subnet) JSON() (bytes []byte, err error) {
 	bytes, err = json.MarshalIndent(s, "", "  ")
@@ -70,11 +75,8 @@ func newSubnet(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
 	}
 	subnet.IP = addressIP
 
-	var subnetAddress string
-
-	subnetAddress = ip
 	var pfx netaddr.IPPrefix
-	prefixStr := fmt.Sprintf("%s/%d", subnetAddress, bits)
+	prefixStr := fmt.Sprintf("%s/%d", ip, bits)
 	var pfxPre netaddr.IPPrefix
 	pfxPre, err = netaddr.ParseIPPrefix(prefixStr)
 	if err != nil {
@@ -339,9 +341,4 @@ func (s *IPV4Subnet) NetworkIPRangesInSubnets(childSubnet *IPV4Subnet) (ranges [
 // NetworkIPRanges the set of equally sized subnet blocks for subnet
 func (s *IPV4Subnet) NetworkIPRanges() (ranges []netaddr.IPRange, err error) {
 	return s.networkIPRanges(s)
-}
-
-// String get string representing subnet (cidr notation)
-func (s *IPV4Subnet) String() string {
-	return s.Prefix.String()
 }
