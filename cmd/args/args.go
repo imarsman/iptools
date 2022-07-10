@@ -21,7 +21,7 @@ type SubnetDivide struct {
 
 type Subnet struct {
 	SubnetRanges   *SubnetRanges   `arg:"subcommand:ranges" help:"divide a subnet into ranges"`
-	SubnetDivide   *SubnetDivide   `arg:"subcommand:divide" help:"divide a subnet into ranges"`
+	SubnetDivide   *SubnetDivide   `arg:"subcommand:divide" help:"divide a subnet into smaller subnets"`
 	SubnetDescribe *SubnetDescribe `arg:"subcommand:describe" help:"describe a subnet"`
 }
 
