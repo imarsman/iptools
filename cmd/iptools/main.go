@@ -35,6 +35,13 @@ func main() {
 	arg.MustParse(&args.CLIArgs)
 
 	if args.CLIArgs.Subnet != nil {
+		if args.CLIArgs.Subnet.SubnetRanges != nil {
+			handler.SubnetRanges(
+				args.CLIArgs.Subnet.SubnetRanges.IP,
+				uint8(args.CLIArgs.Subnet.SubnetRanges.Mask),
+				uint8(args.CLIArgs.Subnet.SubnetRanges.SubMask),
+			)
+		}
 		if args.CLIArgs.Subnet.SubnetDivide != nil {
 			handler.SubnetDivide(
 				args.CLIArgs.Subnet.SubnetDivide.IP,

@@ -13,6 +13,14 @@ var cmd = &complete.Command{
 		"subnet": {
 			Sub: map[string]*complete.Command{
 				// Scheduler health for an environment
+				"ranges": {
+					Flags: map[string]complete.Predictor{
+						"ip":       predict.Set(IPs),
+						"mask":     predict.Nothing,
+						"sub-mask": predict.Nothing,
+						"pretty":   predict.Nothing,
+					},
+				},
 				"divide": {
 					Flags: map[string]complete.Predictor{
 						"ip":       predict.Set(IPs),

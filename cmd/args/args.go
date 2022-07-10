@@ -5,6 +5,13 @@ type SubnetDescribe struct {
 	Mask int    `arg:"-m,--mask" help:""`
 }
 
+type SubnetRanges struct {
+	IP      string `arg:"-i,--ip" help:""`
+	Mask    int    `arg:"-m,--mask" help:""`
+	SubMask int    `arg:"-s,--sub-mask" help:""`
+	Pretty  bool   `arg:"-p,--pretty" help:""`
+}
+
 type SubnetDivide struct {
 	IP      string `arg:"-i,--ip" help:""`
 	Mask    int    `arg:"-m,--mask" help:""`
@@ -13,6 +20,7 @@ type SubnetDivide struct {
 }
 
 type Subnet struct {
+	SubnetRanges   *SubnetRanges   `arg:"subcommand:ranges" help:"divide a subnet into ranges"`
 	SubnetDivide   *SubnetDivide   `arg:"subcommand:divide" help:"divide a subnet into ranges"`
 	SubnetDescribe *SubnetDescribe `arg:"subcommand:describe" help:"describe a subnet"`
 }

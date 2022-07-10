@@ -35,6 +35,11 @@ func NewFromIPAndMask(ip string, mask uint8) (subnet *IPV4Subnet, err error) {
 	return newSubnet(ip, uint8(mask), true)
 }
 
+// NewFromIPAndMaskUseMask new using incoming prefix ip and mask
+func NewFromIPAndMaskUseMask(ip string, mask uint8) (subnet *IPV4Subnet, err error) {
+	return newSubnet(ip, uint8(mask), false)
+}
+
 // NewFromPrefix new using incoming prefix
 func NewFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
 	errMsg := "invalid prefix"
@@ -61,8 +66,15 @@ func newSubnet(ip string, mask uint8, usemask bool) (subnet *IPV4Subnet, err err
 	}
 	subnet.IP = addressIP
 
-	subnetAddress := "255.255.255.0"
+	var subnetAddress string
+
+	if usemask {
+		subnetAddress = "255.255.255.0"
+	} else {
+		subnetAddress = ip
+	}
 	var pfx netaddr.IPPrefix
+	// var prefixStr string
 	// if usemask {
 	prefixStr := fmt.Sprintf("%s/%d", subnetAddress, mask)
 	var pfxPre netaddr.IPPrefix
@@ -70,8 +82,14 @@ func newSubnet(ip string, mask uint8, usemask bool) (subnet *IPV4Subnet, err err
 	if err != nil {
 		return
 	}
+	// if usemask {
 	prefixStr = fmt.Sprintf("%s/%d", pfxPre.Masked().IP().String(), mask)
 	pfx = pfxPre.Masked()
+	// } else {
+	// 	prefixStr = fmt.Sprintf("%s/%d", pfxPre.IP().String(), mask)
+	// 	fmt.Println(prefixStr)
+	// 	pfx = pfxPre
+	// }
 
 	if !pfx.IsValid() {
 		return nil, errors.New(errMsg)
