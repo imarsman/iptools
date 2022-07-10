@@ -182,7 +182,7 @@ func BenchmarkSubnetSplit(b *testing.B) {
 	s, err := NewFromIPAndBits("10.32.0.0", 28)
 	is.NoErr(err)
 	subnets, err := s.networkSubnets(s)
-	b.Logf("Got %d subnets", len(subnets))
 	is.NoErr(err)
+	is.True(len(subnets) == 16)
 	s.NetworkIPRanges()
 }
