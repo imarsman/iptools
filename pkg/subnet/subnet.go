@@ -24,8 +24,28 @@ type IPV4Subnet struct {
 	IP     netaddr.IP       `json:"ip" yaml:"ip"`
 }
 
-// NewFromIPAndMask new using incoming prefix ip and network bits
-func NewFromIPAndMask(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
+// JSON get JSON for subnet
+func (s *IPV4Subnet) JSON() (bytes []byte, err error) {
+	bytes, err = json.MarshalIndent(s, "", "  ")
+	if err != nil {
+		return
+	}
+
+	return bytes, nil
+}
+
+// YAML get YAML for subnet
+func (s *IPV4Subnet) YAML() (bytes []byte, err error) {
+	bytes, err = yaml.Marshal(s)
+	if err != nil {
+		return
+	}
+
+	return bytes, nil
+}
+
+// NewFromIPAndBits new using incoming prefix ip and network bits
+func NewFromIPAndBits(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
 	return newSubnet(ip, uint8(bits))
 }
 
@@ -111,26 +131,6 @@ func (s *IPV4Subnet) classOctet() int {
 		return int(bits[2])
 	}
 	return int(bits[3])
-}
-
-// JSON get JSON for subnet
-func (s *IPV4Subnet) JSON() (bytes []byte, err error) {
-	bytes, err = json.MarshalIndent(s, "", "  ")
-	if err != nil {
-		return
-	}
-
-	return bytes, nil
-}
-
-// YAML get YAML for subnet
-func (s *IPV4Subnet) YAML() (bytes []byte, err error) {
-	bytes, err = yaml.Marshal(s)
-	if err != nil {
-		return
-	}
-
-	return bytes, nil
 }
 
 // PrefixBits byte used for subnet

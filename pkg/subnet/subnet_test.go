@@ -14,7 +14,7 @@ func TestNewSubnet(t *testing.T) {
 	for i := 1; i <= 32; i++ {
 		// subnetMask := fmt.Sprintf("255.255.255.0/%d", i)
 		is := is.New(t)
-		s, err := NewFromIPAndMask("10.32.0.0", uint8(i))
+		s, err := NewFromIPAndBits("10.32.0.0", uint8(i))
 		is.NoErr(err)
 		t.Log("masked", s.Prefix.Masked())
 		t.Log("class bits", s.classOctet())
@@ -125,7 +125,7 @@ func TestBitString(t *testing.T) {
 // go test -bench=. -benchmem
 func BenchmarkBlocks(b *testing.B) {
 	is := is.New(b)
-	s, err := NewFromIPAndMask("10.32.0.0", 28)
+	s, err := NewFromIPAndBits("10.32.0.0", 28)
 	is.NoErr(err)
 	s.NetworkIPRanges()
 }
