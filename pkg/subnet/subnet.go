@@ -216,11 +216,6 @@ func (s *IPV4Subnet) Class() (class rune) {
 	return '0'
 }
 
-// NetworkAddress get last IP for subnet
-func (s *IPV4Subnet) NetworkAddress() (ip netaddr.IP, err error) {
-	return s.Last()
-}
-
 // First get first IP for subnet
 func (s *IPV4Subnet) First() (ip netaddr.IP, err error) {
 	ip = s.IP
@@ -235,6 +230,11 @@ func (s *IPV4Subnet) Last() (ip netaddr.IP, err error) {
 	}
 
 	return
+}
+
+// NetworkAddress get last IP for subnet
+func (s *IPV4Subnet) NetworkAddress() (ip netaddr.IP, err error) {
+	return s.Last()
 }
 
 // Networks number of subnets
@@ -306,7 +306,7 @@ func (s *IPV4Subnet) IPRange() (r netaddr.IPRange, err error) {
 	return
 }
 
-func (s *IPV4Subnet) networkRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
+func (s *IPV4Subnet) networkIPRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
 	// Can't subdivide to smaller prefixed subnet
 	if childSubnet.Prefix.Bits() < s.Prefix.Bits() {
 		err = fmt.Errorf("Subnet to split to has more bits %d than parent %d", s.Prefix.Bits(), childSubnet.Prefix.Bits())
@@ -331,14 +331,14 @@ func (s *IPV4Subnet) networkRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IP
 	return
 }
 
-// NetworkRangesInSubnets set of ranges in the context of subnets of a specified size
-func (s *IPV4Subnet) NetworkRangesInSubnets(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
-	return s.networkRanges(childSubnet)
+// NetworkIPRangesInSubnets set of ranges in the context of subnets of a specified size
+func (s *IPV4Subnet) NetworkIPRangesInSubnets(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
+	return s.networkIPRanges(childSubnet)
 }
 
-// NetworkRanges the set of equally sized subnet blocks for subnet
-func (s *IPV4Subnet) NetworkRanges() (ranges []netaddr.IPRange, err error) {
-	return s.networkRanges(s)
+// NetworkIPRanges the set of equally sized subnet blocks for subnet
+func (s *IPV4Subnet) NetworkIPRanges() (ranges []netaddr.IPRange, err error) {
+	return s.networkIPRanges(s)
 }
 
 // String get string representing subnet (cidr notation)
