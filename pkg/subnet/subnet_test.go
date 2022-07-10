@@ -92,7 +92,7 @@ func TestChildSubnets(t *testing.T) {
 		t.Log("child subnet hosts per network", childSubnet.Hosts())
 		t.Log("network count", subnet.Networks())
 		start := time.Now()
-		networks, err := subnet.NetworkIPRangesInSubnets(childSubnet)
+		networks, err := subnet.NetworkIPRangesInSubnet(childSubnet)
 		is.NoErr(err)
 		t.Log("run took", time.Since(start))
 		t.Log("total networks", len(networks))

@@ -150,10 +150,10 @@ func SubnetDescribe(ip string, mask uint8) {
 }
 
 // SubnetRanges divide a subnet into ranges
-func SubnetRanges(ip string, mask uint8, secondaryMask uint8) {
+func SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 	var err error
 	var s *subnet.IPV4Subnet
-	prefix := fmt.Sprintf("%s/%d", ip, mask)
+	prefix := fmt.Sprintf("%s/%d", ip, bits)
 	s, err = subnet.NewFromPrefix(prefix)
 	if err != nil {
 		fmt.Println(err)
@@ -169,7 +169,7 @@ func SubnetRanges(ip string, mask uint8, secondaryMask uint8) {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		ranges, err = s.NetworkIPRangesInSubnets(s2)
+		ranges, err = s.NetworkIPRangesInSubnet(s2)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -207,7 +207,7 @@ func SubnetRanges(ip string, mask uint8, secondaryMask uint8) {
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 		}
-		if mask == secondaryMask {
+		if bits == secondaryMask {
 			r = []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Networks")},
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", s.Networks())},
@@ -291,7 +291,7 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 		os.Exit(1)
 	}
 
-	ranges := []netaddr.IPRange{}
+	subnets := []*subnet.IPV4Subnet{}
 	var s2 *subnet.IPV4Subnet
 	if secondaryMask != 0 {
 		prefix := fmt.Sprintf("%s/%d", ip, secondaryMask)
@@ -300,14 +300,14 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		ranges, err = s.NetworkIPRangesInSubnets(s2)
+		subnets, err = s.NetworkSubnetsInSubnet(s2)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 	} else {
 		s2 = s
-		ranges, err = s.NetworkIPRanges()
+		subnets, err = s.NetworkSubnetsInSubnet(s)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -363,7 +363,7 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 				table.Body.Cells = append(table.Body.Cells, r)
 				r = []*simpletable.Cell{
 					{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Effective Networks")},
-					{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", len(ranges))},
+					{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%d", len(subnets))},
 				}
 				table.Body.Cells = append(table.Body.Cells, r)
 			}
@@ -395,14 +395,14 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 			},
 		}
 		// var subnetsSplit []*subnet.IPV4Subnet
-		for _, r := range ranges {
-			subnetNew, err := subnet.NewFromIPAndBits(r.From().IPAddr().IP.String(), s2.Prefix.Bits())
-			if err != nil {
-				panic(err.Error())
-			}
+		for _, s := range subnets {
+			// subnetNew, err := subnet.NewFromIPAndBits(r.From().IPAddr().IP.String(), s2.Prefix.Bits())
+			// if err != nil {
+			// 	panic(err.Error())
+			// }
 			// subnetsSplit = append(subnetsSplit, subnetNew)
 			cell := []*simpletable.Cell{
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", subnetNew.String())},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.String())},
 			}
 			table.Body.Cells = append(table.Body.Cells, cell)
 		}
@@ -410,12 +410,12 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 
 		fmt.Println(table.String())
 	} else {
-		for _, r := range ranges {
-			subnetNew, err := subnet.NewFromIPAndBits(r.From().IPAddr().IP.String(), s2.Prefix.Bits())
-			if err != nil {
-				panic(err.Error())
-			}
-			fmt.Println(subnetNew.String())
+		for _, s := range subnets {
+			// subnetNew, err := subnet.NewFromIPAndBits(r.From().IPAddr().IP.String(), s2.Prefix.Bits())
+			// if err != nil {
+			// 	panic(err.Error())
+			// }
+			fmt.Println(s.String())
 		}
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"os"
 	"strings"
 
 	"github.com/imarsman/iptools/pkg/util"
@@ -308,6 +309,45 @@ func (s *IPV4Subnet) IPRange() (r netaddr.IPRange, err error) {
 	return
 }
 
+// NetworkSubnetsInSubnet set of subnets in the context of subnets of a specified size
+func (s *IPV4Subnet) NetworkSubnetsInSubnet(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
+	return s.networkSubnets(childSubnet)
+}
+
+// NetworkSubnets the set of equally sized subnets for subnet
+func (s *IPV4Subnet) NetworkSubnets() (subnets []*IPV4Subnet, err error) {
+	return s.networkSubnets(s)
+}
+
+func (s *IPV4Subnet) networkSubnets(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
+	ranges, err := s.networkIPRanges(childSubnet)
+	if err != nil {
+		return
+	}
+
+	for _, r := range ranges {
+		prefix := fmt.Sprintf("%s/%d", r.From(), childSubnet.Prefix.Bits())
+		s, err = NewFromPrefix(prefix)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		subnets = append(subnets, s)
+	}
+
+	return
+}
+
+// NetworkIPRangesInSubnet set of ranges in the context of subnets of a specified size
+func (s *IPV4Subnet) NetworkIPRangesInSubnet(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
+	return s.networkIPRanges(childSubnet)
+}
+
+// NetworkIPRanges the set of equally sized subnet blocks for subnet
+func (s *IPV4Subnet) NetworkIPRanges() (ranges []netaddr.IPRange, err error) {
+	return s.networkIPRanges(s)
+}
+
 func (s *IPV4Subnet) networkIPRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
 	// Can't subdivide to smaller prefixed subnet
 	if childSubnet.Prefix.Bits() < s.Prefix.Bits() {
@@ -331,14 +371,4 @@ func (s *IPV4Subnet) networkIPRanges(childSubnet *IPV4Subnet) (ranges []netaddr.
 	}
 
 	return
-}
-
-// NetworkIPRangesInSubnets set of ranges in the context of subnets of a specified size
-func (s *IPV4Subnet) NetworkIPRangesInSubnets(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
-	return s.networkIPRanges(childSubnet)
-}
-
-// NetworkIPRanges the set of equally sized subnet blocks for subnet
-func (s *IPV4Subnet) NetworkIPRanges() (ranges []netaddr.IPRange, err error) {
-	return s.networkIPRanges(s)
 }
