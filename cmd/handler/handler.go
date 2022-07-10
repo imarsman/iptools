@@ -396,7 +396,6 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 		// var subnetsSplit []*subnet.IPV4Subnet
 		for _, r := range ranges {
 			subnetNew, err := subnet.NewFromIPAndMaskUseMask(r.From().IPAddr().IP.String(), s2.Prefix.Bits())
-			// fmt.Println("subnetNew", subnetNew, r.From().IPAddr().IP.String())
 			if err != nil {
 				panic(err.Error())
 			}
@@ -406,14 +405,8 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 			}
 			table.Body.Cells = append(table.Body.Cells, cell)
 		}
-		// for _, r := range ranges {
-		// 	cell := []*simpletable.Cell{
-		// 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", r.From().String())},
-		// 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", r.To().String())},
-		// 	}
-		// 	table.Body.Cells = append(table.Body.Cells, cell)
-		// }
 		table.SetStyle(simpletable.StyleCompactLite)
+
 		fmt.Println(table.String())
 	} else {
 		for _, r := range ranges {
