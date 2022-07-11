@@ -16,7 +16,7 @@ func TestNewSubnet(t *testing.T) {
 		is := is.New(t)
 		s, err := NewFromIPAndBits("10.32.0.0", uint8(i))
 		is.NoErr(err)
-		t.Log("masked", s.Prefix.Masked())
+		t.Log("masked", s.Prefix().Masked())
 		t.Log("class bits", s.classOctet())
 		t.Log("subnet max bits for class", s.maxBitsForClass())
 		t.Log("subnet start bits for class", s.startBitsForClass())

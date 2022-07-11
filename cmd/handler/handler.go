@@ -102,7 +102,7 @@ func SubnetDescribe(ip string, mask uint8) {
 	table.Body.Cells = append(table.Body.Cells, r)
 
 	ipType := "Public"
-	if s.IP.IsPrivate() {
+	if s.IP().IsPrivate() {
 		ipType = "Private"
 	}
 	r = []*simpletable.Cell{
@@ -136,13 +136,13 @@ func SubnetDescribe(ip string, mask uint8) {
 
 	r = []*simpletable.Cell{
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "in-addr.arpa")},
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s.in-addr.arpa", util.InAddrArpa(s.IP))},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s.in-addr.arpa", util.InAddrArpa(s.IP()))},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
 	r = []*simpletable.Cell{
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Wildcard Mask")},
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMask(s.Prefix.IP()))},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMask(s.Prefix().IP()))},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
@@ -198,7 +198,7 @@ func SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 		table.Body.Cells = append(table.Body.Cells, r)
 		r = []*simpletable.Cell{
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet IP")},
-			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.IP.String())},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.IP().String())},
 		}
 		if secondaryMask != 0 {
 			r = []*simpletable.Cell{
@@ -324,17 +324,17 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 		}
 		r := []*simpletable.Cell{
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet")},
-			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.Prefix.String())},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.Prefix().String())},
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
 		r = []*simpletable.Cell{
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet IP")},
-			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.IP.String())},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.IP().String())},
 		}
 		if secondaryMask != 0 {
 			r = []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet")},
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.Prefix.String())},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.Prefix().String())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 		}
