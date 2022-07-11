@@ -406,10 +406,6 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 		fmt.Println(table.String())
 	} else {
 		for _, s := range subnets {
-			// subnetNew, err := subnet.NewFromIPAndBits(r.From().IPAddr().IP.String(), s2.Prefix.Bits())
-			// if err != nil {
-			// 	panic(err.Error())
-			// }
 			fmt.Println(s.String())
 		}
 	}
