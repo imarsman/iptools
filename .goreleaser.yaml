@@ -36,6 +36,9 @@ release:
 
     iptools is a set of IP and network tools
 
+    v0.1.10
+    Fixing naming
+
     v0.1.9
     Simplified cmdline args
 
