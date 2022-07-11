@@ -36,8 +36,11 @@ release:
 
     iptools is a set of IP and network tools
 
+    v0.1.9
+    Simplified cmdline args
+
     v0.1.8
-    Added subnet network listing call plus more testing.
+    Added subnet network listing call plus more testing
 
     v0.1.7
     Testing and switch to Go 1.18
