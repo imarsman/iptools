@@ -40,6 +40,7 @@ var cmd = &complete.Command{
 	},
 }
 
+// InitializeCompletion initialize cmdline completion
 func InitializeCompletion() {
 	// Run the completion - provide it with the binary name.
 	cmd.Complete("iptools")

@@ -112,10 +112,10 @@ builds:
       - CGO_ENABLED=0
     ldflags:
       - >
-        -X main.GitCommit={{.ShortCommit}} 
-        -X main.GitLastTag={{.PreviousTag}}
-        -X main.GitExactTag={{.Tag}}
-        -X main.Date={{.Date}}
+        -X github.com/imarsman/iptools/cmd/args.GitCommit={{.ShortCommit}} 
+        -X github.com/imarsman/iptools/cmd/args.GitLastTag={{.PreviousTag}}
+        -X github.com/imarsman/iptools/cmd/args.GitExactTag={{.Tag}}
+        -X github.com/imarsman/iptools/cmd/args.Date={{.Date}}
 
     id: iptools
     dir: .
