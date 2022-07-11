@@ -31,7 +31,7 @@ func SubnetDescribe(ip string, mask uint8) {
 	}
 
 	r := []*simpletable.Cell{
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet Prefix")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet")},
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.CIDR())},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
