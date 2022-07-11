@@ -130,7 +130,7 @@ func SubnetDescribe(ip string, mask uint8) {
 
 	r = []*simpletable.Cell{
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Hex ID")},
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("Ox%s", util.IPToHexStr(last))},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.IPToHexStr(last))},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
@@ -391,16 +391,11 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 
 		table.Header = &simpletable.Header{
 			Cells: []*simpletable.Cell{
-				{Align: simpletable.AlignCenter, Text: "Subnets"},
+				{Align: simpletable.AlignCenter, Text: "Subnet"},
 			},
 		}
 		// var subnetsSplit []*subnet.IPV4Subnet
 		for _, s := range subnets {
-			// subnetNew, err := subnet.NewFromIPAndBits(r.From().IPAddr().IP.String(), s2.Prefix.Bits())
-			// if err != nil {
-			// 	panic(err.Error())
-			// }
-			// subnetsSplit = append(subnetsSplit, subnetNew)
 			cell := []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.String())},
 			}
