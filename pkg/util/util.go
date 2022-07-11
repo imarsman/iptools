@@ -82,7 +82,7 @@ func WildCardMask(ip netaddr.IP) string {
 }
 
 // AddToIP add count IPs to IP
-func AddToIP(startIP netaddr.IP, add int32) (newIP netaddr.IP, err error) {
+func AddToIP(startIP netaddr.IP, add int32) (addedIP netaddr.IP, err error) {
 	if !startIP.Next().IsValid() {
 		err = fmt.Errorf("ip %v is already max", startIP)
 		return
@@ -91,12 +91,13 @@ func AddToIP(startIP netaddr.IP, add int32) (newIP netaddr.IP, err error) {
 	slice := bytes[:]
 	ipValue := binary.BigEndian.Uint32(slice)
 	ipValue += uint32(add)
-	newIP, ok := int2ip(ipValue)
+	addedIP, ok := int2ip(ipValue)
 	if !ok {
 		err = fmt.Errorf("problem after adding %d to IP %v", add, startIP)
 		return
 	}
-	return newIP, nil
+
+	return
 }
 
 // For fun with generics
