@@ -3,23 +3,23 @@ package args
 // SubnetDescribe for calls to describe a subnet
 type SubnetDescribe struct {
 	IP   string `arg:"-i,--ip" help:""`
-	Mask int    `arg:"-m,--mask" help:""`
+	Bits int    `arg:"-m,--mask" help:""`
 }
 
 // SubnetRanges for calls to get list of subnet ranges
 type SubnetRanges struct {
-	IP      string `arg:"-i,--ip" help:""`
-	Mask    int    `arg:"-b,--prefix-bits" help:""`
-	SubMask int    `arg:"-s,--secondary-prefix-bits" help:""`
-	Pretty  bool   `arg:"-p,--pretty" help:""`
+	IP            string `arg:"-i,--ip" help:""`
+	Bits          int    `arg:"-b,--bits" help:""`
+	SecondaryBits int    `arg:"-s,--secondary-bits" help:""`
+	Pretty        bool   `arg:"-p,--pretty" help:""`
 }
 
 // SubnetDivide for calls to divide subnet into networks
 type SubnetDivide struct {
-	IP      string `arg:"-i,--ip" help:""`
-	Mask    int    `arg:"-b,--prefix-bits" help:""`
-	SubMask int    `arg:"-s,--secondary-prefix-bits" help:""`
-	Pretty  bool   `arg:"-p,--pretty" help:""`
+	IP            string `arg:"-i,--ip" help:""`
+	Bits          int    `arg:"-b,--bits" help:""`
+	SecondaryBits int    `arg:"-s,--secondary-bits" help:""`
+	Pretty        bool   `arg:"-p,--pretty" help:""`
 }
 
 // Subnet top level subnet arg

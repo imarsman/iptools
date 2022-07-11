@@ -6,7 +6,7 @@ import (
 )
 
 // IPs list of subnet IPs to make life easier
-var IPs = []string{"99.236.32.0", "10.32.0.0"}
+var IPs = []string{"99.236.32.0", "10.32.0.0", "192.168.1.1"}
 
 var cmd = &complete.Command{
 	Sub: map[string]*complete.Command{
@@ -15,24 +15,24 @@ var cmd = &complete.Command{
 				// Scheduler health for an environment
 				"ranges": {
 					Flags: map[string]complete.Predictor{
-						"ip":                    predict.Set(IPs),
-						"prefix-bits":           predict.Nothing,
-						"secondary-prefix-bits": predict.Nothing,
-						"pretty":                predict.Nothing,
+						"ip":             predict.Set(IPs),
+						"bits":           predict.Nothing,
+						"secondary-bits": predict.Nothing,
+						"pretty":         predict.Nothing,
 					},
 				},
 				"divide": {
 					Flags: map[string]complete.Predictor{
-						"ip":                    predict.Set(IPs),
-						"prefix-bits":           predict.Nothing,
-						"secondary-prefix-bits": predict.Nothing,
-						"pretty":                predict.Nothing,
+						"ip":             predict.Set(IPs),
+						"bits":           predict.Nothing,
+						"secondary-bits": predict.Nothing,
+						"pretty":         predict.Nothing,
 					},
 				},
 				"describe": {
 					Flags: map[string]complete.Predictor{
 						"ip":   predict.Set(IPs),
-						"mask": predict.Nothing,
+						"bits": predict.Nothing,
 					},
 				},
 			},

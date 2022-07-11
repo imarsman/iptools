@@ -38,21 +38,21 @@ func main() {
 		if args.CLIArgs.Subnet.SubnetRanges != nil {
 			handler.SubnetRanges(
 				args.CLIArgs.Subnet.SubnetRanges.IP,
-				uint8(args.CLIArgs.Subnet.SubnetRanges.Mask),
-				uint8(args.CLIArgs.Subnet.SubnetRanges.SubMask),
+				uint8(args.CLIArgs.Subnet.SubnetRanges.Bits),
+				uint8(args.CLIArgs.Subnet.SubnetRanges.SecondaryBits),
 			)
 		}
 		if args.CLIArgs.Subnet.SubnetDivide != nil {
 			handler.SubnetDivide(
 				args.CLIArgs.Subnet.SubnetDivide.IP,
-				uint8(args.CLIArgs.Subnet.SubnetDivide.Mask),
-				uint8(args.CLIArgs.Subnet.SubnetDivide.SubMask),
+				uint8(args.CLIArgs.Subnet.SubnetDivide.Bits),
+				uint8(args.CLIArgs.Subnet.SubnetDivide.SecondaryBits),
 			)
 		}
 		if args.CLIArgs.Subnet.SubnetDescribe != nil {
 			handler.SubnetDescribe(
 				args.CLIArgs.Subnet.SubnetDescribe.IP,
-				uint8(args.CLIArgs.Subnet.SubnetDescribe.Mask),
+				uint8(args.CLIArgs.Subnet.SubnetDescribe.Bits),
 			)
 		}
 	}
