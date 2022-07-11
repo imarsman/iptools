@@ -210,6 +210,10 @@ func (s *IPV4Subnet) TotalHosts() int64 {
 // Hosts bits remaining in mask block
 func (s *IPV4Subnet) Hosts() int64 {
 	if s.Prefix().Bits()%8 == 0 {
+		// This may or may not be the proper solution
+		if s.Prefix().Bits() == 32 {
+			return 1
+		}
 		return int64(
 			(math.Exp2(float64(32) - float64(s.Prefix().Bits()))) / float64(s.Networks()),
 		)
