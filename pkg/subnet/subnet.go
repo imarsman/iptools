@@ -47,7 +47,7 @@ func (s *IPV4Subnet) IP() netaddr.IP {
 
 // String get string representing subnet (cidr notation)
 func (s *IPV4Subnet) String() string {
-	return s.Prefix().String()
+	return s.prefix.String()
 }
 
 // JSON get JSON for subnet
