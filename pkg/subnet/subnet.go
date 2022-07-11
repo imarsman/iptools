@@ -52,7 +52,8 @@ func (s *IPV4Subnet) String() string {
 
 // JSON get JSON for subnet
 func (s *IPV4Subnet) JSON() (bytes []byte, err error) {
-	bytes, err = json.MarshalIndent(s, "", "  ")
+	var prefix = s.prefix.String()
+	bytes, err = json.MarshalIndent(&prefix, "", "  ")
 	if err != nil {
 		return
 	}
@@ -62,7 +63,8 @@ func (s *IPV4Subnet) JSON() (bytes []byte, err error) {
 
 // YAML get YAML for subnet
 func (s *IPV4Subnet) YAML() (bytes []byte, err error) {
-	bytes, err = yaml.Marshal(s)
+	var prefix = s.prefix.String()
+	bytes, err = yaml.Marshal(&prefix)
 	if err != nil {
 		return
 	}
