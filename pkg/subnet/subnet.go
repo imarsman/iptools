@@ -22,7 +22,6 @@ const (
 type IPV4Subnet struct {
 	name   string
 	prefix netaddr.IPPrefix
-	ip     netaddr.IP
 }
 
 // Name subnet name
@@ -42,7 +41,7 @@ func (s *IPV4Subnet) Prefix() netaddr.IPPrefix {
 
 // IP get IP for subnet
 func (s *IPV4Subnet) IP() netaddr.IP {
-	return s.ip
+	return s.prefix.IP()
 }
 
 // String get string representing subnet (cidr notation)
@@ -125,11 +124,6 @@ func newSubnet(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
 
 	errMsg := "invalid prefix"
 
-	addressIP, err := netaddr.ParseIP(ip)
-	if err != nil {
-		return
-	}
-
 	var pfx netaddr.IPPrefix
 	prefixStr := fmt.Sprintf("%s/%d", ip, bits)
 	var pfxPre netaddr.IPPrefix
@@ -147,7 +141,7 @@ func newSubnet(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
 	if pfx.IP().Is6() {
 		return nil, errors.New("subnet too large for current implementation")
 	}
-	subnet.ip = addressIP
+	// subnet.ip = addressIP
 	subnet.prefix = pfx
 
 	return
