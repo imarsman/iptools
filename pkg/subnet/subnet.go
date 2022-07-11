@@ -25,6 +25,16 @@ type IPV4Subnet struct {
 	ip     netaddr.IP
 }
 
+// Name subnet name
+func (s *IPV4Subnet) Name() string {
+	return s.name
+}
+
+// SetName set subnet name
+func (s *IPV4Subnet) SetName(name string) {
+	s.name = name
+}
+
 // Prefix get prefix for subnet
 func (s *IPV4Subnet) Prefix() netaddr.IPPrefix {
 	return s.prefix
@@ -60,9 +70,36 @@ func (s *IPV4Subnet) YAML() (bytes []byte, err error) {
 	return bytes, nil
 }
 
+// NewNamedFromIPAndBits new with name using incoming prefix ip and network bits
+func NewNamedFromIPAndBits(ip string, bits uint8, name string) (subnet *IPV4Subnet, err error) {
+	subnet, err = newSubnet(ip, uint8(bits))
+	if err != nil {
+		return
+	}
+	subnet.name = name
+
+	return
+}
+
 // NewFromIPAndBits new using incoming prefix ip and network bits
 func NewFromIPAndBits(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
 	return newSubnet(ip, uint8(bits))
+}
+
+// NewNamedFromPrefix new with name using incoming prefix
+func NewNamedFromPrefix(prefix string, name string) (subnet *IPV4Subnet, err error) {
+	p, err := netaddr.ParseIPPrefix(prefix)
+	if err != nil {
+		return
+	}
+
+	subnet, err = newSubnet(p.IP().String(), p.Bits())
+	if err != nil {
+		return
+	}
+	subnet.name = name
+
+	return
 }
 
 // NewFromPrefix new using incoming prefix
@@ -72,7 +109,12 @@ func NewFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
 		return
 	}
 
-	return newSubnet(p.IP().String(), p.Bits())
+	subnet, err = newSubnet(p.IP().String(), p.Bits())
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 // newSubnet new subnet with prefix ip and network bits
