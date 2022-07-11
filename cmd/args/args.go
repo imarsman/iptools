@@ -3,7 +3,7 @@ package args
 // SubnetDescribe for calls to describe a subnet
 type SubnetDescribe struct {
 	IP   string `arg:"-i,--ip" help:""`
-	Bits int    `arg:"-m,--mask" help:""`
+	Bits int    `arg:"-b,--bits" help:""`
 }
 
 // SubnetRanges for calls to get list of subnet ranges
