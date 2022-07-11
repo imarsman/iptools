@@ -57,11 +57,6 @@ func BinaryIP4StrToBytes(ip string) (list []byte, err error) {
 	return
 }
 
-// Int32ToHexStr get hex string from int32
-func Int32ToHexStr(int32In uint32) string {
-	return fmt.Sprintf("%x", int32In)
-}
-
 // https://gist.github.com/ammario/649d4c0da650162efd404af23e25b86b
 func int2ip(ipInt uint32) (netaddr.IP, bool) {
 	ip := make(net.IP, 4)
@@ -130,5 +125,5 @@ func IPToHexStr(ip netaddr.IP) string {
 	var ipInt = make(net.IP, 4)
 	binary.BigEndian.PutUint32(ipInt, ipValue)
 
-	return Int32ToHexStr(ipValue)
+	return fmt.Sprintf("%x", ipValue)
 }
