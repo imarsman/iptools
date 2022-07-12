@@ -124,8 +124,7 @@ func newSubnet(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
 	subnet = new(IPV4Subnet)
 
 	var pfx netaddr.IPPrefix
-	prefixStr := fmt.Sprintf("%s/%d", ip, bits)
-	pfx, err = netaddr.ParseIPPrefix(prefixStr)
+	pfx, err = netaddr.ParseIPPrefix(fmt.Sprintf("%s/%d", ip, bits))
 	if err != nil {
 		return
 	}
@@ -183,11 +182,6 @@ func (s *IPV4Subnet) classOctet() int {
 	return int(bits[3])
 }
 
-// PrefixBits byte used for subnet
-func (s *IPV4Subnet) PrefixBits() uint8 {
-	return s.Prefix().Bits()
-}
-
 // ClassNetworkBits bits not used for hosts in class block
 func (s *IPV4Subnet) ClassNetworkBits() uint8 {
 	return s.Prefix().Bits() - s.startClassBits()
@@ -227,14 +221,14 @@ func (s *IPV4Subnet) UsableHosts() int64 {
 
 // startClassBits starting bits for subnet range for the class
 func (s *IPV4Subnet) startClassBits() uint8 {
-	if s.Prefix().Bits() < 8 {
+	if s.Prefix().Bits() < octetBits {
 		return 0
-	} else if s.Prefix().Bits() < 16 {
-		return 8
-	} else if s.Prefix().Bits() < 24 {
-		return 16
+	} else if s.Prefix().Bits() < 2*octetBits {
+		return octetBits
+	} else if s.Prefix().Bits() < 3*octetBits {
+		return 2 * octetBits
 	}
-	return 24
+	return 3 * octetBits
 }
 
 // maxClassBits maximum bits for subnet range for the class
