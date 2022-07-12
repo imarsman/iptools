@@ -147,8 +147,8 @@ func newSubnet(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
 	return
 }
 
-// BroadcastAddress get broadcast address for subnet, i.e. the max IP
-func (s *IPV4Subnet) BroadcastAddress() (ip netaddr.IP, err error) {
+// BroadcastAddr get broadcast address for subnet, i.e. the max IP
+func (s *IPV4Subnet) BroadcastAddr() (ip netaddr.IP, err error) {
 	return s.Last()
 }
 
@@ -159,8 +159,8 @@ func (s *IPV4Subnet) CIDR() (cidr string) {
 	return
 }
 
-// BinarySubnetMask get dot delimited subnet mask in binary
-func (s *IPV4Subnet) BinarySubnetMask() (mask string) {
+// BinaryMask get dot delimited subnet mask in binary
+func (s *IPV4Subnet) BinaryMask() (mask string) {
 	mask = util.BitStr4(s.Prefix().Masked().IP(), `.`)
 
 	return
@@ -177,11 +177,11 @@ func (s *IPV4Subnet) BinaryID() (mask string) {
 func (s *IPV4Subnet) classOctet() int {
 	bits := s.Prefix().Masked().IP().As4()
 
-	if s.maxBitsForClass() == 8 {
+	if s.maxClassBits() == 8 {
 		return int(bits[0])
-	} else if s.maxBitsForClass() == 16 {
+	} else if s.maxClassBits() == 16 {
 		return int(bits[1])
-	} else if s.maxBitsForClass() == 24 {
+	} else if s.maxClassBits() == 24 {
 		return int(bits[2])
 	}
 	return int(bits[3])
@@ -194,12 +194,12 @@ func (s *IPV4Subnet) PrefixBits() uint8 {
 
 // ClassNetworkBits bits not used for hosts in class block
 func (s *IPV4Subnet) ClassNetworkBits() uint8 {
-	return s.Prefix().Bits() - s.startBitsForClass()
+	return s.Prefix().Bits() - s.startClassBits()
 }
 
 // ClassHostBits bits used for network in class block
 func (s *IPV4Subnet) ClassHostBits() uint8 {
-	return s.maxBitsForClass() - s.Prefix().Bits()
+	return s.maxClassBits() - s.Prefix().Bits()
 }
 
 // TotalHosts total hosts in subnet
@@ -229,8 +229,8 @@ func (s *IPV4Subnet) UsableHosts() int64 {
 	return s.Hosts() - 2
 }
 
-// startBitsForClass starting bits for subnet range for the class
-func (s *IPV4Subnet) startBitsForClass() uint8 {
+// startClassBits starting bits for subnet range for the class
+func (s *IPV4Subnet) startClassBits() uint8 {
 	if s.Prefix().Bits() < 8 {
 		return 0
 	} else if s.Prefix().Bits() < 16 {
@@ -241,8 +241,8 @@ func (s *IPV4Subnet) startBitsForClass() uint8 {
 	return 24
 }
 
-// maxBitsForClass maximum bits for subnet range for the class
-func (s *IPV4Subnet) maxBitsForClass() uint8 {
+// maxClassBits maximum bits for subnet range for the class
+func (s *IPV4Subnet) maxClassBits() uint8 {
 	if s.Prefix().Bits() <= 8 {
 		return 8
 	} else if s.Prefix().Bits() <= 16 {
@@ -290,14 +290,14 @@ func (s *IPV4Subnet) Last() (ip netaddr.IP, err error) {
 	return
 }
 
-// NetworkAddress get last IP for subnet
-func (s *IPV4Subnet) NetworkAddress() (ip netaddr.IP, err error) {
+// NetworkAddr get last IP for subnet
+func (s *IPV4Subnet) NetworkAddr() (ip netaddr.IP, err error) {
 	return s.Last()
 }
 
 // Networks number of subnets
 func (s *IPV4Subnet) Networks() int64 {
-	bits := s.Prefix().Bits() - s.startBitsForClass()
+	bits := s.Prefix().Bits() - s.startClassBits()
 
 	return int64(math.Exp2(float64(bits)))
 }
@@ -364,19 +364,19 @@ func (s *IPV4Subnet) IPRange() (r netaddr.IPRange, err error) {
 	return
 }
 
-// NetworkSubnetsInSubnet set of subnets in the context of parent subnet
-func (s *IPV4Subnet) NetworkSubnetsInSubnet(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
-	return s.networkSubnets(childSubnet)
+// ChildSubnets set of subnets in the context of parent subnet
+func (s *IPV4Subnet) ChildSubnets(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
+	return s.subnets(childSubnet)
 }
 
-// NetworkSubnets the set of equally sized subnets for subnet
-func (s *IPV4Subnet) NetworkSubnets() (subnets []*IPV4Subnet, err error) {
-	return s.networkSubnets(s)
+// Subnets the set of equally sized subnets for subnet
+func (s *IPV4Subnet) Subnets() (subnets []*IPV4Subnet, err error) {
+	return s.subnets(s)
 }
 
-// networkSubnets split a subnet into smaller child subnets
-func (s *IPV4Subnet) networkSubnets(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
-	ranges, err := s.networkIPRanges(childSubnet)
+// subnets split a subnet into smaller child subnets
+func (s *IPV4Subnet) subnets(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
+	ranges, err := s.ipRanges(childSubnet)
 	if err != nil {
 		return
 	}
@@ -394,18 +394,18 @@ func (s *IPV4Subnet) networkSubnets(childSubnet *IPV4Subnet) (subnets []*IPV4Sub
 	return
 }
 
-// NetworkIPRangesInSubnet set of ranges in the context of parent subnet
-func (s *IPV4Subnet) NetworkIPRangesInSubnet(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
-	return s.networkIPRanges(childSubnet)
+// ChildIPRanges set of ranges in the context of parent subnet
+func (s *IPV4Subnet) ChildIPRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
+	return s.ipRanges(childSubnet)
 }
 
-// NetworkIPRanges the set of equally sized ranges for subnet
-func (s *IPV4Subnet) NetworkIPRanges() (ranges []netaddr.IPRange, err error) {
-	return s.networkIPRanges(s)
+// IPRanges the set of equally sized ranges for subnet
+func (s *IPV4Subnet) IPRanges() (ranges []netaddr.IPRange, err error) {
+	return s.ipRanges(s)
 }
 
-// networkIPRanges get the ranges for a subnet splitting by child subnet (can be self)
-func (s *IPV4Subnet) networkIPRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
+// ipRanges get the ranges for a subnet splitting by child subnet (can be self)
+func (s *IPV4Subnet) ipRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
 	// Can't subdivide to smaller prefixed subnet
 	if childSubnet.Prefix().Bits() < s.Prefix().Bits() {
 		err = fmt.Errorf("Subnet to split to has more bits %d than parent %d", s.Prefix().Bits(), childSubnet.Prefix().Bits())
