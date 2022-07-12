@@ -354,9 +354,9 @@ func (s *IPV4Subnet) IPRange() (r netaddr.IPRange, err error) {
 	return
 }
 
-// ChildSubnets set of subnets in the context of parent subnet
-func (s *IPV4Subnet) ChildSubnets(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
-	return s.subnets(childSubnet)
+// SecondarySubnets set of subnets in the context of parent subnet
+func (s *IPV4Subnet) SecondarySubnets(secondarySubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
+	return s.subnets(secondarySubnet)
 }
 
 // Subnets the set of equally sized subnets for subnet
@@ -364,15 +364,15 @@ func (s *IPV4Subnet) Subnets() (subnets []*IPV4Subnet, err error) {
 	return s.subnets(s)
 }
 
-// subnets split a subnet into smaller child subnets
-func (s *IPV4Subnet) subnets(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
-	ranges, err := s.ipRanges(childSubnet)
+// subnets split a subnet into smaller secondary subnets
+func (s *IPV4Subnet) subnets(secondarySubnet *IPV4Subnet) (subnets []*IPV4Subnet, err error) {
+	ranges, err := s.ipRanges(secondarySubnet)
 	if err != nil {
 		return
 	}
 
 	for _, r := range ranges {
-		prefix := fmt.Sprintf("%s/%d", r.From(), childSubnet.Prefix().Bits())
+		prefix := fmt.Sprintf("%s/%d", r.From(), secondarySubnet.Prefix().Bits())
 		s, err = NewFromPrefix(prefix)
 		if err != nil {
 			fmt.Println(err)
@@ -384,9 +384,9 @@ func (s *IPV4Subnet) subnets(childSubnet *IPV4Subnet) (subnets []*IPV4Subnet, er
 	return
 }
 
-// ChildIPRanges set of ranges in the context of parent subnet
-func (s *IPV4Subnet) ChildIPRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
-	return s.ipRanges(childSubnet)
+// SecondaryIPRanges set of ranges in the context of parent subnet
+func (s *IPV4Subnet) SecondaryIPRanges(secondarySubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
+	return s.ipRanges(secondarySubnet)
 }
 
 // IPRanges the set of equally sized ranges for subnet
@@ -394,21 +394,21 @@ func (s *IPV4Subnet) IPRanges() (ranges []netaddr.IPRange, err error) {
 	return s.ipRanges(s)
 }
 
-// ipRanges get the ranges for a subnet splitting by child subnet (can be self)
-func (s *IPV4Subnet) ipRanges(childSubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
+// ipRanges get the ranges for a subnet splitting by secondary subnet (can be self)
+func (s *IPV4Subnet) ipRanges(secondarySubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
 	// Can't subdivide to smaller prefixed subnet
-	if childSubnet.Prefix().Bits() < s.Prefix().Bits() {
-		err = fmt.Errorf("Subnet to split to has more bits %d than parent %d", s.Prefix().Bits(), childSubnet.Prefix().Bits())
+	if secondarySubnet.Prefix().Bits() < s.Prefix().Bits() {
+		err = fmt.Errorf("Subnet to split to has more bits %d than parent %d", s.Prefix().Bits(), secondarySubnet.Prefix().Bits())
 		return
 	}
 	ranges = []netaddr.IPRange{}
 	ip := s.IP()
 	ipStart := ip
 
-	ratio := int(math.Exp2(float64(childSubnet.Prefix().Bits() - s.Prefix().Bits())))
+	ratio := int(math.Exp2(float64(secondarySubnet.Prefix().Bits() - s.Prefix().Bits())))
 	for j := 0; j < int(s.Networks()); j++ {
 		for r := 0; r < ratio; r++ {
-			ip, err := util.AddToIP(ipStart, int32(childSubnet.Hosts()-1))
+			ip, err := util.AddToIP(ipStart, int32(secondarySubnet.Hosts()-1))
 			if err != nil {
 				//return
 			}

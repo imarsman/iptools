@@ -169,7 +169,7 @@ func SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		ranges, err = s.ChildIPRanges(s2)
+		ranges, err = s.SecondaryIPRanges(s2)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -300,14 +300,14 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		subnets, err = s.ChildSubnets(s2)
+		subnets, err = s.SecondarySubnets(s2)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 	} else {
 		s2 = s
-		subnets, err = s.ChildSubnets(s)
+		subnets, err = s.SecondarySubnets(s)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
