@@ -9,6 +9,9 @@ This utility can have completion enabled by typing `COMP_INSTALL=1 iptools`.
 This utility currently does three things. It splits a subnet into networks and into networks by a differing subnet size,
 it splits a subnet into a set of ranges for its networks, and it gives summary information for a subnet.
 
+It is likely that there are errors in my code, mostly tied to the fact that this project is my way of learning about
+subnetting. One thing I'd like to do is try IP6 subnetting.
+
 Subnet divisions split into non-default sized networks
 
 ```
@@ -113,4 +116,62 @@ $ iptools subnet describe -ip 10.32.0.0 -bits 24
 | in-addr.arpa       | 0.0.32.10.in-addr.arpa              |
 | Wildcard Mask      | 240.218.250.250                     |
 +--------------------+-------------------------------------+
+```
+
+Top level help
+
+```
+$ iptools -h
+iptools
+-------
+Commit:  fe61dd8
+Date:    2022-07-12T02:59:52Z
+Tag:     v0.1.11
+OS:      darwin
+ARCH:    arm64
+
+Usage: iptools <command> [<args>]
+
+Options:
+  --help, -h             display this help and exit
+  --version              display version and exit
+
+Commands:
+  subnet                 Get networks for subnet
+```
+
+Help for subnet options
+
+```
+$ iptools subnet -h
+iptools
+-------
+Commit:  fe61dd8
+Date:    2022-07-12T02:59:52Z
+Tag:     v0.1.11
+OS:      darwin
+ARCH:    arm64
+
+Usage: iptools subnet <command> [<args>]
+  --help, -h             display this help and exit
+  --version              display version and exit
+
+Commands:
+  ranges                 divide a subnet into ranges
+  divide                 divide a subnet into smaller subnets
+  describe               describe a subnet
+```
+
+Lines of cde
+
+```
+$ gocloc pkg/subnet pkg/util cmd README.md
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+Go                               9            207            145           1189
+Markdown                         1             35              0            128
+-------------------------------------------------------------------------------
+TOTAL                           10            242            145           1317
+-------------------------------------------------------------------------------
 ```
