@@ -9,9 +9,9 @@ import (
 func main() {
 	args.InitializeCompletion()
 
-	// var Args args.Args
 	arg.MustParse(&args.CLIArgs)
 
+	// Inspect cli args and make calls to handlers as apppropriate
 	if args.CLIArgs.Subnet != nil {
 		if args.CLIArgs.Subnet.SubnetRanges != nil {
 			handler.SubnetRanges(
