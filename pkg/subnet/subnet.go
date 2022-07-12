@@ -14,8 +14,7 @@ import (
 )
 
 const (
-	octets   = 4
-	octetMax = 255
+	octetBits = 8
 )
 
 // IPV4Subnet an IP subnet
@@ -120,19 +119,17 @@ func NewFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
 
 // newSubnet new subnet with prefix ip and network bits
 func newSubnet(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
-	subnet = new(IPV4Subnet)
-
 	errMsg := "invalid prefix"
+
+	subnet = new(IPV4Subnet)
 
 	var pfx netaddr.IPPrefix
 	prefixStr := fmt.Sprintf("%s/%d", ip, bits)
-	var pfxPre netaddr.IPPrefix
-	pfxPre, err = netaddr.ParseIPPrefix(prefixStr)
+	pfx, err = netaddr.ParseIPPrefix(prefixStr)
 	if err != nil {
 		return
 	}
-	prefixStr = fmt.Sprintf("%s/%d", pfxPre.Masked().IP().String(), bits)
-	pfx = pfxPre.Masked()
+	pfx = pfx.Masked()
 
 	if !pfx.IsValid() {
 		return nil, errors.New(errMsg)
@@ -141,7 +138,6 @@ func newSubnet(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
 	if pfx.IP().Is6() {
 		return nil, errors.New("subnet too large for current implementation")
 	}
-	// subnet.ip = addressIP
 	subnet.prefix = pfx
 
 	return
@@ -177,11 +173,11 @@ func (s *IPV4Subnet) BinaryID() (mask string) {
 func (s *IPV4Subnet) classOctet() int {
 	bits := s.Prefix().Masked().IP().As4()
 
-	if s.maxClassBits() == 8 {
+	if s.maxClassBits() == octetBits {
 		return int(bits[0])
-	} else if s.maxClassBits() == 16 {
+	} else if s.maxClassBits() == 2*octetBits {
 		return int(bits[1])
-	} else if s.maxClassBits() == 24 {
+	} else if s.maxClassBits() == 3*octetBits {
 		return int(bits[2])
 	}
 	return int(bits[3])
@@ -243,14 +239,14 @@ func (s *IPV4Subnet) startClassBits() uint8 {
 
 // maxClassBits maximum bits for subnet range for the class
 func (s *IPV4Subnet) maxClassBits() uint8 {
-	if s.Prefix().Bits() <= 8 {
-		return 8
-	} else if s.Prefix().Bits() <= 16 {
-		return 16
-	} else if s.Prefix().Bits() <= 24 {
-		return 24
+	if s.Prefix().Bits() <= octetBits {
+		return octetBits
+	} else if s.Prefix().Bits() <= 2*octetBits {
+		return 2 * octetBits
+	} else if s.Prefix().Bits() <= 3*octetBits {
+		return 3 * octetBits
 	}
-	return 32
+	return 4 * octetBits
 }
 
 // Class get network class, a, b, or c
