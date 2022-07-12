@@ -9,7 +9,7 @@ This utility can have completion enabled by typing `COMP_INSTALL=1 iptools`.
 This utility currently does three things. It splits a subnet into networks and into networks by a differing subnet size,
 it splits a subnet into a set of ranges for its networks, and it gives summary information for a subnet.
 
-Subnet networks
+Subnet divisions split into non-default sized networks
 
 ```
 $ iptools subnet divide -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
@@ -33,7 +33,41 @@ $ iptools subnet divide -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
  99.236.192.0/18
  ```
 
-Subnet ranges
+Subnet divisions split default
+
+```
+$ iptools subnet divide -ip 99.236.32.0 -bits 16 -pretty
+
+
+   Category          Value
+--------------- ---------------
+ Subnet          99.236.0.0/16
+ Networks        1
+ Network Hosts   65536
+
+    Subnet
+---------------
+ 99.236.0.0/16
+ ```
+
+Subnet ranges in default size
+
+```
+$ iptools subnet ranges -ip 99.236.32.0 -bits 16 -pretty
+
+
+   Category          Value
+--------------- ---------------
+ Subnet          99.236.0.0/16
+ Networks        1
+ Network Hosts   65536
+
+   Start           End
+------------ ----------------
+ 99.236.0.0   99.236.255.255
+ ```
+ 
+Subnet ranges split into non-default size
 
 ```
 $ iptools subnet ranges -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
