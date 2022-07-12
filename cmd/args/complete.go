@@ -8,6 +8,7 @@ import (
 // IPs list of subnet IPs to make life easier
 var IPs = []string{"99.236.32.0", "10.32.0.0", "192.168.1.1"}
 
+// Define command structure to enable completion
 var cmd = &complete.Command{
 	Sub: map[string]*complete.Command{
 		"subnet": {
