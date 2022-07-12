@@ -12,12 +12,37 @@ it splits a subnet into a set of ranges for its networks, and it gives summary i
 Subnet networks
 
 ```
-$ iptools subnet divide -ip 99.236.32.0 -mask 16 -sub-mask 18 -pretty
+$ iptools subnet divide -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
 
-      Category             Value
--------------------- ------------------
- Subnet               255.255.0.0/16
- Secondary Subnet     255.255.192.0/18
+
+      Category            Value
+-------------------- ---------------
+ Subnet               99.236.0.0/16
+ Secondary Subnet     99.236.0.0/18
+ Networks             1
+ Secondary Networks   4
+ Effective Networks   4
+ Network Hosts        65536
+ Sub Network Hosts    16384
+
+     Subnet
+-----------------
+ 99.236.0.0/18
+ 99.236.64.0/18
+ 99.236.128.0/18
+ 99.236.192.0/18
+ ```
+
+Subnet ranges
+
+```
+$ iptools subnet ranges -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
+
+
+      Category            Value
+-------------------- ---------------
+ Subnet               99.236.0.0/16
+ Secondary Subnet     99.236.0.0/18
  Networks             1
  Secondary Networks   4
  Effective Networks   4
@@ -26,20 +51,20 @@ $ iptools subnet divide -ip 99.236.32.0 -mask 16 -sub-mask 18 -pretty
 
     Start            End
 -------------- ----------------
- 99.236.32.0    99.236.95.255
- 99.236.96.0    99.236.159.255
- 99.236.160.0   99.236.223.255
- 99.236.224.0   99.237.31.255
- ```
+ 99.236.0.0     99.236.63.255
+ 99.236.64.0    99.236.127.255
+ 99.236.128.0   99.236.191.255
+ 99.236.192.0   99.236.255.255
+```
 
 
 Subnet details
 ```
-$ iptools subnet describe -ip 10.32.0.0 -mask 24
+$ iptools subnet describe -ip 10.32.0.0 -bits 24
 +--------------------+-------------------------------------+
 |      Category      |                Value                |
 +--------------------+-------------------------------------+
-| Subnet Prefix      | 10.32.0.0/24                        |
+| Subnet             | 10.32.0.0/24                        |
 | Network Address    | 10.32.0.0                           |
 | IP Address         | 10.32.0.255                         |
 | Broadcast Address  | 10.32.0.255                         |
@@ -50,7 +75,7 @@ $ iptools subnet describe -ip 10.32.0.0 -mask 24
 | IP Type            | Private                             |
 | Binary Subnet Mask | 00001010.00100000.00000000.00000000 |
 | Binary ID          | 00001010001000000000000000000000    |
-| Hex ID             | Oxa2000ff                           |
+| Hex ID             | a2000ff                             |
 | in-addr.arpa       | 0.0.32.10.in-addr.arpa              |
 | Wildcard Mask      | 240.218.250.250                     |
 +--------------------+-------------------------------------+
