@@ -1,13 +1,11 @@
 package main
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"net"
 	"testing"
 
 	"github.com/matryer/is"
-	"inet.af/netaddr"
 )
 
 func expandInterfaceToMatch(i interface{}) interface{} {
@@ -81,15 +79,15 @@ func TestEncodeIP(t *testing.T) {
 // 	t.Logf("cidr %d\n", cidr)
 // }
 
-func TestFromHex(t *testing.T) {
-	is := is.New(t)
-	b, err := base64.StdEncoding.DecodeString(`///wAA==`)
-	is.NoErr(err)
-	t.Log("hex to bytes", b)
-	bytes := [4]byte{}
-	copy(bytes[:], b)
-	netAddrIP := netaddr.IPFrom4(bytes)
-	ipMask := net.IPMask(netAddrIP.IPAddr().IP.To4())
-	cidr, _ := ipMask.Size()
-	t.Log("cidr", cidr)
-}
+// func TestFromHex(t *testing.T) {
+// 	is := is.New(t)
+// 	b, err := base64.StdEncoding.DecodeString(`///wAA==`)
+// 	is.NoErr(err)
+// 	t.Log("hex to bytes", b)
+// 	bytes := [4]byte{}
+// 	copy(bytes[:], b)
+// 	netAddrIP := netip.AddrFrom4(bytes)
+// 	ipMask := net.IPMask(netAddrIP.IPAddr().IP.To4())
+// 	cidr, _ := ipMask.Size()
+// 	t.Log("cidr", cidr)
+// }

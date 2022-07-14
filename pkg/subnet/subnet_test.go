@@ -8,7 +8,6 @@ import (
 
 	"github.com/imarsman/iptools/pkg/util"
 	"github.com/matryer/is"
-	"inet.af/netaddr"
 )
 
 func TestNewSubnet(t *testing.T) {
@@ -36,9 +35,9 @@ func TestNewSubnet(t *testing.T) {
 
 func TestNetworks(t *testing.T) {
 	is := is.New(t)
-	p, err := netaddr.ParseIPPrefix("192.24.12.0/18")
+	p, err := netip.ParsePrefix("192.24.12.0/18")
 	is.NoErr(err)
-	t.Log(p.IP())
+	t.Log(p.Addr())
 	t.Log(p.Masked())
 	s, err := NewFromPrefix(p.Masked().String())
 	networks, err := s.IPRanges()
