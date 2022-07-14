@@ -2,6 +2,7 @@ package subnet
 
 import (
 	"fmt"
+	"net/netip"
 	"testing"
 	"time"
 
@@ -60,7 +61,11 @@ func TestDifferingSubnets(t *testing.T) {
 	t.Log("hosts per network", s.Hosts())
 	t.Log("network count", s.Networks())
 	networks, err = s.IPRanges()
-	t.Log(networks)
+	for _, r := range networks {
+		t.Log(r.String())
+	}
+
+	// t.Log(networks)
 	is.NoErr(err)
 }
 
@@ -96,14 +101,17 @@ func TestSecondarySubnets(t *testing.T) {
 		is.NoErr(err)
 		t.Log("run took", time.Since(start))
 		t.Log("total networks", len(networks))
-		t.Log("networks", networks)
-		t.Log()
+		// t.Log("networks", networks)
+
+		for _, r := range networks {
+			t.Log(r.String())
+		}
 	}
 }
 
 func TestBitString(t *testing.T) {
 	is := is.New(t)
-	ip, err := netaddr.ParseIP("127.0.0.1")
+	ip, err := netip.ParseAddr("127.0.0.1")
 	is.NoErr(err)
 	bitStr := util.BitStr4(ip, ".")
 	t.Log(bitStr)
@@ -112,7 +120,7 @@ func TestBitString(t *testing.T) {
 func TestIPString(t *testing.T) {
 	is := is.New(t)
 	start := "127.0.0.1"
-	ip, err := netaddr.ParseIP(start)
+	ip, err := netip.ParseAddr(start)
 	is.NoErr(err)
 
 	bitStr := util.BitStr4(ip, ".")

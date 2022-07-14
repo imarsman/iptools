@@ -8,19 +8,50 @@ import (
 	"os"
 	"strings"
 
+	"net/netip"
+
 	"github.com/imarsman/iptools/pkg/util"
 	"gopkg.in/yaml.v2"
-	"inet.af/netaddr"
 )
 
 const (
 	octetBits = 8
 )
 
+// IPV4Range added because ranges were removed when netaddr joined core Go
+type IPV4Range struct {
+	first netip.Addr
+	last  netip.Addr
+}
+
+// NewIPV4Range make a new range
+func NewIPV4Range(first, last netip.Addr) IPV4Range {
+	var r = IPV4Range{}
+	r.first = first
+	r.last = last
+
+	return r
+}
+
+// First get first address in range
+func (r *IPV4Range) First() netip.Addr {
+	return r.first
+}
+
+// Last get last address in range
+func (r *IPV4Range) Last() netip.Addr {
+	return r.last
+}
+
+// String return string version of range
+func (r *IPV4Range) String() string {
+	return fmt.Sprintf("%s-%s", r.first.String(), r.last.String())
+}
+
 // IPV4Subnet an IP subnet
 type IPV4Subnet struct {
 	name   string
-	prefix netaddr.IPPrefix
+	prefix netip.Prefix
 }
 
 // Name subnet name
@@ -34,13 +65,13 @@ func (s *IPV4Subnet) SetName(name string) {
 }
 
 // Prefix get prefix for subnet
-func (s *IPV4Subnet) Prefix() netaddr.IPPrefix {
+func (s *IPV4Subnet) Prefix() netip.Prefix {
 	return s.prefix
 }
 
 // IP get IP for subnet
-func (s *IPV4Subnet) IP() netaddr.IP {
-	return s.prefix.IP()
+func (s *IPV4Subnet) IP() netip.Addr {
+	return s.prefix.Addr()
 }
 
 // String get string representing subnet (cidr notation)
@@ -88,12 +119,12 @@ func NewFromIPAndBits(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
 
 // NewNamedFromPrefix new with name using incoming prefix
 func NewNamedFromPrefix(prefix string, name string) (subnet *IPV4Subnet, err error) {
-	p, err := netaddr.ParseIPPrefix(prefix)
+	p, err := netip.ParseAddr(prefix)
 	if err != nil {
 		return
 	}
 
-	subnet, err = newSubnet(p.IP().String(), p.Bits())
+	subnet, err = newSubnet(p.String(), uint8(p.BitLen()))
 	if err != nil {
 		return
 	}
@@ -104,12 +135,12 @@ func NewNamedFromPrefix(prefix string, name string) (subnet *IPV4Subnet, err err
 
 // NewFromPrefix new using incoming prefix
 func NewFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
-	p, err := netaddr.ParseIPPrefix(prefix)
+	p, err := netip.ParsePrefix(prefix)
 	if err != nil {
 		return
 	}
 
-	subnet, err = newSubnet(p.IP().String(), p.Bits())
+	subnet, err = newSubnet(p.Addr().String(), uint8(p.Bits()))
 	if err != nil {
 		return
 	}
@@ -123,8 +154,8 @@ func newSubnet(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
 
 	subnet = new(IPV4Subnet)
 
-	var pfx netaddr.IPPrefix
-	pfx, err = netaddr.ParseIPPrefix(fmt.Sprintf("%s/%d", ip, bits))
+	var pfx netip.Prefix
+	pfx, err = netip.ParsePrefix(fmt.Sprintf("%s/%d", ip, bits))
 	if err != nil {
 		return
 	}
@@ -134,7 +165,7 @@ func newSubnet(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
 		return nil, errors.New(errMsg)
 	}
 
-	if pfx.IP().Is6() {
+	if pfx.Addr().Is6() {
 		return nil, errors.New("subnet too large for current implementation")
 	}
 	subnet.prefix = pfx
@@ -143,7 +174,7 @@ func newSubnet(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
 }
 
 // BroadcastAddr get broadcast address for subnet, i.e. the max IP
-func (s *IPV4Subnet) BroadcastAddr() (ip netaddr.IP, err error) {
+func (s *IPV4Subnet) BroadcastAddr() (ip netip.Addr, err error) {
 	return s.Last()
 }
 
@@ -156,7 +187,7 @@ func (s *IPV4Subnet) CIDR() (cidr string) {
 
 // BinaryMask get dot delimited subnet mask in binary
 func (s *IPV4Subnet) BinaryMask() (mask string) {
-	mask = util.BitStr4(s.Prefix().Masked().IP(), `.`)
+	mask = util.BitStr4(s.Prefix().Masked().Addr(), `.`)
 
 	return
 }
@@ -170,7 +201,7 @@ func (s *IPV4Subnet) BinaryID() (mask string) {
 
 // classOcted get octet for prefix IP
 func (s *IPV4Subnet) classOctet() int {
-	bits := s.Prefix().Masked().IP().As4()
+	bits := s.Prefix().Masked().Addr().As4()
 
 	if s.maxClassBits() == octetBits {
 		return int(bits[0])
@@ -184,12 +215,12 @@ func (s *IPV4Subnet) classOctet() int {
 
 // ClassNetworkBits bits not used for hosts in class block
 func (s *IPV4Subnet) ClassNetworkBits() uint8 {
-	return s.Prefix().Bits() - s.startClassBits()
+	return uint8(s.Prefix().Bits()) - s.startClassBits()
 }
 
 // ClassHostBits bits used for network in class block
 func (s *IPV4Subnet) ClassHostBits() uint8 {
-	return s.maxClassBits() - s.Prefix().Bits()
+	return s.maxClassBits() - uint8(s.Prefix().Bits())
 }
 
 // TotalHosts total hosts in subnet
@@ -265,14 +296,14 @@ func (s *IPV4Subnet) Class() (class rune) {
 }
 
 // First get first IP for subnet
-func (s *IPV4Subnet) First() (ip netaddr.IP, err error) {
-	ip = s.IP()
+func (s *IPV4Subnet) First() (ip netip.Addr, err error) {
+	ip = s.prefix.Addr()
 	return
 }
 
 // Last get last IP for subnet
-func (s *IPV4Subnet) Last() (ip netaddr.IP, err error) {
-	ip, err = util.AddToIP(s.IP(), int32(s.TotalHosts()-1))
+func (s *IPV4Subnet) Last() (ip netip.Addr, err error) {
+	ip, err = util.AddToIP(s.prefix.Addr(), int32(s.TotalHosts()-1))
 	if err != nil {
 		return
 	}
@@ -281,19 +312,19 @@ func (s *IPV4Subnet) Last() (ip netaddr.IP, err error) {
 }
 
 // NetworkAddr get last IP for subnet
-func (s *IPV4Subnet) NetworkAddr() (ip netaddr.IP, err error) {
+func (s *IPV4Subnet) NetworkAddr() (ip netip.Addr, err error) {
 	return s.Last()
 }
 
 // Networks number of subnets
 func (s *IPV4Subnet) Networks() int64 {
-	bits := s.Prefix().Bits() - s.startClassBits()
+	bits := uint8(s.Prefix().Bits()) - s.startClassBits()
 
 	return int64(math.Exp2(float64(bits)))
 }
 
 // UsableIPs get usable ips for subnet
-func (s *IPV4Subnet) UsableIPs() (ips []netaddr.IP, err error) {
+func (s *IPV4Subnet) UsableIPs() (ips []netip.Addr, err error) {
 	errMsg := "empty ip list for subnet"
 	ips, err = s.IPs()
 	if err != nil {
@@ -301,7 +332,7 @@ func (s *IPV4Subnet) UsableIPs() (ips []netaddr.IP, err error) {
 	}
 	if len(ips) == 0 {
 		err = errors.New(errMsg)
-		ips = []netaddr.IP{}
+		ips = []netip.Addr{}
 		return
 	}
 	ips = ips[1 : len(ips)-1]
@@ -310,16 +341,16 @@ func (s *IPV4Subnet) UsableIPs() (ips []netaddr.IP, err error) {
 }
 
 // IPs get ips for subnet
-func (s *IPV4Subnet) IPs() (ips []netaddr.IP, err error) {
+func (s *IPV4Subnet) IPs() (ips []netip.Addr, err error) {
 	errMsg := "empty ip list for subnet"
-	ip := s.Prefix().IP()
+	ip := s.Prefix().Addr()
 	ips = append(ips, ip)
 
 	for j := 0; j < int(s.TotalHosts()); j++ {
 		ip = ip.Next()
-		if (ip == netaddr.IP{}) {
+		if (ip == netip.Addr{}) {
 			err = errors.New(errMsg)
-			ips = []netaddr.IP{}
+			ips = []netip.Addr{}
 			return
 		}
 		ips = append(ips, ip)
@@ -329,27 +360,27 @@ func (s *IPV4Subnet) IPs() (ips []netaddr.IP, err error) {
 }
 
 // UsableIPRange get range of IPs usable for hosts
-func (s *IPV4Subnet) UsableIPRange() (r netaddr.IPRange, err error) {
-	ip := s.Prefix().IP()
+func (s *IPV4Subnet) UsableIPRange() (r IPV4Range, err error) {
+	ip := s.Prefix().Addr()
 	startIP := ip
 	ip, err = util.AddToIP(ip, int32(s.TotalHosts()))
 	if err != nil {
 		return
 	}
-	r = netaddr.IPRangeFrom(startIP.Next(), ip.Prior())
+	r = NewIPV4Range(startIP.Next(), ip.Prev())
 
 	return
 }
 
 // IPRange get subnet range
-func (s *IPV4Subnet) IPRange() (r netaddr.IPRange, err error) {
-	ip := s.Prefix().IP()
+func (s *IPV4Subnet) IPRange() (r IPV4Range, err error) {
+	ip := s.Prefix().Addr()
 	startIP := ip
 	ip, err = util.AddToIP(ip, int32(s.TotalHosts()))
 	if err != nil {
 		return
 	}
-	r = netaddr.IPRangeFrom(startIP, ip)
+	r = NewIPV4Range(startIP, ip)
 
 	return
 }
@@ -372,7 +403,7 @@ func (s *IPV4Subnet) subnets(secondarySubnet *IPV4Subnet) (subnets []*IPV4Subnet
 	}
 
 	for _, r := range ranges {
-		prefix := fmt.Sprintf("%s/%d", r.From(), secondarySubnet.Prefix().Bits())
+		prefix := fmt.Sprintf("%s/%d", r.First(), secondarySubnet.Prefix().Bits())
 		s, err = NewFromPrefix(prefix)
 		if err != nil {
 			fmt.Println(err)
@@ -385,23 +416,23 @@ func (s *IPV4Subnet) subnets(secondarySubnet *IPV4Subnet) (subnets []*IPV4Subnet
 }
 
 // SecondaryIPRanges set of ranges in the context of parent subnet
-func (s *IPV4Subnet) SecondaryIPRanges(secondarySubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
+func (s *IPV4Subnet) SecondaryIPRanges(secondarySubnet *IPV4Subnet) (ranges []IPV4Range, err error) {
 	return s.ipRanges(secondarySubnet)
 }
 
 // IPRanges the set of equally sized ranges for subnet
-func (s *IPV4Subnet) IPRanges() (ranges []netaddr.IPRange, err error) {
+func (s *IPV4Subnet) IPRanges() (ranges []IPV4Range, err error) {
 	return s.ipRanges(s)
 }
 
 // ipRanges get the ranges for a subnet splitting by secondary subnet (can be self)
-func (s *IPV4Subnet) ipRanges(secondarySubnet *IPV4Subnet) (ranges []netaddr.IPRange, err error) {
+func (s *IPV4Subnet) ipRanges(secondarySubnet *IPV4Subnet) (ranges []IPV4Range, err error) {
 	// Can't subdivide to smaller prefixed subnet
 	if secondarySubnet.Prefix().Bits() < s.Prefix().Bits() {
 		err = fmt.Errorf("Subnet to split to has more bits %d than parent %d", s.Prefix().Bits(), secondarySubnet.Prefix().Bits())
 		return
 	}
-	ranges = []netaddr.IPRange{}
+	ranges = []IPV4Range{}
 	ip := s.IP()
 	ipStart := ip
 
@@ -412,7 +443,7 @@ func (s *IPV4Subnet) ipRanges(secondarySubnet *IPV4Subnet) (ranges []netaddr.IPR
 			if err != nil {
 				//return
 			}
-			ranges = append(ranges, netaddr.IPRangeFrom(ipStart, ip))
+			ranges = append(ranges, NewIPV4Range(ipStart, ip))
 			ipStart = ip.Next()
 		}
 	}

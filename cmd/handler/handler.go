@@ -2,13 +2,13 @@ package handler
 
 import (
 	"fmt"
+	"net/netip"
 	"os"
 
 	"github.com/alexeyco/simpletable"
 	"github.com/imarsman/iptools/cmd/args"
 	"github.com/imarsman/iptools/pkg/subnet"
 	"github.com/imarsman/iptools/pkg/util"
-	"inet.af/netaddr"
 )
 
 // SubnetDescribe describe a subnet
@@ -136,13 +136,13 @@ func SubnetDescribe(ip string, mask uint8) {
 
 	r = []*simpletable.Cell{
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "in-addr.arpa")},
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s.in-addr.arpa", util.InAddrArpa(s.IP()))},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s.in-addr.arpa", util.InAddrArpa(s.Prefix().Addr()))},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
 	r = []*simpletable.Cell{
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Wildcard Mask")},
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMask(s.Prefix().IP()))},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMask(netip.Addr(s.Prefix().Addr())))},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
@@ -160,7 +160,7 @@ func SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 		os.Exit(1)
 	}
 
-	ranges := []netaddr.IPRange{}
+	ranges := []subnet.IPV4Range{}
 	var s2 *subnet.IPV4Subnet
 	if secondaryMask != 0 {
 		prefix := fmt.Sprintf("%s/%d", ip, secondaryMask)
@@ -252,11 +252,9 @@ func SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 		fmt.Println()
 		table.SetStyle(simpletable.StyleCompactLite)
 		fmt.Println(table.String())
-	}
 
-	if args.CLIArgs.Subnet.SubnetRanges.Pretty {
 		fmt.Println()
-		table := simpletable.New()
+		table = simpletable.New()
 
 		table.Header = &simpletable.Header{
 			Cells: []*simpletable.Cell{
@@ -266,8 +264,8 @@ func SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 		}
 		for _, r := range ranges {
 			cell := []*simpletable.Cell{
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", r.From().String())},
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", r.To().String())},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", r.First().String())},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", r.Last().String())},
 			}
 			table.Body.Cells = append(table.Body.Cells, cell)
 		}

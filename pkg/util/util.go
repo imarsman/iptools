@@ -4,15 +4,14 @@ import (
 	"encoding/binary"
 	"fmt"
 	"net"
+	"net/netip"
 	"regexp"
 	"strconv"
 	"strings"
-
-	"inet.af/netaddr"
 )
 
 // BitStr4 get bit string for IPV4 IP
-func BitStr4(ip netaddr.IP, separator string) string {
+func BitStr4(ip netip.Addr, separator string) string {
 	bytes := ip.As4()
 	list := []string{}
 
@@ -58,16 +57,16 @@ func BinaryIP4StrToBytes(ip string) (list []byte, err error) {
 }
 
 // https://gist.github.com/ammario/649d4c0da650162efd404af23e25b86b
-func int2ip(ipInt uint32) (netaddr.IP, bool) {
+func int2ip(ipInt uint32) (netip.Addr, error) {
 	ip := make(net.IP, 4)
 	binary.BigEndian.PutUint32(ip, ipInt)
-	addr, ok := netaddr.FromStdIP(ip)
+	addr, ok := netip.ParseAddr(ip.String())
 
 	return addr, ok
 }
 
 // WildCardMask get mask bits available for addressing
-func WildCardMask(ip netaddr.IP) string {
+func WildCardMask(ip netip.Addr) string {
 	bytes := ip.As4()
 	var list = make([]string, 4, 4)
 	for i, b := range bytes {
@@ -82,7 +81,7 @@ func WildCardMask(ip netaddr.IP) string {
 }
 
 // AddToIP add count IPs to IP
-func AddToIP(startIP netaddr.IP, add int32) (addedIP netaddr.IP, err error) {
+func AddToIP(startIP netip.Addr, add int32) (addedIP netip.Addr, err error) {
 	if !startIP.Next().IsValid() {
 		err = fmt.Errorf("ip %v is already max", startIP)
 		return
@@ -91,9 +90,8 @@ func AddToIP(startIP netaddr.IP, add int32) (addedIP netaddr.IP, err error) {
 	slice := bytes[:]
 	ipValue := binary.BigEndian.Uint32(slice)
 	ipValue += uint32(add)
-	addedIP, ok := int2ip(ipValue)
-	if !ok {
-		err = fmt.Errorf("problem after adding %d to IP %v", add, startIP)
+	addedIP, err = int2ip(ipValue)
+	if err != nil {
 		return
 	}
 
@@ -108,7 +106,7 @@ func reverse[T any](s []T) {
 }
 
 // InAddrArpa get the InAddrArpa version of an IP
-func InAddrArpa(ip netaddr.IP) string {
+func InAddrArpa(ip netip.Addr) string {
 	ipStr := ip.String()
 	parts := strings.Split(ipStr, `.`)
 
@@ -118,7 +116,7 @@ func InAddrArpa(ip netaddr.IP) string {
 }
 
 // IPToHexStr convert an IP4 address to a hex string
-func IPToHexStr(ip netaddr.IP) string {
+func IPToHexStr(ip netip.Addr) string {
 	bytes := ip.As4()
 	slice := bytes[:]
 	ipValue := binary.BigEndian.Uint32(slice)
