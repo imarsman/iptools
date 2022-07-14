@@ -9,6 +9,10 @@ This utility can have completion enabled by typing `COMP_INSTALL=1 iptools`.
 This utility currently does three things. It splits a subnet into networks and into networks by a differing subnet size,
 it splits a subnet into a set of ranges for its networks, and it gives summary information for a subnet.
 
+The IP package used, `net/netip`, is in Go 1.18. It is slightly different in API compared to the
+[netaddr](https://github.com/inetaf/netaddr) package that came first. Sadly, the `netip` package loses the IPRange
+struct, so I have added needed functionality here in the subnet package.
+
 One thing I'd like to do is try IP6 subnetting.
 
 ### Subnet divisions split into non-default sized networks
