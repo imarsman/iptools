@@ -1,18 +1,17 @@
 # iptools
 
-This is a learning experience for things like IP subnetting. Mostly I am interested in splitting up subnets into equal
-ranges and defining things like the network ID and broadcast address for subnets. This is a way for me to better
-establish my knowledge of this subject.
+This project was done as a learning experience for things like IP subnetting. Mostly I was interested in learning more
+about ipv4 subnets and splitting up subnets into equal ranges and defining things like the network ID and broadcast
+address for subnets. This is a way for me to better establish my knowledge of this subject.
 
 This utility can have completion enabled by typing `COMP_INSTALL=1 iptools`.
 
 This utility currently does three things. It splits a subnet into networks and into networks by a differing subnet size,
 it splits a subnet into a set of ranges for its networks, and it gives summary information for a subnet.
 
-It is likely that there are errors in my code, mostly tied to the fact that this project is my way of learning about
-subnetting. One thing I'd like to do is try IP6 subnetting.
+One thing I'd like to do is try IP6 subnetting.
 
-Subnet divisions split into non-default sized networks
+### Subnet divisions split into non-default sized networks
 
 ```
 $ iptools subnet divide -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
@@ -36,7 +35,7 @@ $ iptools subnet divide -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
  99.236.192.0/18
  ```
 
-Subnet divisions split default
+### Subnet divisions split default
 
 ```
 $ iptools subnet divide -ip 99.236.32.0 -bits 16 -pretty
@@ -53,7 +52,7 @@ $ iptools subnet divide -ip 99.236.32.0 -bits 16 -pretty
  99.236.0.0/16
  ```
 
-Subnet ranges in default size
+### Subnet ranges in default size
 
 ```
 $ iptools subnet ranges -ip 99.236.32.0 -bits 16 -pretty
@@ -70,7 +69,7 @@ $ iptools subnet ranges -ip 99.236.32.0 -bits 16 -pretty
  99.236.0.0   99.236.255.255
  ```
  
-Subnet ranges split into non-default size
+### Subnet ranges split into non-default size
 
 ```
 $ iptools subnet ranges -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
@@ -95,7 +94,8 @@ $ iptools subnet ranges -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
 ```
 
 
-Subnet details
+### Subnet details
+
 ```
 $ iptools subnet describe -ip 10.32.0.0 -bits 24
 +--------------------+-------------------------------------+
@@ -118,7 +118,7 @@ $ iptools subnet describe -ip 10.32.0.0 -bits 24
 +--------------------+-------------------------------------+
 ```
 
-Top level help
+### Top level help
 
 ```
 $ iptools -h
@@ -140,7 +140,7 @@ Commands:
   subnet                 Get networks for subnet
 ```
 
-Help for subnet options
+### Help for subnet options
 
 ```
 $ iptools subnet -h
@@ -162,7 +162,7 @@ Commands:
   describe               describe a subnet
 ```
 
-Lines of cde
+### Lines of cde
 
 ```
 $ gocloc pkg/subnet pkg/util cmd README.md
