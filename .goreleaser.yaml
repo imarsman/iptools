@@ -36,6 +36,9 @@ release:
 
     iptools is a set of IP and network tools
 
+    v0.1.12
+    Switched to net/netip Go 1.18 core version
+
     v0.1.11
     Using unexported fields for Subnet struct
 
