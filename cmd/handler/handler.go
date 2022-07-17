@@ -7,16 +7,16 @@ import (
 
 	"github.com/alexeyco/simpletable"
 	"github.com/imarsman/iptools/cmd/args"
-	"github.com/imarsman/iptools/pkg/subnet"
+	"github.com/imarsman/iptools/pkg/ip4subnet"
 	"github.com/imarsman/iptools/pkg/util"
 )
 
 // SubnetDescribe describe a subnet
 func SubnetDescribe(ip string, mask uint8) {
 	var err error
-	var s *subnet.IPV4Subnet
+	var s *ip4subnet.IPV4Subnet
 	prefix := fmt.Sprintf("%s/%d", ip, mask)
-	s, err = subnet.NewFromPrefix(prefix)
+	s, err = ip4subnet.NewFromPrefix(prefix)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -152,19 +152,19 @@ func SubnetDescribe(ip string, mask uint8) {
 // SubnetRanges divide a subnet into ranges
 func SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 	var err error
-	var s *subnet.IPV4Subnet
+	var s *ip4subnet.IPV4Subnet
 	prefix := fmt.Sprintf("%s/%d", ip, bits)
-	s, err = subnet.NewFromPrefix(prefix)
+	s, err = ip4subnet.NewFromPrefix(prefix)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	ranges := []subnet.IPV4Range{}
-	var s2 *subnet.IPV4Subnet
+	ranges := []ip4subnet.IPV4Range{}
+	var s2 *ip4subnet.IPV4Subnet
 	if secondaryMask != 0 {
 		prefix := fmt.Sprintf("%s/%d", ip, secondaryMask)
-		s2, err = subnet.NewFromPrefix(prefix)
+		s2, err = ip4subnet.NewFromPrefix(prefix)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -281,19 +281,19 @@ func SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 // SubnetDivide divide a subnet into ranges
 func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 	var err error
-	var s *subnet.IPV4Subnet
+	var s *ip4subnet.IPV4Subnet
 	prefix := fmt.Sprintf("%s/%d", ip, mask)
-	s, err = subnet.NewFromPrefix(prefix)
+	s, err = ip4subnet.NewFromPrefix(prefix)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	subnets := []*subnet.IPV4Subnet{}
-	var s2 *subnet.IPV4Subnet
+	subnets := []*ip4subnet.IPV4Subnet{}
+	var s2 *ip4subnet.IPV4Subnet
 	if secondaryMask != 0 {
 		prefix := fmt.Sprintf("%s/%d", ip, secondaryMask)
-		s2, err = subnet.NewFromPrefix(prefix)
+		s2, err = ip4subnet.NewFromPrefix(prefix)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)

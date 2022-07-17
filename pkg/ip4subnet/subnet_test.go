@@ -1,4 +1,4 @@
-package subnet
+package ip4subnet
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ func TestNewSubnet(t *testing.T) {
 	for i := 1; i <= 32; i++ {
 		// subnetMask := fmt.Sprintf("255.255.255.0/%d", i)
 		is := is.New(t)
-		s, err := NewFromIPAndBits("10.32.0.0", uint8(i))
+		s, err := NewFromIPAndBits("10.32.0.0", int(i))
 		is.NoErr(err)
 		t.Log("masked", s.Prefix().Masked())
 		t.Log("class bits", s.classOctet())

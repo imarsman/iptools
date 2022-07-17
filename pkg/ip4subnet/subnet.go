@@ -1,4 +1,4 @@
-package subnet
+package ip4subnet
 
 import (
 	"encoding/json"
@@ -102,8 +102,8 @@ func (s *IPV4Subnet) YAML() (bytes []byte, err error) {
 }
 
 // NewNamedFromIPAndBits new with name using incoming prefix ip and network bits
-func NewNamedFromIPAndBits(ip string, bits uint8, name string) (subnet *IPV4Subnet, err error) {
-	subnet, err = newSubnet(ip, uint8(bits))
+func NewNamedFromIPAndBits(ip string, bits int, name string) (subnet *IPV4Subnet, err error) {
+	subnet, err = newSubnet(ip, bits)
 	if err != nil {
 		return
 	}
@@ -113,8 +113,8 @@ func NewNamedFromIPAndBits(ip string, bits uint8, name string) (subnet *IPV4Subn
 }
 
 // NewFromIPAndBits new using incoming prefix ip and network bits
-func NewFromIPAndBits(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
-	return newSubnet(ip, uint8(bits))
+func NewFromIPAndBits(ip string, bits int) (subnet *IPV4Subnet, err error) {
+	return newSubnet(ip, bits)
 }
 
 // NewNamedFromPrefix new with name using incoming prefix
@@ -124,7 +124,7 @@ func NewNamedFromPrefix(prefix string, name string) (subnet *IPV4Subnet, err err
 		return
 	}
 
-	subnet, err = newSubnet(p.String(), uint8(p.BitLen()))
+	subnet, err = newSubnet(p.String(), p.BitLen())
 	if err != nil {
 		return
 	}
@@ -140,7 +140,7 @@ func NewFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
 		return
 	}
 
-	subnet, err = newSubnet(p.Addr().String(), uint8(p.Bits()))
+	subnet, err = newSubnet(p.Addr().String(), p.Bits())
 	if err != nil {
 		return
 	}
@@ -149,7 +149,7 @@ func NewFromPrefix(prefix string) (subnet *IPV4Subnet, err error) {
 }
 
 // newSubnet new subnet with prefix ip and network bits
-func newSubnet(ip string, bits uint8) (subnet *IPV4Subnet, err error) {
+func newSubnet(ip string, bits int) (subnet *IPV4Subnet, err error) {
 	errMsg := "invalid prefix"
 
 	subnet = new(IPV4Subnet)
@@ -214,13 +214,13 @@ func (s *IPV4Subnet) classOctet() int {
 }
 
 // ClassNetworkBits bits not used for hosts in class block
-func (s *IPV4Subnet) ClassNetworkBits() uint8 {
-	return uint8(s.Prefix().Bits()) - s.startClassBits()
+func (s *IPV4Subnet) ClassNetworkBits() int {
+	return int(s.Prefix().Bits()) - s.startClassBits()
 }
 
 // ClassHostBits bits used for network in class block
-func (s *IPV4Subnet) ClassHostBits() uint8 {
-	return s.maxClassBits() - uint8(s.Prefix().Bits())
+func (s *IPV4Subnet) ClassHostBits() int {
+	return s.maxClassBits() - s.Prefix().Bits()
 }
 
 // TotalHosts total hosts in subnet
@@ -251,7 +251,7 @@ func (s *IPV4Subnet) UsableHosts() int64 {
 }
 
 // startClassBits starting bits for subnet range for the class
-func (s *IPV4Subnet) startClassBits() uint8 {
+func (s *IPV4Subnet) startClassBits() int {
 	if s.Prefix().Bits() < octetBits {
 		return 0
 	} else if s.Prefix().Bits() < 2*octetBits {
@@ -263,7 +263,7 @@ func (s *IPV4Subnet) startClassBits() uint8 {
 }
 
 // maxClassBits maximum bits for subnet range for the class
-func (s *IPV4Subnet) maxClassBits() uint8 {
+func (s *IPV4Subnet) maxClassBits() int {
 	if s.Prefix().Bits() <= octetBits {
 		return octetBits
 	} else if s.Prefix().Bits() <= 2*octetBits {
@@ -318,7 +318,7 @@ func (s *IPV4Subnet) NetworkAddr() (ip netip.Addr, err error) {
 
 // Networks number of subnets
 func (s *IPV4Subnet) Networks() int64 {
-	bits := uint8(s.Prefix().Bits()) - s.startClassBits()
+	bits := s.Prefix().Bits() - s.startClassBits()
 
 	return int64(math.Exp2(float64(bits)))
 }

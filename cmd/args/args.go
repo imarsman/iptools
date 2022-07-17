@@ -49,32 +49,32 @@ type SubnetDescribe struct {
 	Bits int    `arg:"-b,--bits" help:""`
 }
 
-// SubnetRanges for calls to get list of subnet ranges
-type SubnetRanges struct {
+// SubnetIP4Ranges for calls to get list of subnet ranges
+type SubnetIP4Ranges struct {
 	IP            string `arg:"-i,--ip" help:""`
 	Bits          int    `arg:"-b,--bits" help:""`
 	SecondaryBits int    `arg:"-s,--secondary-bits" help:""`
 	Pretty        bool   `arg:"-p,--pretty" help:""`
 }
 
-// SubnetDivide for calls to divide subnet into networks
-type SubnetDivide struct {
+// SubnetIP4Divide for calls to divide subnet into networks
+type SubnetIP4Divide struct {
 	IP            string `arg:"-i,--ip" help:""`
 	Bits          int    `arg:"-b,--bits" help:""`
 	SecondaryBits int    `arg:"-s,--secondary-bits" help:""`
 	Pretty        bool   `arg:"-p,--pretty" help:""`
 }
 
-// Subnet top level subnet arg
-type Subnet struct {
-	SubnetRanges   *SubnetRanges   `arg:"subcommand:ranges" help:"divide a subnet into ranges"`
-	SubnetDivide   *SubnetDivide   `arg:"subcommand:divide" help:"divide a subnet into smaller subnets"`
-	SubnetDescribe *SubnetDescribe `arg:"subcommand:describe" help:"describe a subnet"`
+// SubnetIP4 top level subnet arg
+type SubnetIP4 struct {
+	SubnetRanges   *SubnetIP4Ranges `arg:"subcommand:ranges" help:"divide a subnet into ranges"`
+	SubnetDivide   *SubnetIP4Divide `arg:"subcommand:divide" help:"divide a subnet into smaller subnets"`
+	SubnetDescribe *SubnetDescribe  `arg:"subcommand:describe" help:"describe a subnet"`
 }
 
 // Args container for cli pargs
 type Args struct {
-	Subnet *Subnet `arg:"subcommand:subnet" help:"Get networks for subnet"`
+	Subnet *SubnetIP4 `arg:"subcommand:subnetip4" help:"Get networks for subnet"`
 }
 
 // CLIArgs the args structure to be filled at runtime
