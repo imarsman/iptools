@@ -1,10 +1,10 @@
-package ip6subnet
+package ipv6subnet
 
 import (
 	"net/netip"
 	"testing"
 
-	"github.com/imarsman/iptools/pkg/ip4subnet/util"
+	"github.com/imarsman/iptools/pkg/ipv4subnet/util"
 	"github.com/matryer/is"
 )
 

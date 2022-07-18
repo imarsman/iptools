@@ -7,16 +7,16 @@ import (
 
 	"github.com/alexeyco/simpletable"
 	"github.com/imarsman/iptools/cmd/args"
-	"github.com/imarsman/iptools/pkg/ip4subnet"
-	"github.com/imarsman/iptools/pkg/ip4subnet/util"
+	"github.com/imarsman/iptools/pkg/ipv4subnet"
+	"github.com/imarsman/iptools/pkg/ipv4subnet/util"
 )
 
 // IP4SubnetDescribe describe a subnet
 func IP4SubnetDescribe(ip string, mask uint8) {
 	var err error
-	var s *ip4subnet.Subnet
+	var s *ipv4subnet.Subnet
 	prefix := fmt.Sprintf("%s/%d", ip, mask)
-	s, err = ip4subnet.NewFromPrefix(prefix)
+	s, err = ipv4subnet.NewFromPrefix(prefix)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -152,19 +152,19 @@ func IP4SubnetDescribe(ip string, mask uint8) {
 // IP4SubnetRanges divide a subnet into ranges
 func IP4SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 	var err error
-	var s *ip4subnet.Subnet
+	var s *ipv4subnet.Subnet
 	prefix := fmt.Sprintf("%s/%d", ip, bits)
-	s, err = ip4subnet.NewFromPrefix(prefix)
+	s, err = ipv4subnet.NewFromPrefix(prefix)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	ranges := []ip4subnet.Range{}
-	var s2 *ip4subnet.Subnet
+	ranges := []ipv4subnet.Range{}
+	var s2 *ipv4subnet.Subnet
 	if secondaryMask != 0 {
 		prefix := fmt.Sprintf("%s/%d", ip, secondaryMask)
-		s2, err = ip4subnet.NewFromPrefix(prefix)
+		s2, err = ipv4subnet.NewFromPrefix(prefix)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -281,19 +281,19 @@ func IP4SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 // IP4SubnetDivide divide a subnet into ranges
 func IP4SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 	var err error
-	var s *ip4subnet.Subnet
+	var s *ipv4subnet.Subnet
 	prefix := fmt.Sprintf("%s/%d", ip, mask)
-	s, err = ip4subnet.NewFromPrefix(prefix)
+	s, err = ipv4subnet.NewFromPrefix(prefix)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	subnets := []*ip4subnet.Subnet{}
-	var s2 *ip4subnet.Subnet
+	subnets := []*ipv4subnet.Subnet{}
+	var s2 *ipv4subnet.Subnet
 	if secondaryMask != 0 {
 		prefix := fmt.Sprintf("%s/%d", ip, secondaryMask)
-		s2, err = ip4subnet.NewFromPrefix(prefix)
+		s2, err = ipv4subnet.NewFromPrefix(prefix)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)

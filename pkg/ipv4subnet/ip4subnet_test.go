@@ -1,4 +1,4 @@
-package ip4subnet
+package ipv4subnet
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/imarsman/iptools/pkg/ip4subnet/util"
+	"github.com/imarsman/iptools/pkg/ipv6subnet/util"
 	"github.com/matryer/is"
 )
 
@@ -14,7 +14,7 @@ func TestNewSubnet(t *testing.T) {
 	for i := 1; i <= 32; i++ {
 		// subnetMask := fmt.Sprintf("255.255.255.0/%d", i)
 		is := is.New(t)
-		s, err := NewFromIPAndBits("10.32.0.0", int(i))
+		s, err := NewFromIPAndBits("10.32.0.0", i)
 		is.NoErr(err)
 		t.Log("masked", s.Prefix().Masked())
 		t.Log("class bits", s.classOctet())

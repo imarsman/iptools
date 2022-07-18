@@ -1,4 +1,4 @@
-package ip6subnet
+package ipv6subnet
 
 import (
 	"encoding/json"

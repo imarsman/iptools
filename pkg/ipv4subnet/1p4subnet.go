@@ -1,4 +1,4 @@
-package ip4subnet
+package ipv4subnet
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 
 	"net/netip"
 
-	"github.com/imarsman/iptools/pkg/ip4subnet/util"
+	"github.com/imarsman/iptools/pkg/ipv4subnet/util"
 	"gopkg.in/yaml.v2"
 )
 
