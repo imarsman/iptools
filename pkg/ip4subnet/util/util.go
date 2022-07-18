@@ -80,8 +80,8 @@ func WildCardMask(ip netip.Addr) string {
 	return strings.Join(list, `.`)
 }
 
-// AddToIP add count IPs to IP
-func AddToIP(startIP netip.Addr, add int32) (addedIP netip.Addr, err error) {
+// AddToIPIP4 add count IPs to IP
+func AddToIPIP4(startIP netip.Addr, add int32) (addedIP netip.Addr, err error) {
 	if !startIP.Next().IsValid() {
 		err = fmt.Errorf("ip %v is already max", startIP)
 		return
@@ -105,8 +105,8 @@ func reverse[T any](s []T) {
 	}
 }
 
-// InAddrArpa get the InAddrArpa version of an IP
-func InAddrArpa(ip netip.Addr) string {
+// InAddrArpaIP4 get the InAddrArpaIP4 version of an IP
+func InAddrArpaIP4(ip netip.Addr) string {
 	ipStr := ip.String()
 	parts := strings.Split(ipStr, `.`)
 

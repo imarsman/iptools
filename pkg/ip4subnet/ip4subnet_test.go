@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/imarsman/iptools/pkg/util"
+	"github.com/imarsman/iptools/pkg/ip4subnet/util"
 	"github.com/matryer/is"
 )
 

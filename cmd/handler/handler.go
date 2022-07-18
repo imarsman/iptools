@@ -8,13 +8,13 @@ import (
 	"github.com/alexeyco/simpletable"
 	"github.com/imarsman/iptools/cmd/args"
 	"github.com/imarsman/iptools/pkg/ip4subnet"
-	"github.com/imarsman/iptools/pkg/util"
+	"github.com/imarsman/iptools/pkg/ip4subnet/util"
 )
 
-// SubnetDescribe describe a subnet
-func SubnetDescribe(ip string, mask uint8) {
+// IP4SubnetDescribe describe a subnet
+func IP4SubnetDescribe(ip string, mask uint8) {
 	var err error
-	var s *ip4subnet.IPV4Subnet
+	var s *ip4subnet.Subnet
 	prefix := fmt.Sprintf("%s/%d", ip, mask)
 	s, err = ip4subnet.NewFromPrefix(prefix)
 	if err != nil {
@@ -136,7 +136,7 @@ func SubnetDescribe(ip string, mask uint8) {
 
 	r = []*simpletable.Cell{
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "in-addr.arpa")},
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s.in-addr.arpa", util.InAddrArpa(s.Prefix().Addr()))},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s.in-addr.arpa", util.InAddrArpaIP4(s.Prefix().Addr()))},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
@@ -149,10 +149,10 @@ func SubnetDescribe(ip string, mask uint8) {
 	fmt.Println(table.String())
 }
 
-// SubnetRanges divide a subnet into ranges
-func SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
+// IP4SubnetRanges divide a subnet into ranges
+func IP4SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 	var err error
-	var s *ip4subnet.IPV4Subnet
+	var s *ip4subnet.Subnet
 	prefix := fmt.Sprintf("%s/%d", ip, bits)
 	s, err = ip4subnet.NewFromPrefix(prefix)
 	if err != nil {
@@ -160,8 +160,8 @@ func SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 		os.Exit(1)
 	}
 
-	ranges := []ip4subnet.IPV4Range{}
-	var s2 *ip4subnet.IPV4Subnet
+	ranges := []ip4subnet.Range{}
+	var s2 *ip4subnet.Subnet
 	if secondaryMask != 0 {
 		prefix := fmt.Sprintf("%s/%d", ip, secondaryMask)
 		s2, err = ip4subnet.NewFromPrefix(prefix)
@@ -278,10 +278,10 @@ func SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 	}
 }
 
-// SubnetDivide divide a subnet into ranges
-func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
+// IP4SubnetDivide divide a subnet into ranges
+func IP4SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 	var err error
-	var s *ip4subnet.IPV4Subnet
+	var s *ip4subnet.Subnet
 	prefix := fmt.Sprintf("%s/%d", ip, mask)
 	s, err = ip4subnet.NewFromPrefix(prefix)
 	if err != nil {
@@ -289,8 +289,8 @@ func SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 		os.Exit(1)
 	}
 
-	subnets := []*ip4subnet.IPV4Subnet{}
-	var s2 *ip4subnet.IPV4Subnet
+	subnets := []*ip4subnet.Subnet{}
+	var s2 *ip4subnet.Subnet
 	if secondaryMask != 0 {
 		prefix := fmt.Sprintf("%s/%d", ip, secondaryMask)
 		s2, err = ip4subnet.NewFromPrefix(prefix)
