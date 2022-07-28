@@ -38,11 +38,11 @@ func IP4SubnetDescribe(ip string, mask uint8) {
 
 	if s.Networks() > 0 {
 		// get last address for subnet
-		last, err := s.Last()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		// last, err := s.Last()
+		// if err != nil {
+		// 	fmt.Println(err)
+		// 	os.Exit(1)
+		// }
 		// Get first address for subnet
 		first, err := s.First()
 		if err != nil {
@@ -56,11 +56,11 @@ func IP4SubnetDescribe(ip string, mask uint8) {
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
 
-		r = []*simpletable.Cell{
-			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "IP Address")},
-			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", last.String())},
-		}
-		table.Body.Cells = append(table.Body.Cells, r)
+		// r = []*simpletable.Cell{
+		// 	{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "IP Address")},
+		// 	{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", last.String())},
+		// }
+		// table.Body.Cells = append(table.Body.Cells, r)
 
 		networkAddress, err := s.BroadcastAddr()
 		if err != nil {
