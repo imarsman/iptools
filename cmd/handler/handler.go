@@ -62,7 +62,7 @@ func IP4SubnetDescribe(ip string, mask uint8) {
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
 
-		networkAddress, err := s.NetworkAddr()
+		networkAddress, err := s.BroadcastAddr()
 		if err != nil {
 			return
 		}

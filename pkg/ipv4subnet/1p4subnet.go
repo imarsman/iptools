@@ -303,7 +303,7 @@ func (s *Subnet) First() (ip netip.Addr, err error) {
 
 // Last get last IP for subnet
 func (s *Subnet) Last() (ip netip.Addr, err error) {
-	ip, err = util.AddToIPIP4(s.prefix.Addr(), int32(s.TotalHosts()-1))
+	ip, err = util.AddToIPIP4(s.prefix.Addr(), int32(s.Hosts()-1))
 	if err != nil {
 		return
 	}
