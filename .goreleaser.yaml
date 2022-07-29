@@ -36,6 +36,9 @@ release:
 
     iptools is a set of IP and network tools
 
+    v0.1.14
+    Fix for subnet describe.
+
     v0.1.13
     Splitting ip4 naming to allow for later ip6
 
