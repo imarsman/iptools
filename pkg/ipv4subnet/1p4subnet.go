@@ -50,8 +50,9 @@ func (r *Range) String() string {
 
 // Subnet an IP subnet
 type Subnet struct {
-	name   string
-	prefix netip.Prefix
+	name          string
+	prefix        netip.Prefix
+	netMaskPrefix netip.Prefix
 }
 
 // Name subnet name
@@ -72,6 +73,11 @@ func (s *Subnet) Prefix() netip.Prefix {
 // IP get IP for subnet
 func (s *Subnet) IP() netip.Addr {
 	return s.prefix.Addr()
+}
+
+// SubnetMask get subnet mask for subnet
+func (s *Subnet) SubnetMask() netip.Prefix {
+	return s.netMaskPrefix
 }
 
 // String get string representing subnet (cidr notation)
@@ -153,6 +159,11 @@ func newSubnet(ip string, bits int) (subnet *Subnet, err error) {
 	errMsg := "invalid prefix"
 
 	subnet = new(Subnet)
+	subnet.netMaskPrefix, err = netip.ParsePrefix(fmt.Sprintf("255.255.255.255/%d", bits))
+	if err != nil {
+		fmt.Println(err)
+	}
+	subnet.netMaskPrefix = subnet.netMaskPrefix.Masked()
 
 	var pfx netip.Prefix
 	pfx, err = netip.ParsePrefix(fmt.Sprintf("%s/%d", ip, bits))

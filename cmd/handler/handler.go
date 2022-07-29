@@ -36,6 +36,12 @@ func IP4SubnetDescribe(ip string, mask uint8) {
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
+	r = []*simpletable.Cell{
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet Mask")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.SubnetMask().Addr())},
+	}
+	table.Body.Cells = append(table.Body.Cells, r)
+
 	if s.Networks() > 0 {
 		// Get first address for subnet
 		first, err := s.First()
