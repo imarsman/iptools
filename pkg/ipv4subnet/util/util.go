@@ -124,5 +124,5 @@ func IPToHexStr(ip netip.Addr) string {
 	var ipInt = make(net.IP, 4)
 	binary.BigEndian.PutUint32(ipInt, ipValue)
 
-	return fmt.Sprintf("%x", ipValue)
+	return fmt.Sprintf("0x%X", ipValue)
 }
