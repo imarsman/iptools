@@ -36,6 +36,7 @@ func IP4SubnetDescribe(ip string, mask uint8) {
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
+	// Get subnet mask
 	r = []*simpletable.Cell{
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet Mask")},
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.SubnetMask().Addr())},
