@@ -195,10 +195,47 @@ func IP4SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet IP")},
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.IP().String())},
 		}
+		table.Body.Cells = append(table.Body.Cells, r)
+
+		networkAddress, err := s.BroadcastAddr()
+		if err != nil {
+			return
+		}
+		r = []*simpletable.Cell{
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Broadcast Address")},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", networkAddress.String())},
+		}
+		table.Body.Cells = append(table.Body.Cells, r)
+		r = []*simpletable.Cell{
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet Mask")},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.SubnetMask().Addr())},
+		}
+		table.Body.Cells = append(table.Body.Cells, r)
 		if secondaryMask != 0 {
 			r = []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet")},
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.CIDR())},
+			}
+			table.Body.Cells = append(table.Body.Cells, r)
+			r = []*simpletable.Cell{
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet IP")},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.IP().String())},
+			}
+			table.Body.Cells = append(table.Body.Cells, r)
+
+			networkAddress, err := s.BroadcastAddr()
+			if err != nil {
+				return
+			}
+			r = []*simpletable.Cell{
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet Broadcast Address")},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", networkAddress.String())},
+			}
+			table.Body.Cells = append(table.Body.Cells, r)
+
+			r = []*simpletable.Cell{
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet Mask")},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.SubnetMask().Addr())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 		}
@@ -320,14 +357,53 @@ func IP4SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.Prefix().String())},
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
+
 		r = []*simpletable.Cell{
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet IP")},
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.IP().String())},
 		}
+		table.Body.Cells = append(table.Body.Cells, r)
+
+		networkAddress, err := s.BroadcastAddr()
+		if err != nil {
+			return
+		}
+		r = []*simpletable.Cell{
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Broadcast Address")},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", networkAddress.String())},
+		}
+		table.Body.Cells = append(table.Body.Cells, r)
+		r = []*simpletable.Cell{
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet Mask")},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.SubnetMask().Addr())},
+		}
+		table.Body.Cells = append(table.Body.Cells, r)
 		if secondaryMask != 0 {
 			r = []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet")},
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.Prefix().String())},
+			}
+			table.Body.Cells = append(table.Body.Cells, r)
+
+			r = []*simpletable.Cell{
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet IP")},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.IP().String())},
+			}
+			table.Body.Cells = append(table.Body.Cells, r)
+
+			networkAddress, err := s.BroadcastAddr()
+			if err != nil {
+				return
+			}
+			r = []*simpletable.Cell{
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet Broadcast Address")},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", networkAddress.String())},
+			}
+			table.Body.Cells = append(table.Body.Cells, r)
+
+			r = []*simpletable.Cell{
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet Mask")},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.SubnetMask().Addr())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 		}
