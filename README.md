@@ -15,21 +15,45 @@ struct, so I have added needed functionality here in the subnet package.
 
 One thing I'd like to do is try IP6 subnetting.
 
+### Subnet divisions split default
+
+```
+$ iptools subnetip4 divide -ip 99.236.32.0 -bits 16 -pretty
+
+     Category            Value
+------------------- ----------------
+ Subnet              99.236.0.0/16
+ Subnet IP           99.236.0.0
+ Broadcast Address   99.236.255.255
+ Subnet Mask         255.255.0.0
+ Networks            1
+ Network Hosts       65536
+
+    Subnet
+---------------
+ 99.236.0.0/16
+ ```
+
 ### Subnet divisions split into non-default sized networks
 
 ```
-$ iptools subnet divide -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
+$ iptools subnetip4 divide -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
 
-
-      Category            Value
--------------------- ---------------
- Subnet               99.236.0.0/16
- Secondary Subnet     99.236.0.0/18
- Networks             1
- Secondary Networks   4
- Effective Networks   4
- Network Hosts        65536
- Sub Network Hosts    16384
+              Category                    Value
+------------------------------------ ----------------
+ Subnet                               99.236.0.0/16
+ Subnet IP                            99.236.0.0
+ Broadcast Address                    99.236.255.255
+ Subnet Mask                          255.255.0.0
+ Secondary Subnet                     99.236.0.0/18
+ Secondary Subnet IP                  99.236.0.0
+ Secondary Subnet Broadcast Address   99.236.255.255
+ Secondary Subnet Mask                255.255.192.0
+ Networks                             1
+ Secondary Networks                   4
+ Effective Networks                   4
+ Network Hosts                        65536
+ Sub Network Hosts                    16384
 
      Subnet
 -----------------
@@ -39,34 +63,19 @@ $ iptools subnet divide -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
  99.236.192.0/18
  ```
 
-### Subnet divisions split default
-
-```
-$ iptools subnet divide -ip 99.236.32.0 -bits 16 -pretty
-
-
-   Category          Value
---------------- ---------------
- Subnet          99.236.0.0/16
- Networks        1
- Network Hosts   65536
-
-    Subnet
----------------
- 99.236.0.0/16
- ```
-
 ### Subnet ranges in default size
 
 ```
-$ iptools subnet ranges -ip 99.236.32.0 -bits 16 -pretty
+$ iptools subnetip4 ranges -ip 99.236.32.0 -bits 16 -pretty
 
-
-   Category          Value
---------------- ---------------
- Subnet          99.236.0.0/16
- Networks        1
- Network Hosts   65536
+     Category            Value
+------------------- ----------------
+ Subnet              99.236.0.0/16
+ Subnet IP           99.236.0.0
+ Broadcast Address   99.236.255.255
+ Subnet Mask         255.255.0.0
+ Networks            1
+ Network Hosts       65536
 
    Start           End
 ------------ ----------------
@@ -76,18 +85,23 @@ $ iptools subnet ranges -ip 99.236.32.0 -bits 16 -pretty
 ### Subnet ranges split into non-default size
 
 ```
-$ iptools subnet ranges -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
+$ iptools subnetip4 ranges -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
 
-
-      Category            Value
--------------------- ---------------
- Subnet               99.236.0.0/16
- Secondary Subnet     99.236.0.0/18
- Networks             1
- Secondary Networks   4
- Effective Networks   4
- Network Hosts        65536
- Sub Network Hosts    16384
+              Category                    Value
+------------------------------------ ----------------
+ Subnet                               99.236.0.0/16
+ Subnet IP                            99.236.0.0
+ Broadcast Address                    99.236.255.255
+ Subnet Mask                          255.255.0.0
+ Secondary Subnet                     99.236.0.0/18
+ Secondary Subnet IP                  99.236.0.0
+ Secondary Subnet Broadcast Address   99.236.255.255
+ Secondary Subnet Mask                255.255.192.0
+ Networks                             1
+ Secondary Networks                   4
+ Effective Networks                   4
+ Network Hosts                        65536
+ Sub Network Hosts                    16384
 
     Start            End
 -------------- ----------------
@@ -101,13 +115,13 @@ $ iptools subnet ranges -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
 ### Subnet details
 
 ```
-$ iptools subnet describe -ip 10.32.0.0 -bits 24
+$ iptools subnetip4 describe -ip 10.32.0.0 -bits 24
 +--------------------+-------------------------------------+
 |      Category      |                Value                |
 +--------------------+-------------------------------------+
 | Subnet             | 10.32.0.0/24                        |
+| Subnet Mask        | 255.255.255.0                       |
 | Network Address    | 10.32.0.0                           |
-| IP Address         | 10.32.0.255                         |
 | Broadcast Address  | 10.32.0.255                         |
 | Networks           | 1                                   |
 | Network Hosts      | 256                                 |
@@ -116,7 +130,7 @@ $ iptools subnet describe -ip 10.32.0.0 -bits 24
 | IP Type            | Private                             |
 | Binary Subnet Mask | 00001010.00100000.00000000.00000000 |
 | Binary ID          | 00001010001000000000000000000000    |
-| Hex ID             | a2000ff                             |
+| Hex ID             | 0xA2000FF                           |
 | in-addr.arpa       | 0.0.32.10.in-addr.arpa              |
 | Wildcard Mask      | 240.218.250.250                     |
 +--------------------+-------------------------------------+
@@ -141,7 +155,7 @@ Options:
   --version              display version and exit
 
 Commands:
-  subnet                 Get networks for subnet
+  subnetip4              Get networks for subnet
 ```
 
 ### Help for subnet options
