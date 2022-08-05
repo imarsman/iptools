@@ -137,7 +137,7 @@ func IP4SubnetDescribe(ip string, mask uint8) {
 
 	r = []*simpletable.Cell{
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Wildcard Mask")},
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMask(netip.Addr(s.Prefix().Addr())))},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMask(netip.Addr(s.SubnetMask().Addr())))},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 

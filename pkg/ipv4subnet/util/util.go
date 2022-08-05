@@ -74,7 +74,7 @@ func WildCardMask(ip netip.Addr) string {
 			list[i] = fmt.Sprint(0)
 			continue
 		}
-		list[i] = fmt.Sprint(250 - b)
+		list[i] = fmt.Sprint(255 - b)
 	}
 
 	return strings.Join(list, `.`)
