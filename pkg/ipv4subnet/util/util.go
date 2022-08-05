@@ -65,16 +65,12 @@ func int2ip(ipInt uint32) (netip.Addr, error) {
 	return addr, ok
 }
 
-// WildCardMask get mask bits available for addressing
-func WildCardMask(ip netip.Addr) string {
+// WildCardMaskIP4 get mask bits available for addressing
+func WildCardMaskIP4(ip netip.Addr) string {
 	bytes := ip.As4()
 	var list = make([]string, 4, 4)
-	for i, b := range bytes {
-		if b == 255 {
-			list[i] = fmt.Sprint(0)
-			continue
-		}
-		list[i] = fmt.Sprint(255 - b)
+	for i := range bytes {
+		list[i] = fmt.Sprint(^bytes[i])
 	}
 
 	return strings.Join(list, `.`)

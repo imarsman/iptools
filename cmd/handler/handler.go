@@ -43,6 +43,12 @@ func IP4SubnetDescribe(ip string, mask uint8) {
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
+	r = []*simpletable.Cell{
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Wildcard Mask")},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMaskIP4(netip.Addr(s.SubnetMask().Addr())))},
+	}
+	table.Body.Cells = append(table.Body.Cells, r)
+
 	if s.Networks() > 0 {
 		// Get first address for subnet
 		first, err := s.First()
@@ -135,12 +141,6 @@ func IP4SubnetDescribe(ip string, mask uint8) {
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
-	r = []*simpletable.Cell{
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Wildcard Mask")},
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMask(netip.Addr(s.SubnetMask().Addr())))},
-	}
-	table.Body.Cells = append(table.Body.Cells, r)
-
 	fmt.Println(table.String())
 }
 
@@ -191,6 +191,7 @@ func IP4SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.CIDR())},
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
+
 		r = []*simpletable.Cell{
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet IP")},
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.IP().String())},
