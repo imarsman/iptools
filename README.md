@@ -121,6 +121,7 @@ $ iptools subnetip4 describe -ip 10.32.0.0 -bits 23
 +--------------------+-------------------------------------+
 | Subnet             | 10.32.0.0/23                        |
 | Subnet Mask        | 255.255.254.0                       |
+| Wildcard Mask      | 0.0.1.255                           |
 | Network Address    | 10.32.0.0                           |
 | Broadcast Address  | 10.32.1.255                         |
 | Networks           | 128                                 |
@@ -132,7 +133,6 @@ $ iptools subnetip4 describe -ip 10.32.0.0 -bits 23
 | Binary ID          | 00001010001000000000000000000000    |
 | Hex ID             | 0xA2001FF                           |
 | in-addr.arpa       | 0.0.32.10.in-addr.arpa              |
-| Wildcard Mask      | 0.0.1.255                           |
 +--------------------+-------------------------------------+
 ```
 
