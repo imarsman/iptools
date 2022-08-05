@@ -115,24 +115,24 @@ $ iptools subnetip4 ranges -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
 ### Subnet details
 
 ```
-$ iptools subnetip4 describe -ip 10.32.0.0 -bits 24
+$ iptools subnetip4 describe -ip 10.32.0.0 -bits 23
 +--------------------+-------------------------------------+
 |      Category      |                Value                |
 +--------------------+-------------------------------------+
-| Subnet             | 10.32.0.0/24                        |
-| Subnet Mask        | 255.255.255.0                       |
+| Subnet             | 10.32.0.0/23                        |
+| Subnet Mask        | 255.255.254.0                       |
 | Network Address    | 10.32.0.0                           |
-| Broadcast Address  | 10.32.0.255                         |
-| Networks           | 1                                   |
-| Network Hosts      | 256                                 |
-| Total Hosts        | 256                                 |
+| Broadcast Address  | 10.32.1.255                         |
+| Networks           | 128                                 |
+| Network Hosts      | 512                                 |
+| Total Hosts        | 65536                               |
 | IP Class           | A                                   |
 | IP Type            | Private                             |
 | Binary Subnet Mask | 00001010.00100000.00000000.00000000 |
 | Binary ID          | 00001010001000000000000000000000    |
-| Hex ID             | 0xA2000FF                           |
+| Hex ID             | 0xA2001FF                           |
 | in-addr.arpa       | 0.0.32.10.in-addr.arpa              |
-| Wildcard Mask      | 240.218.250.250                     |
+| Wildcard Mask      | 0.0.1.255                           |
 +--------------------+-------------------------------------+
 ```
 
