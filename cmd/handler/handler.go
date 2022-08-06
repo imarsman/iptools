@@ -414,7 +414,7 @@ func IP4SubnetDivide(ip string, bits uint8, secondaryBits uint8) {
 		}
 	} else {
 		s2 = s
-		subnets, err = s.SecondarySubnets(s)
+		subnets, err = s.Subnets()
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -551,7 +551,6 @@ func IP4SubnetDivide(ip string, bits uint8, secondaryBits uint8) {
 				{Align: simpletable.AlignCenter, Text: "Subnets"},
 			},
 		}
-		// var subnetsSplit []*subnet.IPV4Subnet
 		for _, s := range subnets {
 			cell := []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.String())},
