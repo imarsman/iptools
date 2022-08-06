@@ -76,8 +76,21 @@ func (s *Subnet) IP() netip.Addr {
 }
 
 // SubnetMask get subnet mask for subnet
-func (s *Subnet) SubnetMask() netip.Prefix {
-	return s.netMaskPrefix
+func (s *Subnet) SubnetMask() netip.Addr {
+	return s.netMaskPrefix.Addr()
+}
+
+// WildcardMask get wildcard mask for subnet
+func (s *Subnet) WildcardMask() netip.Addr {
+	addr := s.netMaskPrefix.Addr()
+	bytes := addr.As4()
+	// var list = make([]string, 4, 4)
+	for i := range bytes {
+		bytes[i] = ^bytes[i]
+	}
+	addr = netip.AddrFrom4(bytes)
+
+	return addr
 }
 
 // String get string representing subnet (cidr notation)

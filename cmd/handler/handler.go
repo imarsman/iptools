@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	"net/netip"
 	"os"
 
 	"github.com/alexeyco/simpletable"
@@ -39,13 +38,14 @@ func IP4SubnetDescribe(ip string, mask uint8) {
 	// Get subnet mask
 	r = []*simpletable.Cell{
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet Mask")},
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.SubnetMask().Addr())},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.SubnetMask())},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
 	r = []*simpletable.Cell{
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Wildcard Mask")},
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMask(netip.Addr(s.SubnetMask().Addr())))},
+		// {Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMask(netip.Addr(s.SubnetMask().Addr())))},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.WildcardMask())},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
@@ -209,12 +209,13 @@ func IP4SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 		table.Body.Cells = append(table.Body.Cells, r)
 		r = []*simpletable.Cell{
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet Mask")},
-			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.SubnetMask().Addr())},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.SubnetMask())},
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
 		r = []*simpletable.Cell{
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Wildcard Mask")},
-			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMask(netip.Addr(s.SubnetMask().Addr())))},
+			// {Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMask(netip.Addr(s.SubnetMask().Addr())))},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.WildcardMask())},
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
 
@@ -242,12 +243,14 @@ func IP4SubnetRanges(ip string, bits uint8, secondaryMask uint8) {
 
 			r = []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet Mask")},
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.SubnetMask().Addr())},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.SubnetMask())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 			r = []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet Wildcard Mask")},
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMask(netip.Addr(s2.SubnetMask().Addr())))},
+				// {Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s",
+				// util.WildCardMask(netip.Addr(s2.SubnetMask().Addr())))},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.WildcardMask())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 		}
@@ -387,12 +390,13 @@ func IP4SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 		table.Body.Cells = append(table.Body.Cells, r)
 		r = []*simpletable.Cell{
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Subnet Mask")},
-			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.SubnetMask().Addr())},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.SubnetMask())},
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
 		r = []*simpletable.Cell{
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Wildcard Mask")},
-			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMask(netip.Addr(s.SubnetMask().Addr())))},
+			// {Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMask(netip.Addr(s.SubnetMask().Addr())))},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.WildcardMask())},
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
 
@@ -421,12 +425,14 @@ func IP4SubnetDivide(ip string, mask uint8, secondaryMask uint8) {
 
 			r = []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet Mask")},
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.SubnetMask().Addr())},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.SubnetMask())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 			r = []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet Wildcard Mask")},
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", util.WildCardMask(netip.Addr(s2.SubnetMask().Addr())))},
+				// {Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s",
+				// util.WildCardMask(netip.Addr(s2.SubnetMask().Addr())))},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.WildcardMask())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 		}
