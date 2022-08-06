@@ -13,7 +13,7 @@ The IP package used, `net/netip`, is in Go 1.18. It is slightly different in API
 [netaddr](https://github.com/inetaf/netaddr) package that came first. Sadly, the `netip` package loses the IPRange
 struct, so I have added needed functionality here in the subnet package.
 
-One thing I'd like to do is try IP6 subnetting.
+One thing I'd like to do is try IP6 subnetting. I have to learn more about IPV6 and its subnetting first.
 
 ### Subnet divisions split default
 
