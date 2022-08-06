@@ -449,6 +449,12 @@ func (s *Subnet) IPRanges() (ranges []Range, err error) {
 	return s.ipRanges(s)
 }
 
+func (s *Subnet) EffectiveNetworks(secondarySubnet *Subnet) int64 {
+	ratio := int64(math.Exp2(float64(secondarySubnet.Prefix().Bits() - s.Prefix().Bits())))
+
+	return s.Networks() * ratio
+}
+
 // ipRanges get the ranges for a subnet splitting by secondary subnet (can be self)
 func (s *Subnet) ipRanges(secondarySubnet *Subnet) (ranges []Range, err error) {
 	// Can't subdivide to smaller prefixed subnet

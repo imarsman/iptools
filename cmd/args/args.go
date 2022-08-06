@@ -45,8 +45,9 @@ func (Args) Version() string {
 
 // SubnetDescribe for calls to describe a subnet
 type SubnetDescribe struct {
-	IP   string `arg:"-i,--ip" help:""`
-	Bits int    `arg:"-b,--bits" help:""`
+	IP            string `arg:"-i,--ip" help:""`
+	Bits          int    `arg:"-b,--bits" help:""`
+	SecondaryBits int    `arg:"-s,--secondary-bits" help:""`
 }
 
 // SubnetIP4Ranges for calls to get list of subnet ranges

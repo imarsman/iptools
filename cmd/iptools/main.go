@@ -31,6 +31,7 @@ func main() {
 			handler.IP4SubnetDescribe(
 				args.CLIArgs.Subnet.SubnetDescribe.IP,
 				uint8(args.CLIArgs.Subnet.SubnetDescribe.Bits),
+				uint8(args.CLIArgs.Subnet.SubnetDescribe.SecondaryBits),
 			)
 		}
 	}

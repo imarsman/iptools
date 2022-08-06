@@ -32,8 +32,9 @@ var cmd = &complete.Command{
 				},
 				"describe": {
 					Flags: map[string]complete.Predictor{
-						"ip":   predict.Set(IPs),
-						"bits": predict.Nothing,
+						"ip":             predict.Set(IPs),
+						"bits":           predict.Nothing,
+						"secondary-bits": predict.Nothing,
 					},
 				},
 			},
