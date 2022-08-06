@@ -11,7 +11,7 @@ import (
 	"github.com/imarsman/iptools/pkg/ipv4subnet/util"
 )
 
-func tableRow(label string, value any) (r []*simpletable.Cell) {
+func row(label string, value any) (r []*simpletable.Cell) {
 	r = []*simpletable.Cell{
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%v", label)},
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%v", value)},
@@ -50,56 +50,56 @@ func IP4SubnetDescribe(ip string, bits uint8, secondaryBits uint8) {
 		},
 	}
 
-	table.Body.Cells = append(table.Body.Cells, tableRow("Subnet", s.CIDR()))
-	table.Body.Cells = append(table.Body.Cells, tableRow("Subnet IP", s.IP().String()))
-	table.Body.Cells = append(table.Body.Cells, tableRow("Broadcast Address", s.BroadcastAddr().String()))
-	table.Body.Cells = append(table.Body.Cells, tableRow("Subnet Mask", s.SubnetMask()))
-	table.Body.Cells = append(table.Body.Cells, tableRow("Wildcard Mask", s.WildcardMask()))
+	table.Body.Cells = append(table.Body.Cells, row("Subnet", s.CIDR()))
+	table.Body.Cells = append(table.Body.Cells, row("Subnet IP", s.IP().String()))
+	table.Body.Cells = append(table.Body.Cells, row("Broadcast Address", s.BroadcastAddr().String()))
+	table.Body.Cells = append(table.Body.Cells, row("Subnet Mask", s.SubnetMask()))
+	table.Body.Cells = append(table.Body.Cells, row("Wildcard Mask", s.WildcardMask()))
 
 	class := string(s.Class())
 	if class == `0` {
 		class = "Subnet"
 	}
-	table.Body.Cells = append(table.Body.Cells, tableRow("IP Class", class))
+	table.Body.Cells = append(table.Body.Cells, row("IP Class", class))
 
 	ipType := "Public"
 	if s.IP().IsPrivate() {
 		ipType = "Private"
 	}
-	table.Body.Cells = append(table.Body.Cells, tableRow("IP Type", ipType))
-	table.Body.Cells = append(table.Body.Cells, tableRow("Binary Subnet Mask", s.BinaryMask()))
-	table.Body.Cells = append(table.Body.Cells, tableRow("Binary ID", s.BinaryID()))
+	table.Body.Cells = append(table.Body.Cells, row("IP Type", ipType))
+	table.Body.Cells = append(table.Body.Cells, row("Binary Subnet Mask", s.BinaryMask()))
+	table.Body.Cells = append(table.Body.Cells, row("Binary ID", s.BinaryID()))
 
 	last := s.Last()
 	if !last.IsValid() {
 		fmt.Println(fmt.Errorf("invalid address %s", netip.Addr{}))
 	}
 
-	table.Body.Cells = append(table.Body.Cells, tableRow("Hex ID", util.IPToHexStr(last)))
-	table.Body.Cells = append(table.Body.Cells, tableRow("in-addr.arpa", util.InAddrArpa(s.Prefix().Addr())))
+	table.Body.Cells = append(table.Body.Cells, row("Hex ID", util.IPToHexStr(last)))
+	table.Body.Cells = append(table.Body.Cells, row("in-addr.arpa", util.InAddrArpa(s.Prefix().Addr())))
 
 	if secondaryBits != 0 {
-		table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Subnet", s2.CIDR()))
-		table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Subnet IP", s2.IP().String()))
+		table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet", s2.CIDR()))
+		table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet IP", s2.IP().String()))
 
 		if !s2.BroadcastAddr().IsValid() {
 			fmt.Println(fmt.Errorf("invalid address %s", netip.Addr{}))
 			return
 		}
-		table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Subnet Broadcast Address", s2.BroadcastAddr().String()))
-		table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Subnet Mask", s2.SubnetMask()))
-		table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Subnet Wildcard Mask", s2.WildcardMask()))
+		table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet Broadcast Address", s2.BroadcastAddr().String()))
+		table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet Mask", s2.SubnetMask()))
+		table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet Wildcard Mask", s2.WildcardMask()))
 	}
 
 	if secondaryBits == 0 {
-		table.Body.Cells = append(table.Body.Cells, tableRow("Networks", s.Networks()))
-		table.Body.Cells = append(table.Body.Cells, tableRow("Network Hosts", s.Hosts()))
+		table.Body.Cells = append(table.Body.Cells, row("Networks", s.Networks()))
+		table.Body.Cells = append(table.Body.Cells, row("Network Hosts", s.Hosts()))
 	} else {
-		table.Body.Cells = append(table.Body.Cells, tableRow("Networks", s.Networks()))
-		table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Networks", s2.Networks()))
-		table.Body.Cells = append(table.Body.Cells, tableRow("Effective Networks", s.EffectiveNetworks(s2)))
-		table.Body.Cells = append(table.Body.Cells, tableRow("Network Hosts", s.Hosts()))
-		table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Network Hosts", s2.Hosts()))
+		table.Body.Cells = append(table.Body.Cells, row("Networks", s.Networks()))
+		table.Body.Cells = append(table.Body.Cells, row("Secondary Networks", s2.Networks()))
+		table.Body.Cells = append(table.Body.Cells, row("Effective Networks", s.EffectiveNetworks(s2)))
+		table.Body.Cells = append(table.Body.Cells, row("Network Hosts", s.Hosts()))
+		table.Body.Cells = append(table.Body.Cells, row("Secondary Network Hosts", s2.Hosts()))
 	}
 
 	table.SetStyle(simpletable.StyleCompactLite)
@@ -148,40 +148,40 @@ func IP4SubnetRanges(ip string, bits uint8, secondaryBits uint8) {
 				{Align: simpletable.AlignCenter, Text: "Value"},
 			},
 		}
-		table.Body.Cells = append(table.Body.Cells, tableRow("Subnet", s.CIDR()))
-		table.Body.Cells = append(table.Body.Cells, tableRow("Subnet IP", s.IP().String()))
+		table.Body.Cells = append(table.Body.Cells, row("Subnet", s.CIDR()))
+		table.Body.Cells = append(table.Body.Cells, row("Subnet IP", s.IP().String()))
 
 		if !s.BroadcastAddr().IsValid() {
 			fmt.Println(fmt.Errorf("invalid address %s", netip.Addr{}))
 			return
 		}
 
-		table.Body.Cells = append(table.Body.Cells, tableRow("Broadcast Address", s.BroadcastAddr().String()))
-		table.Body.Cells = append(table.Body.Cells, tableRow("Subnet Mask", s.SubnetMask()))
-		table.Body.Cells = append(table.Body.Cells, tableRow("Wildcard Mask", s.WildcardMask()))
+		table.Body.Cells = append(table.Body.Cells, row("Broadcast Address", s.BroadcastAddr().String()))
+		table.Body.Cells = append(table.Body.Cells, row("Subnet Mask", s.SubnetMask()))
+		table.Body.Cells = append(table.Body.Cells, row("Wildcard Mask", s.WildcardMask()))
 
 		if secondaryBits != 0 {
-			table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Subnet", s2.CIDR))
-			table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Subnet IP", s2.IP().String()))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet", s2.CIDR))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet IP", s2.IP().String()))
 
 			if !s2.BroadcastAddr().IsValid() {
 				fmt.Println(fmt.Errorf("invalid address %s", netip.Addr{}))
 				return
 			}
 
-			table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Subnet Broadcast Address", s2.BroadcastAddr().String()))
-			table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Subnet Mask", s2.SubnetMask()))
-			table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Subnet Wildcard Mask", s2.WildcardMask()))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet Broadcast Address", s2.BroadcastAddr().String()))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet Mask", s2.SubnetMask()))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet Wildcard Mask", s2.WildcardMask()))
 		}
 		if secondaryBits == 0 {
-			table.Body.Cells = append(table.Body.Cells, tableRow("Networks", s.Networks()))
-			table.Body.Cells = append(table.Body.Cells, tableRow("Network Hosts", s.Hosts()))
+			table.Body.Cells = append(table.Body.Cells, row("Networks", s.Networks()))
+			table.Body.Cells = append(table.Body.Cells, row("Network Hosts", s.Hosts()))
 		} else {
-			table.Body.Cells = append(table.Body.Cells, tableRow("Networks", s.Networks()))
-			table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Networks", s2.Networks()))
-			table.Body.Cells = append(table.Body.Cells, tableRow("Effective Networks", len(ranges)))
-			table.Body.Cells = append(table.Body.Cells, tableRow("Network Hosts", s.Hosts()))
-			table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Network Hosts", s2.Hosts()))
+			table.Body.Cells = append(table.Body.Cells, row("Networks", s.Networks()))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Networks", s2.Networks()))
+			table.Body.Cells = append(table.Body.Cells, row("Effective Networks", len(ranges)))
+			table.Body.Cells = append(table.Body.Cells, row("Network Hosts", s.Hosts()))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Network Hosts", s2.Hosts()))
 		}
 		fmt.Println()
 		table.SetStyle(simpletable.StyleCompactLite)
@@ -197,7 +197,7 @@ func IP4SubnetRanges(ip string, bits uint8, secondaryBits uint8) {
 			},
 		}
 		for _, r := range ranges {
-			table.Body.Cells = append(table.Body.Cells, tableRow(r.First().String(), r.Last().String()))
+			table.Body.Cells = append(table.Body.Cells, row(r.First().String(), r.Last().String()))
 		}
 		table.SetStyle(simpletable.StyleCompactLite)
 		fmt.Println(table.String())
@@ -250,39 +250,39 @@ func IP4SubnetDivide(ip string, bits uint8, secondaryBits uint8) {
 				{Align: simpletable.AlignCenter, Text: "Value"},
 			},
 		}
-		table.Body.Cells = append(table.Body.Cells, tableRow("Subnet", s.Prefix().String()))
-		table.Body.Cells = append(table.Body.Cells, tableRow("Subnet IP", s.IP().String()))
+		table.Body.Cells = append(table.Body.Cells, row("Subnet", s.Prefix().String()))
+		table.Body.Cells = append(table.Body.Cells, row("Subnet IP", s.IP().String()))
 
 		if !s.BroadcastAddr().IsValid() {
 			fmt.Println(fmt.Errorf("invalid address %s", netip.Addr{}))
 			return
 		}
-		table.Body.Cells = append(table.Body.Cells, tableRow("Broadcast Address", s.BroadcastAddr().String()))
-		table.Body.Cells = append(table.Body.Cells, tableRow("Subnet Mask", s.SubnetMask()))
-		table.Body.Cells = append(table.Body.Cells, tableRow("Wildcard Mask", s.WildcardMask()))
+		table.Body.Cells = append(table.Body.Cells, row("Broadcast Address", s.BroadcastAddr().String()))
+		table.Body.Cells = append(table.Body.Cells, row("Subnet Mask", s.SubnetMask()))
+		table.Body.Cells = append(table.Body.Cells, row("Wildcard Mask", s.WildcardMask()))
 
 		if secondaryBits != 0 {
-			table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Subnet", s2.Prefix().String()))
-			table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Subnet IP", s2.IP().String()))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet", s2.Prefix().String()))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet IP", s2.IP().String()))
 
 			if !s2.BroadcastAddr().IsValid() {
 				fmt.Println(fmt.Errorf("invalid address %s", netip.Addr{}))
 				return
 			}
-			table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Subnet Broadcast Address", s2.BroadcastAddr().String()))
-			table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Subnet Mask", s2.SubnetMask()))
-			table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Subnet Wildcard Mask", s2.WildcardMask()))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet Broadcast Address", s2.BroadcastAddr().String()))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet Mask", s2.SubnetMask()))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet Wildcard Mask", s2.WildcardMask()))
 		}
 
 		if secondaryBits == 0 {
-			table.Body.Cells = append(table.Body.Cells, tableRow("Networks", s.Networks()))
-			table.Body.Cells = append(table.Body.Cells, tableRow("Network Hosts", s.Hosts()))
+			table.Body.Cells = append(table.Body.Cells, row("Networks", s.Networks()))
+			table.Body.Cells = append(table.Body.Cells, row("Network Hosts", s.Hosts()))
 		} else {
-			table.Body.Cells = append(table.Body.Cells, tableRow("Netorks", s.Networks()))
-			table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Networks", s2.Networks()))
-			table.Body.Cells = append(table.Body.Cells, tableRow("Effective Networks", s.EffectiveNetworks(s2)))
-			table.Body.Cells = append(table.Body.Cells, tableRow("Network Hosts", s.Hosts()))
-			table.Body.Cells = append(table.Body.Cells, tableRow("Secondary Network Hosts", s2.Hosts()))
+			table.Body.Cells = append(table.Body.Cells, row("Netorks", s.Networks()))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Networks", s2.Networks()))
+			table.Body.Cells = append(table.Body.Cells, row("Effective Networks", s.EffectiveNetworks(s2)))
+			table.Body.Cells = append(table.Body.Cells, row("Network Hosts", s.Hosts()))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Network Hosts", s2.Hosts()))
 		}
 		fmt.Println()
 		table.SetStyle(simpletable.StyleCompactLite)
