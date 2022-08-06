@@ -119,24 +119,50 @@ $ iptools subnetip4 ranges -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
 
 ```
 $ iptools subnetip4 describe -ip 10.32.0.0 -bits 23
-+--------------------+-------------------------------------+
-|      Category      |                Value                |
-+--------------------+-------------------------------------+
-| Subnet             | 10.32.0.0/23                        |
-| Subnet Mask        | 255.255.254.0                       |
-| Wildcard Mask      | 0.0.1.255                           |
-| Network Address    | 10.32.0.0                           |
-| Broadcast Address  | 10.32.1.255                         |
-| Networks           | 128                                 |
-| Network Hosts      | 512                                 |
-| Total Hosts        | 65536                               |
-| IP Class           | A                                   |
-| IP Type            | Private                             |
-| Binary Subnet Mask | 00001010.00100000.00000000.00000000 |
-| Binary ID          | 00001010001000000000000000000000    |
-| Hex ID             | 0xA2001FF                           |
-| in-addr.arpa       | 0.0.32.10.in-addr.arpa              |
-+--------------------+-------------------------------------+
+      Category                       Value
+-------------------- -------------------------------------
+ Subnet               10.32.0.0/23
+ Subnet IP            10.32.0.0
+ Broadcast Address    10.32.1.255
+ Subnet Mask          255.255.254.0
+ Wildcard Mask        0.0.1.255
+ IP Class             A
+ IP Type              Private
+ Binary Subnet Mask   00001010.00100000.00000000.00000000
+ Binary ID            00001010001000000000000000000000
+ Hex ID               0xA2001FF
+ in-addr.arpa         0.0.32.10.in-addr.arpa
+ Networks             128
+ Network Hosts        512
+```
+
+#### Subnet with secondary subnet details
+
+```
+$ iptools subnetip4 describe -ip 10.32.0.0 -bits 16 -secondary-bits 18
+              Category                               Value
+------------------------------------ -------------------------------------
+ Subnet                               10.32.0.0/16
+ Subnet IP                            10.32.0.0
+ Broadcast Address                    10.32.255.255
+ Subnet Mask                          255.255.0.0
+ Wildcard Mask                        0.0.255.255
+ IP Class                             A
+ IP Type                              Private
+ Binary Subnet Mask                   00001010.00100000.00000000.00000000
+ Binary ID                            00001010001000000000000000000000
+ Hex ID                               0xA20FFFF
+ in-addr.arpa                         0.0.32.10.in-addr.arpa
+ Secondary Subnet                     10.32.0.0/18
+ Secondary Subnet IP                  10.32.0.0
+ Secondary Subnet Broadcast Address   10.32.63.255
+ Secondary Subnet Mask                255.255.192.0
+ Secondary Subnet Wildcard Mask       0.0.63.255
+ Networks                             1
+ Secondary Networks                   4
+ Effective Networks                   4
+ Network Hosts                        65536
+ Sub Network Hosts                    16384
 ```
 
 ### Top level help
