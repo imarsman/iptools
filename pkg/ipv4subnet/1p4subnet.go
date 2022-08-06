@@ -198,7 +198,7 @@ func newSubnet(ip string, bits int) (subnet *Subnet, err error) {
 }
 
 // BroadcastAddr get broadcast address for subnet, i.e. the max IP
-func (s *Subnet) BroadcastAddr() (ip netip.Addr, err error) {
+func (s *Subnet) BroadcastAddr() (ip netip.Addr) {
 	return s.Last()
 }
 
@@ -326,17 +326,17 @@ func (s *Subnet) First() (ip netip.Addr, err error) {
 }
 
 // Last get last IP for subnet
-func (s *Subnet) Last() (ip netip.Addr, err error) {
-	ip, err = util.AddToAddr(s.prefix.Addr(), int32(s.Hosts()-1))
+func (s *Subnet) Last() (ip netip.Addr) {
+	ip, err := util.AddToAddr(s.prefix.Addr(), int32(s.Hosts()-1))
 	if err != nil {
-		return
+		return netip.Addr{}
 	}
 
 	return
 }
 
 // NetworkAddr get last IP for subnet
-func (s *Subnet) NetworkAddr() (ip netip.Addr, err error) {
+func (s *Subnet) NetworkAddr() (ip netip.Addr) {
 	return s.Last()
 }
 

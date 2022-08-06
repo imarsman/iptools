@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"net/netip"
 	"os"
 
 	"github.com/alexeyco/simpletable"
@@ -53,14 +54,9 @@ func IP4SubnetDescribe(ip string, bits uint8, secondaryBits uint8) {
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
-	networkAddress, err := s.BroadcastAddr()
-	if err != nil {
-		return
-	}
-
 	r = []*simpletable.Cell{
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Broadcast Address")},
-		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", networkAddress.String())},
+		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.BroadcastAddr().String())},
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
@@ -109,9 +105,9 @@ func IP4SubnetDescribe(ip string, bits uint8, secondaryBits uint8) {
 	}
 	table.Body.Cells = append(table.Body.Cells, r)
 
-	last, err := s.Last()
-	if err != nil {
-		return
+	last := s.Last()
+	if !last.IsValid() {
+		fmt.Println(fmt.Errorf("invalid address %s", netip.Addr{}))
 	}
 
 	r = []*simpletable.Cell{
@@ -129,7 +125,7 @@ func IP4SubnetDescribe(ip string, bits uint8, secondaryBits uint8) {
 	if secondaryBits != 0 {
 		r := []*simpletable.Cell{
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet")},
-			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.CIDR())},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.CIDR())},
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
 
@@ -139,13 +135,13 @@ func IP4SubnetDescribe(ip string, bits uint8, secondaryBits uint8) {
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
 
-		networkAddress, err := s2.BroadcastAddr()
-		if err != nil {
+		if !s2.BroadcastAddr().IsValid() {
+			fmt.Println(fmt.Errorf("invalid address %s", netip.Addr{}))
 			return
 		}
 		r = []*simpletable.Cell{
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet Broadcast Address")},
-			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", networkAddress.String())},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.BroadcastAddr().String())},
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
 
@@ -265,13 +261,14 @@ func IP4SubnetRanges(ip string, bits uint8, secondaryBits uint8) {
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
 
-		networkAddress, err := s.BroadcastAddr()
-		if err != nil {
+		if !s.BroadcastAddr().IsValid() {
+			fmt.Println(fmt.Errorf("invalid address %s", netip.Addr{}))
 			return
 		}
+
 		r = []*simpletable.Cell{
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Broadcast Address")},
-			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", networkAddress.String())},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.BroadcastAddr().String())},
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
 		r = []*simpletable.Cell{
@@ -297,13 +294,14 @@ func IP4SubnetRanges(ip string, bits uint8, secondaryBits uint8) {
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 
-			networkAddress, err := s.BroadcastAddr()
-			if err != nil {
+			if !s2.BroadcastAddr().IsValid() {
+				fmt.Println(fmt.Errorf("invalid address %s", netip.Addr{}))
 				return
 			}
+
 			r = []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet Broadcast Address")},
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", networkAddress.String())},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.BroadcastAddr().String())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 
@@ -401,8 +399,8 @@ func IP4SubnetDivide(ip string, bits uint8, secondaryBits uint8) {
 	}
 
 	subnets := []*ipv4subnet.Subnet{}
-	var s2 *ipv4subnet.Subnet
-	if bits != secondaryBits {
+	var s2 = s
+	if secondaryBits != 0 {
 		prefix := fmt.Sprintf("%s/%d", ip, secondaryBits)
 		s2, err = ipv4subnet.NewFromPrefix(prefix)
 		if err != nil {
@@ -443,13 +441,13 @@ func IP4SubnetDivide(ip string, bits uint8, secondaryBits uint8) {
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
 
-		networkAddress, err := s.BroadcastAddr()
-		if err != nil {
+		if !s.BroadcastAddr().IsValid() {
+			fmt.Println(fmt.Errorf("invalid address %s", netip.Addr{}))
 			return
 		}
 		r = []*simpletable.Cell{
 			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Broadcast Address")},
-			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", networkAddress.String())},
+			{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s.BroadcastAddr().String())},
 		}
 		table.Body.Cells = append(table.Body.Cells, r)
 		r = []*simpletable.Cell{
@@ -476,13 +474,13 @@ func IP4SubnetDivide(ip string, bits uint8, secondaryBits uint8) {
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 
-			networkAddress, err := s.BroadcastAddr()
-			if err != nil {
+			if !s2.BroadcastAddr().IsValid() {
+				fmt.Println(fmt.Errorf("invalid address %s", netip.Addr{}))
 				return
 			}
 			r = []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", "Secondary Subnet Broadcast Address")},
-				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", networkAddress.String())},
+				{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%s", s2.BroadcastAddr().String())},
 			}
 			table.Body.Cells = append(table.Body.Cells, r)
 
@@ -550,7 +548,7 @@ func IP4SubnetDivide(ip string, bits uint8, secondaryBits uint8) {
 
 		table.Header = &simpletable.Header{
 			Cells: []*simpletable.Cell{
-				{Align: simpletable.AlignCenter, Text: "Subnet"},
+				{Align: simpletable.AlignCenter, Text: "Subnets"},
 			},
 		}
 		// var subnetsSplit []*subnet.IPV4Subnet

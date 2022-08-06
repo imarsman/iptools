@@ -18,49 +18,52 @@ One thing I'd like to do is try IP6 subnetting. I have to learn more about IPV6 
 ### Subnet divisions split default
 
 ```
-$ iptools subnetip4 divide -ip 99.236.32.0 -bits 16 -pretty
+$ iptools subnetip4 ranges -ip 10.32.0.0 -bits 16 -pretty
 
      Category            Value
-------------------- ----------------
- Subnet              99.236.0.0/16
- Subnet IP           99.236.0.0
- Broadcast Address   99.236.255.255
+------------------- ---------------
+ Subnet              10.32.0.0/16
+ Subnet IP           10.32.0.0
+ Broadcast Address   10.32.255.255
  Subnet Mask         255.255.0.0
+ Wildcard Mask       0.0.255.255
  Networks            1
  Network Hosts       65536
 
-    Subnet
----------------
- 99.236.0.0/16
+   Start          End
+----------- ---------------
+ 10.32.0.0   10.32.255.255
  ```
 
 ### Subnet divisions split into non-default sized networks
 
 ```
-$ iptools subnetip4 divide -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
+$ iptools subnetip4 divide -ip 10.32.0.0 -bits 16 -secondary-bits 18 -pretty
 
               Category                    Value
------------------------------------- ----------------
- Subnet                               99.236.0.0/16
- Subnet IP                            99.236.0.0
- Broadcast Address                    99.236.255.255
+------------------------------------ ---------------
+ Subnet                               10.32.0.0/16
+ Subnet IP                            10.32.0.0
+ Broadcast Address                    10.32.255.255
  Subnet Mask                          255.255.0.0
- Secondary Subnet                     99.236.0.0/18
- Secondary Subnet IP                  99.236.0.0
- Secondary Subnet Broadcast Address   99.236.255.255
+ Wildcard Mask                        0.0.255.255
+ Secondary Subnet                     10.32.0.0/18
+ Secondary Subnet IP                  10.32.0.0
+ Secondary Subnet Broadcast Address   10.32.63.255
  Secondary Subnet Mask                255.255.192.0
+ Secondary Subnet Wildcard Mask       0.0.63.255
  Networks                             1
  Secondary Networks                   4
  Effective Networks                   4
  Network Hosts                        65536
  Sub Network Hosts                    16384
 
-     Subnet
------------------
- 99.236.0.0/18
- 99.236.64.0/18
- 99.236.128.0/18
- 99.236.192.0/18
+    Subnets
+----------------
+ 10.32.0.0/18
+ 10.32.64.0/18
+ 10.32.128.0/18
+ 10.32.192.0/18
  ```
 
 ### Subnet ranges in default size
