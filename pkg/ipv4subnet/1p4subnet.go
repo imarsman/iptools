@@ -314,7 +314,7 @@ func (s *Subnet) First() (ip netip.Addr, err error) {
 
 // Last get last IP for subnet
 func (s *Subnet) Last() (ip netip.Addr, err error) {
-	ip, err = util.AddToIPIP4(s.prefix.Addr(), int32(s.Hosts()-1))
+	ip, err = util.AddToAddr(s.prefix.Addr(), int32(s.Hosts()-1))
 	if err != nil {
 		return
 	}
@@ -374,7 +374,7 @@ func (s *Subnet) IPs() (ips []netip.Addr, err error) {
 func (s *Subnet) UsableIPRange() (r Range, err error) {
 	ip := s.Prefix().Addr()
 	startIP := ip
-	ip, err = util.AddToIPIP4(ip, int32(s.TotalHosts()))
+	ip, err = util.AddToAddr(ip, int32(s.TotalHosts()))
 	if err != nil {
 		return
 	}
@@ -387,7 +387,7 @@ func (s *Subnet) UsableIPRange() (r Range, err error) {
 func (s *Subnet) IPRange() (r Range, err error) {
 	ip := s.Prefix().Addr()
 	startIP := ip
-	ip, err = util.AddToIPIP4(ip, int32(s.TotalHosts()))
+	ip, err = util.AddToAddr(ip, int32(s.TotalHosts()))
 	if err != nil {
 		return
 	}
@@ -450,7 +450,7 @@ func (s *Subnet) ipRanges(secondarySubnet *Subnet) (ranges []Range, err error) {
 	ratio := int(math.Exp2(float64(secondarySubnet.Prefix().Bits() - s.Prefix().Bits())))
 	for j := 0; j < int(s.Networks()); j++ {
 		for r := 0; r < ratio; r++ {
-			ip, err := util.AddToIPIP4(ipStart, int32(secondarySubnet.Hosts()-1))
+			ip, err := util.AddToAddr(ipStart, int32(secondarySubnet.Hosts()-1))
 			if err != nil {
 				//return
 			}

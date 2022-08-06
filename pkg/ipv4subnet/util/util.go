@@ -65,8 +65,8 @@ func int2ip(ipInt uint32) (netip.Addr, error) {
 	return addr, ok
 }
 
-// WildCardMaskIP4 get mask bits available for addressing
-func WildCardMaskIP4(ip netip.Addr) string {
+// WildCardMask get mask bits available for addressing
+func WildCardMask(ip netip.Addr) string {
 	bytes := ip.As4()
 	var list = make([]string, 4, 4)
 	for i := range bytes {
@@ -76,8 +76,8 @@ func WildCardMaskIP4(ip netip.Addr) string {
 	return strings.Join(list, `.`)
 }
 
-// AddToIPIP4 add count IPs to IP
-func AddToIPIP4(startIP netip.Addr, add int32) (addedIP netip.Addr, err error) {
+// AddToAddr add count IPs to IP
+func AddToAddr(startIP netip.Addr, add int32) (addedIP netip.Addr, err error) {
 	if !startIP.Next().IsValid() {
 		err = fmt.Errorf("ip %v is already max", startIP)
 		return
@@ -101,8 +101,8 @@ func reverse[T any](s []T) {
 	}
 }
 
-// InAddrArpaIP4 get the InAddrArpaIP4 version of an IP
-func InAddrArpaIP4(ip netip.Addr) string {
+// InAddrArpa get the InAddrArpa version of an IP
+func InAddrArpa(ip netip.Addr) string {
 	ipStr := ip.String()
 	parts := strings.Split(ipStr, `.`)
 
