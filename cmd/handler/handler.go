@@ -5,11 +5,16 @@ import (
 	"net/netip"
 	"os"
 
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
+
 	"github.com/alexeyco/simpletable"
 	"github.com/imarsman/iptools/cmd/args"
 	"github.com/imarsman/iptools/pkg/ipv4subnet"
 	"github.com/imarsman/iptools/pkg/ipv4subnet/util"
 )
+
+var printer = message.NewPrinter(language.English)
 
 func row(label string, value any) (r []*simpletable.Cell) {
 	r = []*simpletable.Cell{
@@ -93,13 +98,15 @@ func IP4SubnetDescribe(ip string, bits uint8, secondaryBits uint8) {
 
 	if secondaryBits == 0 {
 		table.Body.Cells = append(table.Body.Cells, row("Networks", s.Networks()))
-		table.Body.Cells = append(table.Body.Cells, row("Network Hosts", s.Hosts()))
+
+		table.Body.Cells = append(table.Body.Cells, row("Network Hosts", printer.Sprintf("%d", s.Hosts())))
 	} else {
 		table.Body.Cells = append(table.Body.Cells, row("Networks", s.Networks()))
 		table.Body.Cells = append(table.Body.Cells, row("Secondary Networks", s2.Networks()))
 		table.Body.Cells = append(table.Body.Cells, row("Effective Networks", s.EffectiveNetworks(s2)))
-		table.Body.Cells = append(table.Body.Cells, row("Network Hosts", s.Hosts()))
-		table.Body.Cells = append(table.Body.Cells, row("Secondary Network Hosts", s2.Hosts()))
+
+		table.Body.Cells = append(table.Body.Cells, row("Network Hosts", printer.Sprintf("%d", s.Hosts())))
+		table.Body.Cells = append(table.Body.Cells, row("Secondary Network Hosts", printer.Sprintf("%d", s2.Hosts())))
 	}
 
 	table.SetStyle(simpletable.StyleCompactLite)
@@ -175,13 +182,13 @@ func IP4SubnetRanges(ip string, bits uint8, secondaryBits uint8) {
 		}
 		if secondaryBits == 0 {
 			table.Body.Cells = append(table.Body.Cells, row("Networks", s.Networks()))
-			table.Body.Cells = append(table.Body.Cells, row("Network Hosts", s.Hosts()))
+			table.Body.Cells = append(table.Body.Cells, row("Network Hosts", printer.Sprintf("%d", printer.Sprintf("%d", s.Hosts()))))
 		} else {
 			table.Body.Cells = append(table.Body.Cells, row("Networks", s.Networks()))
 			table.Body.Cells = append(table.Body.Cells, row("Secondary Networks", s2.Networks()))
 			table.Body.Cells = append(table.Body.Cells, row("Effective Networks", len(ranges)))
-			table.Body.Cells = append(table.Body.Cells, row("Network Hosts", s.Hosts()))
-			table.Body.Cells = append(table.Body.Cells, row("Secondary Network Hosts", s2.Hosts()))
+			table.Body.Cells = append(table.Body.Cells, row("Network Hosts", printer.Sprintf("%d", s.Hosts())))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Network Hosts", printer.Sprintf("%d", s2.Hosts())))
 		}
 		fmt.Println()
 		table.SetStyle(simpletable.StyleCompactLite)
@@ -281,8 +288,8 @@ func IP4SubnetDivide(ip string, bits uint8, secondaryBits uint8) {
 			table.Body.Cells = append(table.Body.Cells, row("Netorks", s.Networks()))
 			table.Body.Cells = append(table.Body.Cells, row("Secondary Networks", s2.Networks()))
 			table.Body.Cells = append(table.Body.Cells, row("Effective Networks", s.EffectiveNetworks(s2)))
-			table.Body.Cells = append(table.Body.Cells, row("Network Hosts", s.Hosts()))
-			table.Body.Cells = append(table.Body.Cells, row("Secondary Network Hosts", s2.Hosts()))
+			table.Body.Cells = append(table.Body.Cells, row("Network Hosts", printer.Sprintf("%d", s.Hosts())))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Network Hosts", printer.Sprintf("%d", s2.Hosts())))
 		}
 		fmt.Println()
 		table.SetStyle(simpletable.StyleCompactLite)

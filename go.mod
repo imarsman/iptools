@@ -7,6 +7,7 @@ require (
 	github.com/alexflint/go-arg v1.4.2
 	github.com/matryer/is v1.4.0
 	github.com/posener/complete/v2 v2.0.1-alpha.13
+	golang.org/x/text v0.3.7
 	gopkg.in/yaml.v2 v2.4.0
 )
 

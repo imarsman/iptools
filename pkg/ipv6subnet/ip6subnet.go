@@ -63,8 +63,8 @@ func (s *Subnet) YAML() (bytes []byte, err error) {
 }
 
 // NewNamedFromIPAndBits new with name using incoming prefix ip and network bits
-func NewNamedFromIPAndBits(ip string, bits int, name string) (subnet *Subnet, err error) {
-	subnet, err = newSubnet(ip, bits)
+func NewNamedFromIPAndBits(addr string, bits int, name string) (subnet *Subnet, err error) {
+	subnet, err = newSubnet(addr, bits)
 	if err != nil {
 		return
 	}
@@ -74,8 +74,8 @@ func NewNamedFromIPAndBits(ip string, bits int, name string) (subnet *Subnet, er
 }
 
 // NewFromIPAndBits new using incoming prefix ip and network bits
-func NewFromIPAndBits(ip string, bits int) (subnet *Subnet, err error) {
-	return newSubnet(ip, bits)
+func NewFromIPAndBits(addr string, bits int) (subnet *Subnet, err error) {
+	return newSubnet(addr, bits)
 }
 
 // NewNamedFromPrefix new with name using incoming prefix
@@ -110,13 +110,11 @@ func NewFromPrefix(prefix string) (subnet *Subnet, err error) {
 }
 
 // newSubnet new subnet with prefix ip and network bits
-func newSubnet(ip string, bits int) (subnet *Subnet, err error) {
+func newSubnet(addr string, bits int) (subnet *Subnet, err error) {
 	errMsg := "invalid prefix"
 
-	subnet = new(Subnet)
-
 	var pfx netip.Prefix
-	pfx, err = netip.ParsePrefix(fmt.Sprintf("%s/%d", ip, bits))
+	pfx, err = netip.ParsePrefix(fmt.Sprintf("%s/%d", addr, bits))
 	if err != nil {
 		return
 	}
@@ -126,8 +124,8 @@ func newSubnet(ip string, bits int) (subnet *Subnet, err error) {
 		return nil, errors.New(errMsg)
 	}
 
-	if pfx.Addr().Is6() {
-		return nil, errors.New("subnet too large for current implementation")
+	if pfx.Addr().Is4() {
+		return nil, errors.New("Invalid address. Need IPV6")
 	}
 	subnet.prefix = pfx
 
