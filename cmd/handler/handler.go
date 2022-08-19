@@ -168,7 +168,7 @@ func IP4SubnetRanges(ip string, bits uint8, secondaryBits uint8) {
 		table.Body.Cells = append(table.Body.Cells, row("Wildcard Mask", s.WildcardMask()))
 
 		if secondaryBits != 0 {
-			table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet", s2.CIDR))
+			table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet", s2.CIDR()))
 			table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet IP", s2.IP().String()))
 
 			if !s2.BroadcastAddr().IsValid() {
