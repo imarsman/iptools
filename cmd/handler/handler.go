@@ -58,6 +58,7 @@ func IP4SubnetDescribe(ip string, bits uint8, secondaryBits uint8) {
 	table.Body.Cells = append(table.Body.Cells, row("Subnet", s.CIDR()))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet IP", s.IP().String()))
 	table.Body.Cells = append(table.Body.Cells, row("Broadcast Address", s.BroadcastAddr().String()))
+	table.Body.Cells = append(table.Body.Cells, row("Broadcast Address Hex ID", util.IPToHexStr(s.Last())))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet Mask", s.SubnetMask()))
 	table.Body.Cells = append(table.Body.Cells, row("Wildcard Mask", s.WildcardMask()))
 
@@ -75,12 +76,6 @@ func IP4SubnetDescribe(ip string, bits uint8, secondaryBits uint8) {
 	table.Body.Cells = append(table.Body.Cells, row("Binary Subnet Mask", s.BinaryMask()))
 	table.Body.Cells = append(table.Body.Cells, row("Binary ID", s.BinaryID()))
 
-	last := s.Last()
-	if !last.IsValid() {
-		fmt.Println(fmt.Errorf("invalid address %s", netip.Addr{}))
-	}
-
-	table.Body.Cells = append(table.Body.Cells, row("Hex ID", util.IPToHexStr(last)))
 	table.Body.Cells = append(table.Body.Cells, row("in-addr.arpa", util.InAddrArpa(s.Prefix().Addr())))
 
 	if secondaryBits != 0 {

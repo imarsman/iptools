@@ -105,6 +105,9 @@ func reverse[T any](s []T) {
 
 // InAddrArpa get the InAddrArpa version of an IP
 func InAddrArpa(ip netip.Addr) string {
+	if !ip.Is4() {
+		return ""
+	}
 	ipStr := ip.String()
 	parts := strings.Split(ipStr, `.`)
 
@@ -115,9 +118,10 @@ func InAddrArpa(ip netip.Addr) string {
 
 // IPToHexStr convert an IP4 address to a hex string
 func IPToHexStr(ip netip.Addr) string {
-	bytes := ip.As4()
-	slice := bytes[:]
-	ipValue := binary.BigEndian.Uint32(slice)
+	if !ip.Is4() {
+		return ""
+	}
+	ipValue := binary.BigEndian.Uint32(ip.AsSlice())
 
 	var ipInt = make(net.IP, 4)
 	binary.BigEndian.PutUint32(ipInt, ipValue)
