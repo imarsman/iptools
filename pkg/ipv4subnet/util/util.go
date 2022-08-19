@@ -113,7 +113,7 @@ func InAddrArpa(ip netip.Addr) string {
 
 	reverse(parts)
 
-	return strings.Join(parts, ".")
+	return fmt.Sprintf("%s.%s", strings.Join(parts, "."), "in-addr.arpa")
 }
 
 // IPToHexStr convert an IP4 address to a hex string

@@ -105,12 +105,19 @@ func reverse[T any](s []T) {
 	}
 }
 
-// InAddrArpaIP4 get the InAddrArpaIP4 version of an IP
-func InAddrArpaIP4(ip netip.Addr) string {
+// InAddrArpa get the InAddrArpa version of an IP
+// This has not been tested
+// result will be [dot separated].ip6.arpa
+// e.g. 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa
+func InAddrArpa(ip netip.Addr) string {
 	ipStr := ip.StringExpanded()
-	parts := strings.Split(ipStr, `:`)
 
-	reverse(parts)
+	var chars = make([]string, 0, 32)
+	for _, r := range strings.Join(strings.Split(ipStr, `:`), "") {
+		chars = append(chars, string(r))
+	}
 
-	return strings.Join(parts, ".")
+	reverse(chars)
+
+	return fmt.Sprintf("%s.%s", strings.Join(chars, "."), ".ip6.arpa")
 }
