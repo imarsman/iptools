@@ -4,31 +4,26 @@ import (
 	"net/netip"
 	"testing"
 
-	"github.com/imarsman/iptools/pkg/ipv4subnet/util"
+	"github.com/imarsman/iptools/pkg/ipv6subnet/util"
 	"github.com/matryer/is"
 )
 
+// Sample IP addresses
+// 2001:0db8:3c4d:0015:0000:0000:1a2f:1a2b
+
 func TestNewSubnet(t *testing.T) {
-	// for i := 1; i <= 32; i++ {
-	// 	// subnetMask := fmt.Sprintf("255.255.255.0/%d", i)
-	// 	is := is.New(t)
-	// 	s, err := NewFromIPAndBits("10.32.0.0", int(i))
-	// 	is.NoErr(err)
-	// 	t.Log("masked", s.Prefix().Masked())
-	// 	t.Log("class bits", s.classOctet())
-	// 	t.Log("subnet max bits for class", s.maxClassBits())
-	// 	t.Log("subnet start bits for class", s.startClassBits())
-	// 	// t.Log("block size", s.BlockSize())
-	// 	t.Log("networks", s.Networks())
-	// 	// hosts per network
-	// 	// t.Log("count", float64(s.PrefixBits()), int64((math.Exp2(float64(32 - s.Prefix.Bits())))))
-	// 	t.Log("hosts per network", s.Hosts())
-	// 	t.Log("usable hosts per network", s.UsableHosts())
-	// 	t.Log("total hosts per subnet", s.Hosts()*s.Networks())
-	// 	t.Log("class network bits", s.ClassNetworkBits())
-	// 	t.Log("class host bits", s.ClassHostBits())
-	// 	t.Log()
-	// }
+	is := is.New(t)
+
+	s, err := NewFromIPAndBits("2001:0db8:3c4d:0015:0000:0000:1a2f:1a2b", 64)
+	is.NoErr(err)
+	t.Log(s.prefix.Masked())
+	t.Log(s.prefix)
+	t.Log(s.prefix.Addr().StringExpanded())
+
+	t.Log("subnet", s.SubnetString())
+	t.Log("interface", s.InterfaceString())
+	t.Log("prefix", s.PrefixString())
+	t.Log("is global unicast", s.Addr().IsGlobalUnicast())
 }
 
 func TestNetworks(t *testing.T) {

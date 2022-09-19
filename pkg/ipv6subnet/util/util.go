@@ -10,6 +10,22 @@ import (
 	"strings"
 )
 
+// Bytes2Hex get string with two byte sets delimited by colon
+func Bytes2Hex(bytes []byte) string {
+	var sb strings.Builder
+	for i, byte := range bytes {
+		part := fmt.Sprintf("%x", byte)
+		if len(part) == 1 {
+			sb.WriteString("0")
+		}
+		sb.WriteString(part)
+		if (i+1)%2 == 0 && i != 0 && i != (len(bytes)-1) {
+			sb.WriteString(":")
+		}
+	}
+	return sb.String()
+}
+
 // BitStr4 get bit string for IPV4 IP
 func BitStr4(ip netip.Addr, separator string) string {
 	bytes := ip.As4()

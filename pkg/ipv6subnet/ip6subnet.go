@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/netip"
 
+	"github.com/imarsman/iptools/pkg/ipv6subnet/util"
 	"gopkg.in/yaml.v2"
 )
 
@@ -30,9 +31,26 @@ func (s *Subnet) Prefix() netip.Prefix {
 	return s.prefix
 }
 
-// IP get IP for subnet
-func (s *Subnet) IP() netip.Addr {
+// Addr get Addr for subnet
+func (s *Subnet) Addr() netip.Addr {
 	return s.prefix.Addr()
+}
+
+func (s *Subnet) SubnetString() string {
+	bytes := s.Addr().Next().AsSlice()
+	return util.Bytes2Hex(bytes[6:8])
+}
+
+func (s *Subnet) InterfaceString() string {
+	start := s.prefix.Bits() / 8
+	bytes := s.Addr().AsSlice()
+	return util.Bytes2Hex(bytes[start:])
+}
+
+func (s *Subnet) PrefixString() string {
+	end := s.prefix.Bits() / 8
+	bytes := s.Addr().AsSlice()
+	return util.Bytes2Hex(bytes[:end])
 }
 
 // String get string representing subnet (cidr notation)
@@ -110,24 +128,21 @@ func NewFromPrefix(prefix string) (subnet *Subnet, err error) {
 }
 
 // newSubnet new subnet with prefix ip and network bits
-func newSubnet(addr string, bits int) (subnet *Subnet, err error) {
-	errMsg := "invalid prefix"
+func newSubnet(address string, bits int) (subnet *Subnet, err error) {
+	subnet = new(Subnet)
+	addr, err := netip.ParseAddr(address)
+	if err != nil {
+		fmt.Println("error", err)
+		return
+	}
+	if addr.Is4() {
+		return nil, errors.New("subnet too large for current implementation")
+	}
 
-	var pfx netip.Prefix
-	pfx, err = netip.ParsePrefix(fmt.Sprintf("%s/%d", addr, bits))
+	subnet.prefix = netip.PrefixFrom(addr, bits)
 	if err != nil {
 		return
 	}
-	pfx = pfx.Masked()
-
-	if !pfx.IsValid() {
-		return nil, errors.New(errMsg)
-	}
-
-	if pfx.Addr().Is4() {
-		return nil, errors.New("Invalid address. Need IPV6")
-	}
-	subnet.prefix = pfx
 
 	return
 }
