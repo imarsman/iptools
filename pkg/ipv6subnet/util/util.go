@@ -3,11 +3,13 @@ package util
 import (
 	"encoding/binary"
 	"fmt"
+	"math/rand"
 	"net"
 	"net/netip"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Bytes2Hex get string with two byte sets delimited by colon
@@ -24,6 +26,140 @@ func Bytes2Hex(bytes []byte) string {
 		}
 	}
 	return sb.String()
+}
+
+// AddressType the type of address for the subnet
+// https://www.networkacademy.io/ccna/ipv6/ipv6-address-types
+func AddressType(addr netip.Addr) string {
+	switch {
+	case addr.IsGlobalUnicast(): // 2001
+		return "Global unicast"
+	case addr.IsInterfaceLocalMulticast(): // fe80::/10
+		return "Interface local multicast"
+	case addr.IsLinkLocalMulticast(): // ff00::/8 ff02
+		return "Link local muticast"
+	case addr.IsLinkLocalUnicast(): // fe80::/10
+		return "Link local unicast"
+	case addr.IsLoopback(): // ::1/128
+		return "Loopback"
+	case addr.IsMulticast(): // ff00::/8
+		return "Multicast"
+	case addr.IsPrivate(): // fc00::/7
+		return "Private"
+	case addr.IsUnspecified():
+		return "Unspecified"
+	default:
+		return "Unknown"
+	}
+}
+
+func bytesToMacAddr(bytes []byte) string {
+	macAddress := fmt.Sprintf("%02x:%02x:%02x:%02x:%02x:%02x", bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5])
+
+	return macAddress
+}
+
+func bytes2MacAddrBytes(mac [6]byte) ([]byte, error) {
+	addr := net.HardwareAddr(mac[:])
+
+	return addr, nil
+}
+
+func makeMacAddress() (buf [6]byte, err error) {
+	rand.Seed(time.Now().Unix())
+	buf = [6]byte{}
+	_, err = rand.Read(buf[:])
+	if err != nil {
+		fmt.Println("error:", err)
+		return
+	}
+
+	return
+}
+
+func RandomSubnet() uint16 {
+	rand.Seed(time.Now().Unix())
+
+	max := 65_536
+
+	rand := rand.Intn(max)
+
+	return uint16(rand)
+}
+
+func mac2LinkLocal(s string) (netip.Addr, error) {
+	mac, err := net.ParseMAC(s)
+	if err != nil {
+		return netip.Addr{}, err
+	}
+
+	// Invert the bit at the index 6 (counting from 0)
+	mac[0] ^= (1 << (2 - 1))
+
+	ip := []byte{
+		0xfe, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, // prepend with fe80::
+		mac[0], mac[1], mac[2], 0xff, 0xfe, mac[3], mac[4], mac[5], // insert ff:fe in the middle
+	}
+	var addrBytes [16]byte
+	copy(addrBytes[:], ip)
+
+	return netip.AddrFrom16(addrBytes), nil
+}
+
+func mac2GlobalUnicast(s string) (netip.Addr, error) {
+	mac, err := net.ParseMAC(s)
+	if err != nil {
+		return netip.Addr{}, err
+	}
+
+	// Invert the bit at the index 6 (counting from 0)
+	mac[0] ^= (1 << (2 - 1))
+
+	rand.Seed(time.Now().Unix())
+
+	ip := []byte{
+		// 0x20, 0x01, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, // prepend with fe80::
+		0x20, 0x01, 0x0, 0x0, 0x0, 0x0, byte(rand.Intn(256)), byte(rand.Intn(256)), // prepend with fe80::
+		mac[0], mac[1], mac[2], 0xff, 0xfe, mac[3], mac[4], mac[5], // insert ff:fe in the middle
+	}
+	var addrBytes [16]byte
+	copy(addrBytes[:], ip)
+
+	return netip.AddrFrom16(addrBytes), nil
+}
+
+func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {
+	bytes, err := makeMacAddress()
+	if err != nil {
+		return
+	}
+	macAddrBytes, err := bytes2MacAddrBytes(bytes)
+	if err != nil {
+		return
+	}
+	addr, err = mac2GlobalUnicast(bytesToMacAddr(macAddrBytes))
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func RandomAddrLinkLocal() (addr netip.Addr, err error) {
+	bytes, err := makeMacAddress()
+	if err != nil {
+		return
+	}
+	macAddrBytes, err := bytes2MacAddrBytes(bytes)
+	if err != nil {
+		return
+	}
+	addr, err = mac2LinkLocal(bytesToMacAddr(macAddrBytes))
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 // BitStr4 get bit string for IPV4 IP

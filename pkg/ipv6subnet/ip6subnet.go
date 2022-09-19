@@ -1,6 +1,7 @@
 package ipv6subnet
 
 import (
+	// "crypto/rand"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -36,29 +37,30 @@ func (s *Subnet) Addr() netip.Addr {
 	return s.prefix.Addr()
 }
 
-// Type the type of address for the subnet
-func (s *Subnet) Type() string {
-	switch {
-	case s.Addr().IsGlobalUnicast():
-		return "Global unicast"
-	case s.Addr().IsInterfaceLocalMulticast():
-		return "Interface local multicast"
-	case s.Addr().IsLinkLocalMulticast():
-		return "Link local muticast"
-	case s.Addr().IsLinkLocalUnicast():
-		return "Link local unicast"
-	case s.Addr().IsLoopback():
-		return "Loopback"
-	case s.Addr().IsMulticast():
-		return "Multicast"
-	case s.Addr().IsPrivate():
-		return "Private"
-	case s.Addr().IsUnspecified():
-		return "Unspecified"
-	default:
-		return "Unknown"
-	}
-}
+// // AddressType the type of address for the subnet
+// // https://www.networkacademy.io/ccna/ipv6/ipv6-address-types
+// func (s *Subnet) AddressType() string {
+// 	switch {
+// 	case s.Addr().IsGlobalUnicast(): // 2001
+// 		return "Global unicast"
+// 	case s.Addr().IsInterfaceLocalMulticast(): // fe80::/10
+// 		return "Interface local multicast"
+// 	case s.Addr().IsLinkLocalMulticast(): // ff00::/8 ff02
+// 		return "Link local muticast"
+// 	case s.Addr().IsLinkLocalUnicast(): // fe80::/10
+// 		return "Link local unicast"
+// 	case s.Addr().IsLoopback(): // ::1/128
+// 		return "Loopback"
+// 	case s.Addr().IsMulticast(): // ff00::/8
+// 		return "Multicast"
+// 	case s.Addr().IsPrivate(): // fc00::/7
+// 		return "Private"
+// 	case s.Addr().IsUnspecified():
+// 		return "Unspecified"
+// 	default:
+// 		return "Unknown"
+// 	}
+// }
 
 // SubnetString get the string representation in hex of the subnet bits
 func (s *Subnet) SubnetString() string {
