@@ -117,9 +117,11 @@ func mac2GlobalUnicast(s string) (netip.Addr, error) {
 
 	rand.Seed(time.Now().Unix())
 
+	// db8:cafe
 	ip := []byte{
 		// 0x20, 0x01, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, // prepend with fe80::
-		0x20, 0x01, 0x0, 0x0, 0x0, 0x0, byte(rand.Intn(256)), byte(rand.Intn(256)), // prepend with fe80::
+		// 0x20, 0x01, 0x0, 0x0, 0x0, 0x0, byte(rand.Intn(256)), byte(rand.Intn(256)), // prepend with fe80::
+		0x20, 0x01, 0xd, 0xb8, 0xca, 0xfe, byte(rand.Intn(256)), byte(rand.Intn(256)), // prepend with 2001::
 		mac[0], mac[1], mac[2], 0xff, 0xfe, mac[3], mac[4], mac[5], // insert ff:fe in the middle
 	}
 	var addrBytes [16]byte

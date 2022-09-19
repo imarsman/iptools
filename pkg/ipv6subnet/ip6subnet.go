@@ -37,6 +37,42 @@ func (s *Subnet) Addr() netip.Addr {
 	return s.prefix.Addr()
 }
 
+// First get firt IP from subnet
+func (s *Subnet) First() netip.Addr {
+	addr := s.prefix.Addr()
+	bytes := addr.As16()
+	bytes[8] = 0
+	bytes[9] = 0
+	bytes[10] = 0
+	bytes[11] = 0
+	bytes[12] = 0
+	bytes[13] = 0
+	bytes[14] = 0
+	bytes[15] = 0
+
+	addr = netip.AddrFrom16(bytes)
+
+	return addr
+}
+
+// First get firt IP from subnet
+func (s *Subnet) Last() netip.Addr {
+	addr := s.prefix.Addr()
+	bytes := addr.As16()
+	bytes[8] = 0xff
+	bytes[9] = 0xff
+	bytes[10] = 0xff
+	bytes[11] = 0xff
+	bytes[12] = 0xff
+	bytes[13] = 0xff
+	bytes[14] = 0xff
+	bytes[15] = 0xff
+
+	addr = netip.AddrFrom16(bytes)
+
+	return addr
+}
+
 // // AddressType the type of address for the subnet
 // // https://www.networkacademy.io/ccna/ipv6/ipv6-address-types
 // func (s *Subnet) AddressType() string {

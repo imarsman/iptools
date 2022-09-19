@@ -17,6 +17,8 @@ func TestNewSubnet(t *testing.T) {
 	is.NoErr(err)
 	s, err := NewFromIPAndBits(addr.StringExpanded(), 64)
 	is.NoErr(err)
+	t.Log("First in subnet", s.First().StringExpanded())
+	t.Log("Last in subnet", s.Last().StringExpanded())
 	t.Log(s.prefix.Masked())
 	t.Log(s.prefix)
 	t.Log(s.prefix.Addr().StringExpanded())
