@@ -36,24 +36,51 @@ func (s *Subnet) Addr() netip.Addr {
 	return s.prefix.Addr()
 }
 
+// Type the type of address for the subnet
+func (s *Subnet) Type() string {
+	switch {
+	case s.Addr().IsGlobalUnicast():
+		return "Global unicast"
+	case s.Addr().IsInterfaceLocalMulticast():
+		return "Interface local multicast"
+	case s.Addr().IsLinkLocalMulticast():
+		return "Link local muticast"
+	case s.Addr().IsLinkLocalUnicast():
+		return "Link local unicast"
+	case s.Addr().IsLoopback():
+		return "Loopback"
+	case s.Addr().IsMulticast():
+		return "Multicast"
+	case s.Addr().IsPrivate():
+		return "Private"
+	case s.Addr().IsUnspecified():
+		return "Unspecified"
+	default:
+		return "Unknown"
+	}
+}
+
+// SubnetString get the string representation in hex of the subnet bits
 func (s *Subnet) SubnetString() string {
 	bytes := s.Addr().Next().AsSlice()
 	return util.Bytes2Hex(bytes[6:8])
 }
 
+// InterfaceString get the string representation in hex of the interface bits
 func (s *Subnet) InterfaceString() string {
 	start := s.prefix.Bits() / 8
 	bytes := s.Addr().AsSlice()
 	return util.Bytes2Hex(bytes[start:])
 }
 
+// PrefixString get the string representation in hex of the address prefix
 func (s *Subnet) PrefixString() string {
 	end := s.prefix.Bits() / 8
 	bytes := s.Addr().AsSlice()
 	return util.Bytes2Hex(bytes[:end])
 }
 
-// String get string representing subnet (cidr notation)
+// String get string representing subnet of the subnet prefix
 func (s *Subnet) String() string {
 	return s.prefix.String()
 }
