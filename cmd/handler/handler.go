@@ -333,7 +333,7 @@ func SubnetIP6LinkLocalDescribe(ip string, bits int, random bool) {
 			os.Exit(1)
 		}
 	} else {
-		if ip != "" {
+		if ip == "" {
 			fmt.Println("No ip and no -random argument")
 			os.Exit(1)
 		}
@@ -357,7 +357,7 @@ func SubnetIP6LinkLocalDescribe(ip string, bits int, random bool) {
 			{Align: simpletable.AlignCenter, Text: "Value"},
 		},
 	}
-	table.Body.Cells = append(table.Body.Cells, row("Subnet IP", s.Addr().StringExpanded()))
+	table.Body.Cells = append(table.Body.Cells, row("Subnet IP", s.Addr().String()))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet", s.Prefix().Masked()))
 	table.Body.Cells = append(table.Body.Cells, row("IP Type", ip6util.AddressType(s.Addr())))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet", fmt.Sprintf("%s", s.SubnetString())))
@@ -383,7 +383,7 @@ func SubnetIP6GlobalUnicastDescribe(ip string, bits int, random bool) {
 			os.Exit(1)
 		}
 	} else {
-		if ip != "" {
+		if ip == "" {
 			fmt.Println("No ip and no -random argument")
 			os.Exit(1)
 		}
@@ -407,7 +407,7 @@ func SubnetIP6GlobalUnicastDescribe(ip string, bits int, random bool) {
 			{Align: simpletable.AlignCenter, Text: "Value"},
 		},
 	}
-	table.Body.Cells = append(table.Body.Cells, row("Subnet IP", s.Addr().StringExpanded()))
+	table.Body.Cells = append(table.Body.Cells, row("Subnet IP", s.Addr().String()))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet", s.Prefix().Masked()))
 	table.Body.Cells = append(table.Body.Cells, row("IP Type", ip6util.AddressType(s.Addr())))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet", fmt.Sprintf("%s", s.SubnetString())))

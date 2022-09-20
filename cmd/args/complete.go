@@ -44,14 +44,14 @@ var cmd = &complete.Command{
 				// Scheduler health for an environment
 				"global-unicast-describe": {
 					Flags: map[string]complete.Predictor{
-						"ip":     predict.Set(IPs),
+						"ip":     predict.Nothing,
 						"bits":   predict.Nothing,
 						"random": predict.Nothing,
 					},
 				},
 				"link-local-describe": {
 					Flags: map[string]complete.Predictor{
-						"ip":     predict.Set(IPs),
+						"ip":     predict.Nothing,
 						"bits":   predict.Nothing,
 						"random": predict.Nothing,
 					},
