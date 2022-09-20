@@ -56,13 +56,6 @@ var cmd = &complete.Command{
 						"random": predict.Nothing,
 					},
 				},
-				"describe": {
-					Flags: map[string]complete.Predictor{
-						"ip":             predict.Set(IPs),
-						"bits":           predict.Nothing,
-						"secondary-bits": predict.Nothing,
-					},
-				},
 			},
 		},
 	},

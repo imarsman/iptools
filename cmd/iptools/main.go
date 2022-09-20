@@ -43,5 +43,12 @@ func main() {
 				args.CLIArgs.IP6Subnet.IP6SubnetGlobalUnicastDescribe.Random,
 			)
 		}
+		if args.CLIArgs.IP6Subnet.IP6SubnetLinkLocalDescribe != nil {
+			handler.SubnetIP6LinkLocalDescribe(
+				args.CLIArgs.IP6Subnet.IP6SubnetLinkLocalDescribe.IP,
+				args.CLIArgs.IP6Subnet.IP6SubnetLinkLocalDescribe.Bits,
+				args.CLIArgs.IP6Subnet.IP6SubnetLinkLocalDescribe.Random,
+			)
+		}
 	}
 }
