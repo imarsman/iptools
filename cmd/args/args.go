@@ -43,39 +43,60 @@ func (Args) Version() string {
 	return buf.String()
 }
 
-// SubnetDescribe for calls to describe a subnet
-type SubnetDescribe struct {
+// IP4SubnetDescribe for calls to describe a subnet
+type IP4SubnetDescribe struct {
 	IP            string `arg:"-i,--ip" help:""`
 	Bits          int    `arg:"-b,--bits" help:""`
 	SecondaryBits int    `arg:"-s,--secondary-bits" help:""`
 }
 
-// SubnetIP4Ranges for calls to get list of subnet ranges
-type SubnetIP4Ranges struct {
-	IP            string `arg:"-i,--ip" help:""`
-	Bits          int    `arg:"-b,--bits" help:""`
-	SecondaryBits int    `arg:"-s,--secondary-bits" help:""`
-	Pretty        bool   `arg:"-p,--pretty" help:""`
-}
-
-// SubnetIP4Divide for calls to divide subnet into networks
-type SubnetIP4Divide struct {
+// IP4SubnetRanges for calls to get list of subnet ranges
+type IP4SubnetRanges struct {
 	IP            string `arg:"-i,--ip" help:""`
 	Bits          int    `arg:"-b,--bits" help:""`
 	SecondaryBits int    `arg:"-s,--secondary-bits" help:""`
 	Pretty        bool   `arg:"-p,--pretty" help:""`
 }
 
-// SubnetIP4 top level subnet arg
-type SubnetIP4 struct {
-	SubnetRanges   *SubnetIP4Ranges `arg:"subcommand:ranges" help:"divide a subnet into ranges"`
-	SubnetDivide   *SubnetIP4Divide `arg:"subcommand:divide" help:"divide a subnet into smaller subnets"`
-	SubnetDescribe *SubnetDescribe  `arg:"subcommand:describe" help:"describe a subnet"`
+// IP4SubnetDivide for calls to divide subnet into networks
+type IP4SubnetDivide struct {
+	IP            string `arg:"-i,--ip" help:""`
+	Bits          int    `arg:"-b,--bits" help:""`
+	SecondaryBits int    `arg:"-s,--secondary-bits" help:""`
+	Pretty        bool   `arg:"-p,--pretty" help:""`
+}
+
+// IP6SubnetGlobalUnicastDescribe for calls to describe a subnet
+type IP6SubnetGlobalUnicastDescribe struct {
+	IP     string `arg:"-i,--ip" help:"IP address"`
+	Random bool   `arg:"-r,--random" help:"generate random IP"`
+	Bits   int    `arg:"-b,--bits" help:"subnet bits"`
+}
+
+// IP6SubnetLinkLocalDescribe for calls to describe a subnet
+type IP6SubnetLinkLocalDescribe struct {
+	IP     string `arg:"-i,--ip" help:"IP address"`
+	Random bool   `arg:"-r,--random" help:"generate random IP"`
+	Bits   int    `arg:"-b,--bits" help:"subnet bits"`
+}
+
+// IP6Subnet IP6 calls
+type IP6Subnet struct {
+	IP6SubnetGlobalUnicastDescribe *IP6SubnetGlobalUnicastDescribe `arg:"subcommand:global-unicast-describe"`
+	IP6SubnetLinkLocalDescribe     *IP6SubnetLinkLocalDescribe     `arg:"subcommand:link-local-describe"`
+}
+
+// IP4Subnet top level IP4 subnet arg
+type IP4Subnet struct {
+	SubnetRanges   *IP4SubnetRanges   `arg:"subcommand:ranges" help:"divide a subnet into ranges"`
+	SubnetDivide   *IP4SubnetDivide   `arg:"subcommand:divide" help:"divide a subnet into smaller subnets"`
+	SubnetDescribe *IP4SubnetDescribe `arg:"subcommand:describe" help:"describe a subnet"`
 }
 
 // Args container for cli pargs
 type Args struct {
-	Subnet *SubnetIP4 `arg:"subcommand:subnetip4" help:"Get networks for subnet"`
+	IP4Subnet *IP4Subnet `arg:"subcommand:subnetip4" help:"Get networks for subnet"`
+	IP6Subnet *IP6Subnet `arg:"subcommand:subnetip6" help:"Get IP6 address information"`
 }
 
 // CLIArgs the args structure to be filled at runtime

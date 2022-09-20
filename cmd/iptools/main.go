@@ -12,26 +12,35 @@ func main() {
 	arg.MustParse(&args.CLIArgs)
 
 	// Inspect cli args and make calls to handlers as apppropriate
-	if args.CLIArgs.Subnet != nil {
-		if args.CLIArgs.Subnet.SubnetRanges != nil {
+	if args.CLIArgs.IP4Subnet != nil {
+		if args.CLIArgs.IP4Subnet.SubnetRanges != nil {
 			handler.IP4SubnetRanges(
-				args.CLIArgs.Subnet.SubnetRanges.IP,
-				uint8(args.CLIArgs.Subnet.SubnetRanges.Bits),
-				uint8(args.CLIArgs.Subnet.SubnetRanges.SecondaryBits),
+				args.CLIArgs.IP4Subnet.SubnetRanges.IP,
+				args.CLIArgs.IP4Subnet.SubnetRanges.Bits,
+				args.CLIArgs.IP4Subnet.SubnetRanges.SecondaryBits,
 			)
 		}
-		if args.CLIArgs.Subnet.SubnetDivide != nil {
+		if args.CLIArgs.IP4Subnet.SubnetDivide != nil {
 			handler.IP4SubnetDivide(
-				args.CLIArgs.Subnet.SubnetDivide.IP,
-				uint8(args.CLIArgs.Subnet.SubnetDivide.Bits),
-				uint8(args.CLIArgs.Subnet.SubnetDivide.SecondaryBits),
+				args.CLIArgs.IP4Subnet.SubnetDivide.IP,
+				args.CLIArgs.IP4Subnet.SubnetDivide.Bits,
+				args.CLIArgs.IP4Subnet.SubnetDivide.SecondaryBits,
 			)
 		}
-		if args.CLIArgs.Subnet.SubnetDescribe != nil {
+		if args.CLIArgs.IP4Subnet.SubnetDescribe != nil {
 			handler.IP4SubnetDescribe(
-				args.CLIArgs.Subnet.SubnetDescribe.IP,
-				uint8(args.CLIArgs.Subnet.SubnetDescribe.Bits),
-				uint8(args.CLIArgs.Subnet.SubnetDescribe.SecondaryBits),
+				args.CLIArgs.IP4Subnet.SubnetDescribe.IP,
+				args.CLIArgs.IP4Subnet.SubnetDescribe.Bits,
+				args.CLIArgs.IP4Subnet.SubnetDescribe.SecondaryBits,
+			)
+		}
+	}
+	if args.CLIArgs.IP6Subnet != nil {
+		if args.CLIArgs.IP6Subnet.IP6SubnetGlobalUnicastDescribe != nil {
+			handler.SubnetIP6GlobalUnicastDescribe(
+				args.CLIArgs.IP6Subnet.IP6SubnetGlobalUnicastDescribe.IP,
+				args.CLIArgs.IP6Subnet.IP6SubnetGlobalUnicastDescribe.Bits,
+				args.CLIArgs.IP6Subnet.IP6SubnetGlobalUnicastDescribe.Random,
 			)
 		}
 	}

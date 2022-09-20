@@ -2,6 +2,7 @@ package ipv6subnet
 
 import (
 	// "crypto/rand"
+
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -41,14 +42,14 @@ func (s *Subnet) Addr() netip.Addr {
 func (s *Subnet) First() netip.Addr {
 	addr := s.prefix.Addr()
 	bytes := addr.As16()
-	bytes[8] = 0
-	bytes[9] = 0
-	bytes[10] = 0
-	bytes[11] = 0
-	bytes[12] = 0
-	bytes[13] = 0
-	bytes[14] = 0
-	bytes[15] = 0
+	bytes[8] = 0x0
+	bytes[9] = 0x0
+	bytes[10] = 0x0
+	bytes[11] = 0x0
+	bytes[12] = 0x0
+	bytes[13] = 0x0
+	bytes[14] = 0x0
+	bytes[15] = 0x0
 
 	addr = netip.AddrFrom16(bytes)
 
@@ -103,6 +104,14 @@ func (s *Subnet) SubnetString() string {
 	bytes := s.Addr().Next().AsSlice()
 	return util.Bytes2Hex(bytes[6:8])
 }
+
+// func (s *Subnet) SubnetInt() int {
+// 	bytes := s.Addr().Next().AsSlice()
+// 	fmt.Println(len(bytes))
+// 	hexParts := util.Bytes2Hex(bytes[6:8])
+// 	// intVal := 0
+// 	return int(intVal)
+// }
 
 // InterfaceString get the string representation in hex of the interface bits
 func (s *Subnet) InterfaceString() string {

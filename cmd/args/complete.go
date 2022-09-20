@@ -39,6 +39,32 @@ var cmd = &complete.Command{
 				},
 			},
 		},
+		"subnetip6": {
+			Sub: map[string]*complete.Command{
+				// Scheduler health for an environment
+				"global-unicast-describe": {
+					Flags: map[string]complete.Predictor{
+						"ip":     predict.Set(IPs),
+						"bits":   predict.Nothing,
+						"random": predict.Nothing,
+					},
+				},
+				"link-local-describe": {
+					Flags: map[string]complete.Predictor{
+						"ip":     predict.Set(IPs),
+						"bits":   predict.Nothing,
+						"random": predict.Nothing,
+					},
+				},
+				"describe": {
+					Flags: map[string]complete.Predictor{
+						"ip":             predict.Set(IPs),
+						"bits":           predict.Nothing,
+						"secondary-bits": predict.Nothing,
+					},
+				},
+			},
+		},
 	},
 }
 
