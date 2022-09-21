@@ -36,6 +36,9 @@ release:
 
     iptools is a set of IP and network tools
 
+    v0.1.21
+    Work on mostly IPV6 address description
+
     v0.1.20
     First IP6 calls
 
