@@ -29,7 +29,10 @@ tasks:
     cmds:
       - goreleaser release --snapshot --rm-dist
   install:
-    dir: ./dist/{{.buildname}}_{{OS}}_{{ARCH}}/
+    vars:
+      ARCH_VER:
+        sh: if [[ "{{ARCH}}" = "amd64" ]]; then echo "_v1"; else echo ""; fi
+    dir: ./dist/{{.buildname}}_{{OS}}_{{ARCH}}{{.ARCH_VER}}/
     desc: "install in local bin directory"
     cmds:
       - task: build
