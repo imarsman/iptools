@@ -9,7 +9,7 @@ This utility can have completion enabled by typing `COMP_INSTALL=1 iptools`.
 This utility currently does three things with IPV4. It splits a subnet into networks and into networks by a differing subnet size,
 it splits a subnet into a set of ranges for its networks, and it gives summary information for a subnet.
 
-For IPV6 a random (or manually entered) IPV6 address can be generated and described. Currently global unicast and link
+For IPV6 a random IPV6 IP can be generated (or manually entered as a parameter) and described. Currently global unicast and link
 local addresses are handled. The full range of address types will at tome point be supported
 
 The IP package used, `net/netip`, is in Go 1.18. It is slightly different in API compared to the
