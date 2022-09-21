@@ -389,7 +389,6 @@ func subnetIP6Describe(s *ipv6subnet.Subnet) {
 	table.Body.Cells = append(table.Body.Cells, row("Prefix", s.Prefix().Masked()))
 	table.Body.Cells = append(table.Body.Cells, row("Routing Prefix", fmt.Sprintf("%s", s.RoutingPrefixString())))
 	table.Body.Cells = append(table.Body.Cells, row("Default Gateway", s.DefaultGatewayString()))
-	// table.Body.Cells = append(table.Body.Cells, row("General Prefix", fmt.Sprintf("%s", s.GeneralPrefixString())))
 	// table.Body.Cells = append(table.Body.Cells, row("Specific Prefix", fmt.Sprintf("%s", s.SpecificPrefixString())))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet", fmt.Sprintf("%s", s.SubnetString())))
 	table.Body.Cells = append(table.Body.Cells, row("ip6.arpa", fmt.Sprintf("%s", ip6util.IP6Arpa(s.Addr()))))
