@@ -79,15 +79,8 @@ func (s *Subnet) SubnetString() string {
 	return util.Bytes2Hex(util.AddrSubnetSection(s.Addr()))
 }
 
-// GeneralPrefixString get the general prefix as a hex string
-// func (s *Subnet) GeneralPrefixString() string {
-// 	return util.Bytes2Hex(util.AddrGeneralPrefixSection(s.Addr()))
-// }
-
 // RoutingPrefixString get the routing prefix as a hex string
 func (s *Subnet) RoutingPrefixString() string {
-	// rs := netip.PrefixFrom(s.Addr(), 48)
-	// return rs.String()
 	return fmt.Sprintf("%s::/%d", util.Bytes2Hex(util.AddrRoutingPrefixSecion(s.Addr())), 48)
 }
 
