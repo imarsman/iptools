@@ -10,6 +10,12 @@ import (
 	"time"
 )
 
+// AddrDefaultGateway get IP default gateway for IP
+func AddrDefaultGateway(addr netip.Addr) []byte {
+	bytes := addr.As16()
+	return bytes[:6]
+}
+
 // AddrSubnetSection get IP section for IP
 func AddrSubnetSection(addr netip.Addr) []byte {
 	bytes := addr.As16()

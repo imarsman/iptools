@@ -79,6 +79,11 @@ func (s *Subnet) SubnetString() string {
 	return util.Bytes2Hex(util.AddrSubnetSection(s.Addr()))
 }
 
+// DefaultGatewayString get the default gateway as a hex string
+func (s *Subnet) DefaultGatewayString() string {
+	return fmt.Sprintf("%s::%d", util.Bytes2Hex(util.AddrDefaultGateway(s.Addr())), 1)
+}
+
 // RoutingPrefixString get the routing prefix as a hex string
 func (s *Subnet) RoutingPrefixString() string {
 	return fmt.Sprintf("%s::/%d", util.Bytes2Hex(util.AddrRoutingPrefixSecion(s.Addr())), 48)
