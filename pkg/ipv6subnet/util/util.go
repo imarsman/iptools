@@ -33,6 +33,16 @@ func AddrInterfaceSection(addr netip.Addr) []byte {
 	return bytes[8:]
 }
 
+func IP6Arpa(addr netip.Addr) string {
+	addrStr := addr.StringExpanded()
+	addrStr = strings.ReplaceAll(addrStr, ":", "")
+	addrSlice := strings.Split(addrStr, "")
+	reverse(addrSlice)
+
+	addrStr = fmt.Sprintf("%s.ip6.arpa", strings.Join(addrSlice, "."))
+	return addrStr
+}
+
 // Bytes2Hex get string with two byte sets delimited by colon
 func Bytes2Hex(bytes []byte) string {
 	var sb strings.Builder
