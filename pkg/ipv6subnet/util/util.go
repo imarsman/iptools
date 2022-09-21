@@ -33,6 +33,7 @@ func AddrInterfaceSection(addr netip.Addr) []byte {
 	return bytes[8:]
 }
 
+// IP6Arpa get the IPV6 ARPA address
 func IP6Arpa(addr netip.Addr) string {
 	addrStr := addr.StringExpanded()
 	addrStr = strings.ReplaceAll(addrStr, ":", "")
