@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"net"
 	"net/netip"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -31,6 +32,25 @@ func AddrRoutingPrefixSecion(addr netip.Addr) []byte {
 func AddrInterfaceSection(addr netip.Addr) []byte {
 	bytes := addr.As16()
 	return bytes[8:]
+}
+
+func AddrToBitString(addr netip.Addr) (result string) {
+	str := addr.StringExpanded()
+
+	var sb strings.Builder
+	parts := strings.Split(str, ":")
+	for _, p := range parts {
+		value, err := strconv.ParseInt(p, 16, 64)
+		if err != nil {
+			return ""
+		}
+		sb.WriteString(fmt.Sprintf("%08b.", value))
+	}
+
+	result = sb.String()
+	result = result[:len(result)-1]
+
+	return result
 }
 
 // IP6Arpa get the IPV6 ARPA address
