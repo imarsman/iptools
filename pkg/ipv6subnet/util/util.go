@@ -1,13 +1,10 @@
 package util
 
 import (
-	"encoding/binary"
 	"fmt"
 	"math/rand"
 	"net"
 	"net/netip"
-	"regexp"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -53,6 +50,7 @@ func AddressType(addr netip.Addr) string {
 	}
 }
 
+// bytesToMacAddr transform a 6 byte array to a mac address
 func bytesToMacAddr(bytes []byte) string {
 	macAddress := fmt.Sprintf("%02x:%02x:%02x:%02x:%02x:%02x", bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5])
 
@@ -65,6 +63,7 @@ func bytes2MacAddrBytes(mac [6]byte) ([]byte, error) {
 	return addr, nil
 }
 
+// makeMacAddress make a random mac address of a 6 byte array
 func makeMacAddress() (buf [6]byte, err error) {
 	rand.Seed(time.Now().Unix())
 	buf = [6]byte{}
@@ -77,6 +76,7 @@ func makeMacAddress() (buf [6]byte, err error) {
 	return
 }
 
+// RandomSubnet get a random subnet for IPV6
 func RandomSubnet() uint16 {
 	rand.Seed(time.Now().Unix())
 
@@ -87,6 +87,7 @@ func RandomSubnet() uint16 {
 	return uint16(rand)
 }
 
+// mac2LinkLocal transform a mac address to a link local address
 func mac2LinkLocal(s string) (netip.Addr, error) {
 	mac, err := net.ParseMAC(s)
 	if err != nil {
@@ -106,6 +107,7 @@ func mac2LinkLocal(s string) (netip.Addr, error) {
 	return netip.AddrFrom16(addrBytes), nil
 }
 
+// mac2GlobalUnicast transform a mac address to a globaal unicast address
 func mac2GlobalUnicast(s string) (netip.Addr, error) {
 	mac, err := net.ParseMAC(s)
 	if err != nil {
@@ -130,6 +132,7 @@ func mac2GlobalUnicast(s string) (netip.Addr, error) {
 	return netip.AddrFrom16(addrBytes), nil
 }
 
+// RandomAddrGlobalUnicast get a global unicast random IPV6 address
 func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {
 	bytes, err := makeMacAddress()
 	if err != nil {
@@ -147,6 +150,7 @@ func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {
 	return
 }
 
+// RandomAddrLinkLocal get a link-local random IPV6 address
 func RandomAddrLinkLocal() (addr netip.Addr, err error) {
 	bytes, err := makeMacAddress()
 	if err != nil {
@@ -164,93 +168,93 @@ func RandomAddrLinkLocal() (addr netip.Addr, err error) {
 	return
 }
 
-// BitStr4 get bit string for IPV4 IP
-func BitStr4(ip netip.Addr, separator string) string {
-	bytes := ip.As4()
-	list := []string{}
+// // BitStr4 get bit string for IPV4 IP
+// func BitStr4(ip netip.Addr, separator string) string {
+// 	bytes := ip.As4()
+// 	list := []string{}
 
-	for _, b := range bytes {
-		list = append(list, fmt.Sprintf("%08b", b))
-	}
+// 	for _, b := range bytes {
+// 		list = append(list, fmt.Sprintf("%08b", b))
+// 	}
 
-	return strings.Join(list, separator)
-}
+// 	return strings.Join(list, separator)
+// }
 
-// BinaryIP4StrToBytes convert a binary IP string for an IPV4 IP to a set of 4 bytes
-func BinaryIP4StrToBytes(ip string) (list []byte, err error) {
-	var parts []string
-	if !strings.Contains(ip, ".") {
-		if len(ip) != 32 {
-			err = fmt.Errorf("invalid binary ip %s", ip)
-			return
-		}
-		var matches bool
-		matches, err = regexp.MatchString(`[01]`, ip)
-		if err != nil {
-			return
-		}
-		if !matches {
-			err = fmt.Errorf("invalid binary ip %s", ip)
-			return
-		}
-		parts = []string{ip[0:8], ip[8:16], ip[16:24], ip[25:32]}
-	} else {
-		parts = strings.Split(ip, ".")
-	}
+// // BinaryIP4StrToBytes convert a binary IP string for an IPV4 IP to a set of 4 bytes
+// func BinaryIP4StrToBytes(ip string) (list []byte, err error) {
+// 	var parts []string
+// 	if !strings.Contains(ip, ".") {
+// 		if len(ip) != 32 {
+// 			err = fmt.Errorf("invalid binary ip %s", ip)
+// 			return
+// 		}
+// 		var matches bool
+// 		matches, err = regexp.MatchString(`[01]`, ip)
+// 		if err != nil {
+// 			return
+// 		}
+// 		if !matches {
+// 			err = fmt.Errorf("invalid binary ip %s", ip)
+// 			return
+// 		}
+// 		parts = []string{ip[0:8], ip[8:16], ip[16:24], ip[25:32]}
+// 	} else {
+// 		parts = strings.Split(ip, ".")
+// 	}
 
-	for _, part := range parts {
-		var i int64
-		i, err = strconv.ParseInt(part, 2, 32)
-		if err != nil {
-			return
-		}
-		list = append(list, byte(i))
-	}
+// 	for _, part := range parts {
+// 		var i int64
+// 		i, err = strconv.ParseInt(part, 2, 32)
+// 		if err != nil {
+// 			return
+// 		}
+// 		list = append(list, byte(i))
+// 	}
 
-	return
-}
+// 	return
+// }
 
 // https://gist.github.com/ammario/649d4c0da650162efd404af23e25b86b
-func int2ip(ipInt uint32) (netip.Addr, error) {
-	ip := make(net.IP, 4)
-	binary.BigEndian.PutUint32(ip, ipInt)
-	addr, ok := netip.ParseAddr(ip.String())
+// func int2ip(ipInt uint32) (netip.Addr, error) {
+// 	ip := make(net.IP, 4)
+// 	binary.BigEndian.PutUint32(ip, ipInt)
+// 	addr, ok := netip.ParseAddr(ip.String())
 
-	return addr, ok
-}
+// 	return addr, ok
+// }
 
 // WildCardMask get mask bits available for addressing
-func WildCardMask(ip netip.Addr) string {
-	bytes := ip.As4()
-	var list = make([]string, 4, 4)
-	for i, b := range bytes {
-		if b == 255 {
-			list[i] = fmt.Sprint(0)
-			continue
-		}
-		list[i] = fmt.Sprint(250 - b)
-	}
+// func WildCardMask(ip netip.Addr) string {
+// 	bytes := ip.As4()
+// 	var list = make([]string, 4, 4)
+// 	for i, b := range bytes {
+// 		if b == 255 {
+// 			list[i] = fmt.Sprint(0)
+// 			continue
+// 		}
+// 		list[i] = fmt.Sprint(250 - b)
+// 	}
 
-	return strings.Join(list, `.`)
-}
+// 	return strings.Join(list, `.`)
+// }
 
 // AddToIPIP4 add count IPs to IP
-func AddToIPIP4(startIP netip.Addr, add int32) (addedIP netip.Addr, err error) {
-	if !startIP.Next().IsValid() {
-		err = fmt.Errorf("ip %v is already max", startIP)
-		return
-	}
-	bytes := startIP.As4()
-	slice := bytes[:]
-	ipValue := binary.BigEndian.Uint32(slice)
-	ipValue += uint32(add)
-	addedIP, err = int2ip(ipValue)
-	if err != nil {
-		return
-	}
+// func AddToIPIP4(startIP netip.Addr, add int32) (addedIP netip.Addr, err error) {
+// 	if !startIP.Next().IsValid() {
+// 		err = fmt.Errorf("ip %v is already max", startIP)
+// 		return
+// 	}
+// 	bytes := startIP.As4()
+// 	slice := bytes[:]
+// 	ipValue := binary.BigEndian.Uint32(slice)
+// 	ipValue += uint32(add)
+// 	addedIP, err = int2ip(ipValue)
+// 	if err != nil {
+// 		return
+// 	}
 
-	return
-}
+// 	return
+// }
 
 // For fun with generics
 func reverse[T any](s []T) {
@@ -263,15 +267,15 @@ func reverse[T any](s []T) {
 // This has not been tested
 // result will be [dot separated].ip6.arpa
 // e.g. 1.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa
-func InAddrArpa(ip netip.Addr) string {
-	ipStr := ip.StringExpanded()
+// func InAddrArpa(ip netip.Addr) string {
+// 	ipStr := ip.StringExpanded()
 
-	var chars = make([]string, 0, 32)
-	for _, r := range strings.Join(strings.Split(ipStr, `:`), "") {
-		chars = append(chars, string(r))
-	}
+// 	var chars = make([]string, 0, 32)
+// 	for _, r := range strings.Join(strings.Split(ipStr, `:`), "") {
+// 		chars = append(chars, string(r))
+// 	}
 
-	reverse(chars)
+// 	reverse(chars)
 
-	return fmt.Sprintf("%s.%s", strings.Join(chars, "."), ".ip6.arpa")
-}
+// 	return fmt.Sprintf("%s.%s", strings.Join(chars, "."), ".ip6.arpa")
+// }

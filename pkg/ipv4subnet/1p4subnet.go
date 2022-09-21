@@ -449,6 +449,7 @@ func (s *Subnet) IPRanges() (ranges []Range, err error) {
 	return s.ipRanges(s)
 }
 
+// EffectiveNetworks number of networks
 func (s *Subnet) EffectiveNetworks(secondarySubnet *Subnet) int64 {
 	ratio := int64(math.Exp2(float64(secondarySubnet.Prefix().Bits() - s.Prefix().Bits())))
 

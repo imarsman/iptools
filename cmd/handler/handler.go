@@ -318,36 +318,62 @@ func IP4SubnetDivide(ip string, bits int, secondaryBits int) {
 	}
 }
 
-func SubnetIP6LinkLocalDescribe(ip string, bits int, random bool) {
-	var s *ipv6subnet.Subnet
-
-	if random {
-		addr, err := ip6util.RandomAddrLinkLocal()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		s, err = ipv6subnet.NewFromIPAndBits(addr.StringExpanded(), bits)
+// IP6DescribeGlobalUnicast describe a global unicast address
+func IP6DescribeGlobalUnicast(ip string, bits int, random bool) {
+	var addr netip.Addr
+	if !random {
+		var err error
+		addr, err = netip.ParseAddr(ip)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 	} else {
-		if ip == "" {
-			fmt.Println("No ip and no -random argument")
-			os.Exit(1)
-		}
-		addr, err := netip.ParseAddr(ip)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		s, err = ipv6subnet.NewFromIPAndBits(addr.StringExpanded(), bits)
+		var err error
+		addr, err = ip6util.RandomAddrGlobalUnicast()
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 	}
+	s, err := ipv6subnet.NewFromIPAndBits(addr.StringExpanded(), bits)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	subnetIP6Describe(s)
+}
+
+// IP6DescribeLinkLocal describe a link-local address
+func IP6DescribeLinkLocal(ip string, bits int, random bool) {
+	var addr netip.Addr
+	if !random {
+		var err error
+		addr, err = netip.ParseAddr(ip)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	} else {
+		var err error
+		addr, err = ip6util.RandomAddrLinkLocal()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	}
+	s, err := ipv6subnet.NewFromIPAndBits(addr.StringExpanded(), bits)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	subnetIP6Describe(s)
+}
+
+// subnetIP6Describe describe a link local IP
+func subnetIP6Describe(s *ipv6subnet.Subnet) {
 	table := simpletable.New()
 	table.SetStyle(simpletable.StyleCompactLite)
 
@@ -360,6 +386,7 @@ func SubnetIP6LinkLocalDescribe(ip string, bits int, random bool) {
 	table.Body.Cells = append(table.Body.Cells, row("Subnet IP", s.Addr().String()))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet", s.Prefix().Masked()))
 	table.Body.Cells = append(table.Body.Cells, row("IP Type", ip6util.AddressType(s.Addr())))
+	table.Body.Cells = append(table.Body.Cells, row("Routing Prefix", fmt.Sprintf("%s", s.RoutingPrefixString())))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet", fmt.Sprintf("%s", s.SubnetString())))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet first address", s.First().StringExpanded()))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet last address", s.Last().StringExpanded()))
@@ -367,52 +394,52 @@ func SubnetIP6LinkLocalDescribe(ip string, bits int, random bool) {
 	fmt.Println(table.String())
 }
 
-// SubnetIP6GlobalUnicastDescribe describe an IP6 Global unicast subnet
-func SubnetIP6GlobalUnicastDescribe(ip string, bits int, random bool) {
-	var s *ipv6subnet.Subnet
+// // SubnetIP6GlobalUnicastDescribe describe an IP6 Global unicast subnet
+// func SubnetIP6GlobalUnicastDescribe(ip string, bits int, random bool) {
+// 	var s *ipv6subnet.Subnet
 
-	if random {
-		addr, err := ip6util.RandomAddrGlobalUnicast()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		s, err = ipv6subnet.NewFromIPAndBits(addr.StringExpanded(), bits)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-	} else {
-		if ip == "" {
-			fmt.Println("No ip and no -random argument")
-			os.Exit(1)
-		}
-		addr, err := netip.ParseAddr(ip)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		s, err = ipv6subnet.NewFromIPAndBits(addr.StringExpanded(), bits)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-	}
-	table := simpletable.New()
-	table.SetStyle(simpletable.StyleCompactLite)
+// 	if random {
+// 		addr, err := ip6util.RandomAddrGlobalUnicast()
+// 		if err != nil {
+// 			fmt.Println(err)
+// 			os.Exit(1)
+// 		}
+// 		s, err = ipv6subnet.NewFromIPAndBits(addr.StringExpanded(), bits)
+// 		if err != nil {
+// 			fmt.Println(err)
+// 			os.Exit(1)
+// 		}
+// 	} else {
+// 		if ip == "" {
+// 			fmt.Println("No ip and no -random argument")
+// 			os.Exit(1)
+// 		}
+// 		addr, err := netip.ParseAddr(ip)
+// 		if err != nil {
+// 			fmt.Println(err)
+// 			os.Exit(1)
+// 		}
+// 		s, err = ipv6subnet.NewFromIPAndBits(addr.StringExpanded(), bits)
+// 		if err != nil {
+// 			fmt.Println(err)
+// 			os.Exit(1)
+// 		}
+// 	}
+// 	table := simpletable.New()
+// 	table.SetStyle(simpletable.StyleCompactLite)
 
-	table.Header = &simpletable.Header{
-		Cells: []*simpletable.Cell{
-			{Align: simpletable.AlignCenter, Text: "Category"},
-			{Align: simpletable.AlignCenter, Text: "Value"},
-		},
-	}
-	table.Body.Cells = append(table.Body.Cells, row("Subnet IP", s.Addr().String()))
-	table.Body.Cells = append(table.Body.Cells, row("Subnet", s.Prefix().Masked()))
-	table.Body.Cells = append(table.Body.Cells, row("IP Type", ip6util.AddressType(s.Addr())))
-	table.Body.Cells = append(table.Body.Cells, row("Subnet", fmt.Sprintf("%s", s.SubnetString())))
-	table.Body.Cells = append(table.Body.Cells, row("Subnet first address", s.First().StringExpanded()))
-	table.Body.Cells = append(table.Body.Cells, row("Subnet last address", s.Last().StringExpanded()))
+// 	table.Header = &simpletable.Header{
+// 		Cells: []*simpletable.Cell{
+// 			{Align: simpletable.AlignCenter, Text: "Category"},
+// 			{Align: simpletable.AlignCenter, Text: "Value"},
+// 		},
+// 	}
+// 	table.Body.Cells = append(table.Body.Cells, row("Subnet IP", s.Addr().String()))
+// 	table.Body.Cells = append(table.Body.Cells, row("Subnet", s.Prefix().Masked()))
+// 	table.Body.Cells = append(table.Body.Cells, row("IP Type", ip6util.AddressType(s.Addr())))
+// 	table.Body.Cells = append(table.Body.Cells, row("Subnet", fmt.Sprintf("%s", s.SubnetString())))
+// 	table.Body.Cells = append(table.Body.Cells, row("Subnet first address", s.First().StringExpanded()))
+// 	table.Body.Cells = append(table.Body.Cells, row("Subnet last address", s.Last().StringExpanded()))
 
-	fmt.Println(table.String())
-}
+// 	fmt.Println(table.String())
+// }

@@ -105,13 +105,10 @@ func (s *Subnet) SubnetString() string {
 	return util.Bytes2Hex(bytes[6:8])
 }
 
-// func (s *Subnet) SubnetInt() int {
-// 	bytes := s.Addr().Next().AsSlice()
-// 	fmt.Println(len(bytes))
-// 	hexParts := util.Bytes2Hex(bytes[6:8])
-// 	// intVal := 0
-// 	return int(intVal)
-// }
+func (s *Subnet) RoutingPrefixString() string {
+	bytes := s.Addr().Next().AsSlice()
+	return util.Bytes2Hex(bytes[:6])
+}
 
 // InterfaceString get the string representation in hex of the interface bits
 func (s *Subnet) InterfaceString() string {

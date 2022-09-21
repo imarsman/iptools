@@ -37,14 +37,14 @@ func main() {
 	}
 	if args.CLIArgs.IP6Subnet != nil {
 		if args.CLIArgs.IP6Subnet.IP6SubnetGlobalUnicastDescribe != nil {
-			handler.SubnetIP6GlobalUnicastDescribe(
+			handler.IP6DescribeGlobalUnicast(
 				args.CLIArgs.IP6Subnet.IP6SubnetGlobalUnicastDescribe.IP,
 				args.CLIArgs.IP6Subnet.IP6SubnetGlobalUnicastDescribe.Bits,
 				args.CLIArgs.IP6Subnet.IP6SubnetGlobalUnicastDescribe.Random,
 			)
 		}
 		if args.CLIArgs.IP6Subnet.IP6SubnetLinkLocalDescribe != nil {
-			handler.SubnetIP6LinkLocalDescribe(
+			handler.IP6DescribeLinkLocal(
 				args.CLIArgs.IP6Subnet.IP6SubnetLinkLocalDescribe.IP,
 				args.CLIArgs.IP6Subnet.IP6SubnetLinkLocalDescribe.Bits,
 				args.CLIArgs.IP6Subnet.IP6SubnetLinkLocalDescribe.Random,
