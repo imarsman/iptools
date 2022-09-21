@@ -9,6 +9,30 @@ import (
 	"time"
 )
 
+// AddrSubnetSection get IP section for IP
+func AddrSubnetSection(addr netip.Addr) []byte {
+	bytes := addr.As16()
+	return bytes[6:8]
+}
+
+// AddrGeneralPrefixSection get the general prefix section for IP
+func AddrGeneralPrefixSection(addr netip.Addr) []byte {
+	bytes := addr.As16()
+	return bytes[:8]
+}
+
+// AddrRoutingPrefixSecion get routing prefix section for IP
+func AddrRoutingPrefixSecion(addr netip.Addr) []byte {
+	bytes := addr.As16()
+	return bytes[:6]
+}
+
+// AddrInterfaceSection get interface section for IP
+func AddrInterfaceSection(addr netip.Addr) []byte {
+	bytes := addr.As16()
+	return bytes[8:]
+}
+
 // Bytes2Hex get string with two byte sets delimited by colon
 func Bytes2Hex(bytes []byte) string {
 	var sb strings.Builder

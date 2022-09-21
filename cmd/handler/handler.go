@@ -383,9 +383,10 @@ func subnetIP6Describe(s *ipv6subnet.Subnet) {
 			{Align: simpletable.AlignCenter, Text: "Value"},
 		},
 	}
-	table.Body.Cells = append(table.Body.Cells, row("Subnet IP", s.Addr().String()))
-	table.Body.Cells = append(table.Body.Cells, row("Subnet", s.Prefix().Masked()))
+
 	table.Body.Cells = append(table.Body.Cells, row("IP Type", ip6util.AddressType(s.Addr())))
+	table.Body.Cells = append(table.Body.Cells, row("IP", s.Addr().String()))
+	table.Body.Cells = append(table.Body.Cells, row("Prefix", s.Prefix().Masked()))
 	table.Body.Cells = append(table.Body.Cells, row("General Prefix", fmt.Sprintf("%s", s.GeneralPrefixString())))
 	table.Body.Cells = append(table.Body.Cells, row("Routing Prefix", fmt.Sprintf("%s", s.RoutingPrefixString())))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet", fmt.Sprintf("%s", s.SubnetString())))

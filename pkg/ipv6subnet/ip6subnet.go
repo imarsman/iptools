@@ -56,7 +56,7 @@ func (s *Subnet) First() netip.Addr {
 	return addr
 }
 
-// First get firt IP from subnet
+// Last get last IP for subnet
 func (s *Subnet) Last() netip.Addr {
 	addr := s.prefix.Addr()
 	bytes := addr.As16()
@@ -99,35 +99,32 @@ func (s *Subnet) Last() netip.Addr {
 // 	}
 // }
 
-// SubnetString get the string representation in hex of the subnet bits
+// SubnetString get the string subnet section as a hex string
 func (s *Subnet) SubnetString() string {
-	bytes := s.Addr().Next().AsSlice()
-	return util.Bytes2Hex(bytes[6:8])
+	return util.Bytes2Hex(util.AddrSubnetSection(s.Addr()))
 }
 
+// GeneralPrefixString get the general prefix as a hex string
 func (s *Subnet) GeneralPrefixString() string {
-	bytes := s.Addr().Next().AsSlice()
-	return util.Bytes2Hex(bytes[:6])
+	return util.Bytes2Hex(util.AddrGeneralPrefixSection(s.Addr()))
 }
 
+// RoutingPrefixString get the routing prefix as a hex string
 func (s *Subnet) RoutingPrefixString() string {
-	bytes := s.Addr().Next().AsSlice()
-	return util.Bytes2Hex(bytes[:8])
+	return util.Bytes2Hex(util.AddrRoutingPrefixSecion(s.Addr()))
 }
 
 // InterfaceString get the string representation in hex of the interface bits
 func (s *Subnet) InterfaceString() string {
-	start := s.prefix.Bits() / 8
-	bytes := s.Addr().AsSlice()
-	return util.Bytes2Hex(bytes[start:])
+	return util.Bytes2Hex(util.AddrInterfaceSection(s.Addr()))
 }
 
 // PrefixString get the string representation in hex of the address prefix
-func (s *Subnet) PrefixString() string {
-	end := s.prefix.Bits() / 8
-	bytes := s.Addr().AsSlice()
-	return util.Bytes2Hex(bytes[:end])
-}
+// func (s *Subnet) PrefixString() string {
+// 	end := s.prefix.Bits() / 8
+// 	bytes := s.Addr().AsSlice()
+// 	return util.Bytes2Hex(bytes[:end])
+// }
 
 // String get string representing subnet of the subnet prefix
 func (s *Subnet) String() string {
