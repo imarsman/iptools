@@ -183,8 +183,7 @@ $ iptools subnetip6 global-unicast-describe -bits 64 -random
  IP Type                Global unicast
  IP                     2001:db8:cafe:caaf:21a0:1fff:fe9f:cae3
  Prefix                 2001:db8:cafe:caaf::/64
- General Prefix         2001:0db8:cafe:caaf
- Routing Prefix         2001:0db8:cafe
+ Routing Prefix         2001:0db8:cafe::/48
  Subnet                 caaf
  Subnet first address   2001:0db8:cafe:caaf:0000:0000:0000:0000
  Subnet last address    2001:0db8:cafe:caaf:ffff:ffff:ffff:ffff
@@ -199,8 +198,7 @@ $ iptools subnetip6 global-unicast-describe -bits 64 -random
  IP Type                Link local unicast
  IP                     fe80::162c:d0ff:fe4b:95d6
  Prefix                 fe80::/64
- General Prefix         fe80:0000:0000:0000
- Routing Prefix         fe80:0000:0000
+ Routing Prefix         fe80:0000:0000::/48
  Subnet                 0000
  Subnet first address   fe80:0000:0000:0000:0000:0000:0000:0000
  Subnet last address    fe80:0000:0000:0000:ffff:ffff:ffff:ffff
