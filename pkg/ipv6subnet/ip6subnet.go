@@ -74,57 +74,25 @@ func (s *Subnet) Last() netip.Addr {
 	return addr
 }
 
-// // AddressType the type of address for the subnet
-// // https://www.networkacademy.io/ccna/ipv6/ipv6-address-types
-// func (s *Subnet) AddressType() string {
-// 	switch {
-// 	case s.Addr().IsGlobalUnicast(): // 2001
-// 		return "Global unicast"
-// 	case s.Addr().IsInterfaceLocalMulticast(): // fe80::/10
-// 		return "Interface local multicast"
-// 	case s.Addr().IsLinkLocalMulticast(): // ff00::/8 ff02
-// 		return "Link local muticast"
-// 	case s.Addr().IsLinkLocalUnicast(): // fe80::/10
-// 		return "Link local unicast"
-// 	case s.Addr().IsLoopback(): // ::1/128
-// 		return "Loopback"
-// 	case s.Addr().IsMulticast(): // ff00::/8
-// 		return "Multicast"
-// 	case s.Addr().IsPrivate(): // fc00::/7
-// 		return "Private"
-// 	case s.Addr().IsUnspecified():
-// 		return "Unspecified"
-// 	default:
-// 		return "Unknown"
-// 	}
-// }
-
 // SubnetString get the string subnet section as a hex string
 func (s *Subnet) SubnetString() string {
 	return util.Bytes2Hex(util.AddrSubnetSection(s.Addr()))
 }
 
 // GeneralPrefixString get the general prefix as a hex string
-func (s *Subnet) GeneralPrefixString() string {
-	return util.Bytes2Hex(util.AddrGeneralPrefixSection(s.Addr()))
-}
+// func (s *Subnet) GeneralPrefixString() string {
+// 	return util.Bytes2Hex(util.AddrGeneralPrefixSection(s.Addr()))
+// }
 
 // RoutingPrefixString get the routing prefix as a hex string
 func (s *Subnet) RoutingPrefixString() string {
-	return util.Bytes2Hex(util.AddrRoutingPrefixSecion(s.Addr()))
+	return fmt.Sprintf("%s::/%d", util.Bytes2Hex(util.AddrRoutingPrefixSecion(s.Addr())), 48)
 }
 
 // InterfaceString get the string representation in hex of the interface bits
 func (s *Subnet) InterfaceString() string {
 	return util.Bytes2Hex(util.AddrInterfaceSection(s.Addr()))
 }
-
-// PrefixString get the string representation in hex of the address prefix
-// func (s *Subnet) PrefixString() string {
-// 	end := s.prefix.Bits() / 8
-// 	bytes := s.Addr().AsSlice()
-// 	return util.Bytes2Hex(bytes[:end])
-// }
 
 // String get string representing subnet of the subnet prefix
 func (s *Subnet) String() string {

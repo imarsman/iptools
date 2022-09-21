@@ -25,7 +25,6 @@ func TestNewSubnet(t *testing.T) {
 
 	t.Log("subnet", s.SubnetString())
 	t.Log("interface", s.InterfaceString())
-	t.Log("prefix", s.GeneralPrefixString())
 	t.Log("is global unicast", s.Addr().IsGlobalUnicast())
 	t.Log("Address type", util.AddressType(s.Addr()))
 }
