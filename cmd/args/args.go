@@ -78,7 +78,7 @@ type IP6SubnetDescribe struct {
 	IP     string `arg:"-i,--ip" help:"IP address"`
 	Random bool   `arg:"-r,--random" help:"generate random IP"`
 	Bits   int    `arg:"-b,--bits" help:"subnet bits"`
-	Type   string `arg:"-t,--type"`
+	Type   string `arg:"-t,--type,required"`
 }
 
 // IP6Subnet IP6 calls
