@@ -73,17 +73,18 @@ type IP6SubnetGlobalUnicastDescribe struct {
 	Bits   int    `arg:"-b,--bits" help:"subnet bits"`
 }
 
-// IP6SubnetLinkLocalDescribe for calls to describe a subnet
-type IP6SubnetLinkLocalDescribe struct {
+// IP6SubnetDescribe for calls to describe a subnet
+type IP6SubnetDescribe struct {
 	IP     string `arg:"-i,--ip" help:"IP address"`
 	Random bool   `arg:"-r,--random" help:"generate random IP"`
 	Bits   int    `arg:"-b,--bits" help:"subnet bits"`
+	Type   string `arg:"-t,--type"`
 }
 
 // IP6Subnet IP6 calls
 type IP6Subnet struct {
-	IP6SubnetGlobalUnicastDescribe *IP6SubnetGlobalUnicastDescribe `arg:"subcommand:global-unicast-describe"`
-	IP6SubnetLinkLocalDescribe     *IP6SubnetLinkLocalDescribe     `arg:"subcommand:link-local-describe"`
+	// IP6SubnetGlobalUnicastDescribe *IP6SubnetGlobalUnicastDescribe `arg:"subcommand:global-unicast-describe"`
+	IP6SubnetDescribe *IP6SubnetDescribe `arg:"subcommand:describe"`
 }
 
 // IP4Subnet top level IP4 subnet arg

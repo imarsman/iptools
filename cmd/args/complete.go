@@ -8,6 +8,12 @@ import (
 // IPs list of subnet IPs to make life easier
 var IPs = []string{"99.236.32.0", "10.32.0.0", "192.168.1.1"}
 
+// IP6Types IP6 address types
+var IP6Types = []string{
+	"global-unicast",
+	"link-local",
+}
+
 // Define command structure to enable completion
 var cmd = &complete.Command{
 	Sub: map[string]*complete.Command{
@@ -41,19 +47,13 @@ var cmd = &complete.Command{
 		},
 		"subnetip6": {
 			Sub: map[string]*complete.Command{
-				// Scheduler health for an environment
-				"global-unicast-describe": {
+				// Describe an IP
+				"describe": {
 					Flags: map[string]complete.Predictor{
 						"ip":     predict.Nothing,
 						"bits":   predict.Nothing,
 						"random": predict.Nothing,
-					},
-				},
-				"link-local-describe": {
-					Flags: map[string]complete.Predictor{
-						"ip":     predict.Nothing,
-						"bits":   predict.Nothing,
-						"random": predict.Nothing,
+						"type":   predict.Set(IP6Types),
 					},
 				},
 			},

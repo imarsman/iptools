@@ -318,8 +318,8 @@ func IP4SubnetDivide(ip string, bits int, secondaryBits int) {
 	}
 }
 
-// IP6DescribeGlobalUnicast describe a global unicast address
-func IP6DescribeGlobalUnicast(ip string, bits int, random bool) {
+// IP6SubnetDescribe describe a link-local address
+func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 	var addr netip.Addr
 	if !random {
 		var err error
@@ -330,9 +330,20 @@ func IP6DescribeGlobalUnicast(ip string, bits int, random bool) {
 		}
 	} else {
 		var err error
-		addr, err = ip6util.RandomAddrGlobalUnicast()
-		if err != nil {
-			fmt.Println(err)
+		if ip6Type == "global-unicast" {
+			addr, err = ip6util.RandomAddrLinkLocal()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		} else if ip6Type == "link-local" {
+			addr, err = ip6util.RandomAddrLinkLocal()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		} else {
+			fmt.Println("No valid type specified")
 			os.Exit(1)
 		}
 	}
@@ -342,38 +353,11 @@ func IP6DescribeGlobalUnicast(ip string, bits int, random bool) {
 		os.Exit(1)
 	}
 
-	subnetIP6Describe(s)
+	ip6SubnetDescribe(s)
 }
 
-// IP6DescribeLinkLocal describe a link-local address
-func IP6DescribeLinkLocal(ip string, bits int, random bool) {
-	var addr netip.Addr
-	if !random {
-		var err error
-		addr, err = netip.ParseAddr(ip)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-	} else {
-		var err error
-		addr, err = ip6util.RandomAddrLinkLocal()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-	}
-	s, err := ipv6subnet.NewFromIPAndBits(addr.StringExpanded(), bits)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	subnetIP6Describe(s)
-}
-
-// subnetIP6Describe describe a link local IP
-func subnetIP6Describe(s *ipv6subnet.Subnet) {
+// ip6SubnetDescribe describe a link local IP
+func ip6SubnetDescribe(s *ipv6subnet.Subnet) {
 	table := simpletable.New()
 	table.SetStyle(simpletable.StyleCompactLite)
 
