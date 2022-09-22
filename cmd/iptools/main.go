@@ -36,12 +36,18 @@ func main() {
 		}
 	}
 	if args.CLIArgs.IP6Subnet != nil {
-		if args.CLIArgs.IP6Subnet != nil {
+		if args.CLIArgs.IP6Subnet.IP6SubnetDescribe != nil {
 			handler.IP6SubnetDescribe(
 				args.CLIArgs.IP6Subnet.IP6SubnetDescribe.IP,
 				args.CLIArgs.IP6Subnet.IP6SubnetDescribe.Bits,
 				args.CLIArgs.IP6Subnet.IP6SubnetDescribe.Random,
 				args.CLIArgs.IP6Subnet.IP6SubnetDescribe.Type,
+			)
+		}
+		if args.CLIArgs.IP6Subnet.IP6RandomIPs != nil {
+			handler.IP6RandomIPs(
+				args.CLIArgs.IP6Subnet.IP6RandomIPs.Type,
+				args.CLIArgs.IP6Subnet.IP6RandomIPs.Number,
 			)
 		}
 	}

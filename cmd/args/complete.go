@@ -60,6 +60,12 @@ var cmd = &complete.Command{
 						"type":   predict.Set(IP6Types),
 					},
 				},
+				"random-ips": {
+					Flags: map[string]complete.Predictor{
+						"number": predict.Nothing,
+						"type":   predict.Set(IP6Types),
+					},
+				},
 			},
 		},
 	},

@@ -402,3 +402,47 @@ func ip6SubnetDisplay(s *ipv6subnet.Subnet) {
 
 	fmt.Println(table.String())
 }
+
+// IP6RandomIPs produce list of random IPs
+func IP6RandomIPs(ip6Type string, number int) {
+	if number == 0 {
+		number = 10
+	}
+	if number > 100 {
+		number = 100
+	}
+	var addr netip.Addr
+	var err error
+	if ip6Type == typeGlobalUnicast {
+		for i := 0; i < number; i++ {
+			addr, err = ip6util.RandomAddrGlobalUnicast()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			fmt.Println(addr.StringExpanded())
+		}
+	} else if ip6Type == typeLinkLocal {
+		for i := 0; i < number; i++ {
+			addr, err = ip6util.RandomAddrLinkLocal()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			fmt.Println(addr.StringExpanded())
+		}
+	} else if ip6Type == typeUniqueLocal {
+		for i := 0; i < number; i++ {
+			addr, err = ip6util.RandomAddrUniqueLocal()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			fmt.Println(addr.StringExpanded())
+		}
+	} else {
+		fmt.Println("No valid type specified")
+		os.Exit(1)
+	}
+
+}

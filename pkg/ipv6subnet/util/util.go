@@ -134,7 +134,7 @@ func bytes2MacAddrBytes(mac [6]byte) ([]byte, error) {
 
 // makeMacAddress make a random mac address of a 6 byte array
 func makeMacAddress() (buf [6]byte, err error) {
-	rand.Seed(time.Now().Unix())
+	rand.Seed(time.Now().UnixNano())
 	buf = [6]byte{}
 	_, err = rand.Read(buf[:])
 	if err != nil {
@@ -147,7 +147,7 @@ func makeMacAddress() (buf [6]byte, err error) {
 
 // RandomSubnet get a random subnet for IPV6
 func RandomSubnet() uint16 {
-	rand.Seed(time.Now().Unix())
+	rand.Seed(time.Now().UnixNano())
 
 	max := 65_536
 
@@ -166,7 +166,7 @@ func mac2GlobalUnicast(s string) (netip.Addr, error) {
 	// Invert the bit at the index 6 (counting from 0)
 	mac[0] ^= (1 << (2 - 1))
 
-	rand.Seed(time.Now().Unix())
+	rand.Seed(time.Now().UnixNano())
 
 	// global unicast must start with 2000 to 3fff
 	// The first 8 bytes define the range
