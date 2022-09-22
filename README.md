@@ -176,30 +176,34 @@ $ iptools subnetip4 describe -ip 10.32.0.0 -bits 16 -secondary-bits 18
 ### IPV6 Global unicast address
 
 ```
-$ iptools subnetip6 global-unicast-describe -bits 64 -random
-
-       Category                          Value
----------------------- -----------------------------------------
+$ iptools subnetip6 describe -bits 64 -type global-unicast -random
+       Category                                          Value
+---------------------- --------------------------------------------------------------------------
  IP Type                Global unicast
- IP                     2001:db8:cafe:caaf:21a0:1fff:fe9f:cae3
- Prefix                 2001:db8:cafe:caaf::/64
+ IP                     2001:db8:cafe:19b7:ba3a:40ff:fe77:1928
+ Interface ID           ba3a:40ff:fe77:1928
+ Prefix                 2001:db8:cafe:19b7::/64
  Routing Prefix         2001:0db8:cafe::/48
- Subnet                 caaf
- Subnet first address   2001:0db8:cafe:caaf:0000:0000:0000:0000
- Subnet last address    2001:0db8:cafe:caaf:ffff:ffff:ffff:ffff
+ Default Gateway        2001:0db8:cafe::1
+ Subnet                 19b7
+ ip6.arpa               8.2.9.1.7.7.e.f.f.f.0.4.a.3.a.b.7.b.9.1.e.f.a.c.8.b.d.0.1.0.0.2.ip6.arpa
+ Subnet first address   2001:0db8:cafe:19b7:0000:0000:0000:0000
+ Subnet last address    2001:0db8:cafe:19b7:ffff:ffff:ffff:ffff
 ```
 
 ### IPV6 Link local address
 ```
- $ iptools subnetip6 link-local-describe -bits 64 -random
-
-       Category                          Value
----------------------- -----------------------------------------
+$ iptools subnetip6 describe -bits 64 -type link-local -random
+       Category                                          Value
+---------------------- --------------------------------------------------------------------------
  IP Type                Link local unicast
- IP                     fe80::162c:d0ff:fe4b:95d6
+ IP                     fe80::750f:b0ff:feac:de48
+ Interface ID           750f:b0ff:feac:de48
  Prefix                 fe80::/64
  Routing Prefix         fe80:0000:0000::/48
+ Default Gateway        fe80:0000:0000::1
  Subnet                 0000
+ ip6.arpa               8.4.e.d.c.a.e.f.f.f.0.b.f.0.5.7.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa
  Subnet first address   fe80:0000:0000:0000:0000:0000:0000:0000
  Subnet last address    fe80:0000:0000:0000:ffff:ffff:ffff:ffff
 ```
@@ -273,9 +277,9 @@ $ gocloc pkg cmd README.md
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Go                              12            319            332           1519
-Markdown                         1             48              0            235
+Go                              12            324            308           1528
+Markdown                         1             46              0            239
 -------------------------------------------------------------------------------
-TOTAL                           13            367            332           1754
+TOTAL                           13            370            308           1767
 -------------------------------------------------------------------------------
 ```
