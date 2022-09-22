@@ -331,7 +331,7 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 	} else {
 		var err error
 		if ip6Type == "global-unicast" {
-			addr, err = ip6util.RandomAddrLinkLocal()
+			addr, err = ip6util.RandomAddrGlobalUnicast()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -353,11 +353,11 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 		os.Exit(1)
 	}
 
-	ip6SubnetDescribe(s)
+	ip6SubnetDisplay(s)
 }
 
-// ip6SubnetDescribe describe a link local IP
-func ip6SubnetDescribe(s *ipv6subnet.Subnet) {
+// ip6SubnetDisplay describe a link local IP
+func ip6SubnetDisplay(s *ipv6subnet.Subnet) {
 	table := simpletable.New()
 	table.SetStyle(simpletable.StyleCompactLite)
 
