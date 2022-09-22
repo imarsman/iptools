@@ -252,22 +252,24 @@ Commands:
   divide                 divide a subnet into smaller subnets
   describe               describe a subnet
 
-$ iptools subnetip6 -h                                                                                                                 255 ↵
+$ iptools subnetip6 describe -h
 iptools
 -------
-Commit:  b3fd0d9
-Date:    2022-09-21T00:55:35Z
+Commit:  4ef1383
+Date:    2022-09-22T00:23:25Z
 Tag:     v0.1.21
 OS:      darwin
 ARCH:    arm64
 
-Usage: iptools subnetip6 <command> [<args>]
+Usage: iptools subnetip6 describe [--ip IP] [--random] [--bits BITS] --type TYPE
+
+Options:
+  --ip IP, -i IP         IP address
+  --random, -r           generate random IP
+  --bits BITS, -b BITS   subnet bits
+  --type TYPE, -t TYPE
   --help, -h             display this help and exit
   --version              display version and exit
-
-Commands:
-  global-unicast-describe
-  link-local-describe
 ```
 
 ### Lines of code
