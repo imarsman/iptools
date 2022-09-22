@@ -168,9 +168,16 @@ func mac2GlobalUnicast(s string) (netip.Addr, error) {
 
 	rand.Seed(time.Now().Unix())
 
+	// global unicast must start with 2000 to 3fff
+	// The first 8 bytes define the range
+	// min: 32 = hex 20
+	// max: 63 = hex 3f
+	inRange := rand.Intn(63-32) + 32
+
 	// db8:cafe
 	ip := []byte{
-		0x20, 0x01, 0xd, 0xb8, 0xca, 0xfe, byte(rand.Intn(256)), byte(rand.Intn(256)), // prepend with 2001::
+		// 0x20, 0x01, 0xd, 0xb8, 0xca, 0xfe, byte(rand.Intn(256)), byte(rand.Intn(256)), // prepend with 2001::
+		byte(inRange), 0x01, 0xd, 0xb8, 0xca, 0xfe, byte(rand.Intn(256)), byte(rand.Intn(256)),
 		mac[0], mac[1], mac[2], 0xff, 0xfe, mac[3], mac[4], mac[5], // insert ff:fe in the middle
 	}
 	var addrBytes [16]byte
@@ -191,7 +198,6 @@ func mac2UniqueLocal(s string) (netip.Addr, error) {
 
 	rand.Seed(time.Now().Unix())
 
-	// db8:cafe
 	ip := []byte{
 		0xfd, 0x0, byte(rand.Intn(256)), byte(rand.Intn(256)), byte(rand.Intn(256)), byte(rand.Intn(256)), byte(rand.Intn(256)), byte(rand.Intn(256)), // prepend with fd00::
 		mac[0], mac[1], mac[2], 0xff, 0xfe, mac[3], mac[4], mac[5], // insert ff:fe in the middle
@@ -212,6 +218,7 @@ func mac2LinkLocal(s string) (netip.Addr, error) {
 	// Invert the bit at the index 6 (counting from 0)
 	mac[0] ^= (1 << (2 - 1))
 
+	// link local can be fc00::/7 to fdff::/7
 	ip := []byte{
 		0xfe, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, // prepend with fe80::
 		mac[0], mac[1], mac[2], 0xff, 0xfe, mac[3], mac[4], mac[5], // insert ff:fe in the middle
@@ -221,6 +228,8 @@ func mac2LinkLocal(s string) (netip.Addr, error) {
 
 	return netip.AddrFrom16(addrBytes), nil
 }
+
+// https://en.wikipedia.org/wiki/IPv6_address
 
 // RandomAddrGlobalUnicast get a global unicast random IPV6 address
 func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {

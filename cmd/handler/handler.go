@@ -325,6 +325,13 @@ const typeUniqueLocal = "unique-local"
 
 // IP6SubnetDescribe describe a link-local address
 func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
+	if ip6Type == "" && ip == "" {
+		fmt.Println("If no IP then type must be supplied")
+		os.Exit(1)
+	} else if ip == "" && !random {
+		fmt.Println("No type supplied and -random is false")
+		os.Exit(1)
+	}
 	var addr netip.Addr
 	if !random {
 		var err error
