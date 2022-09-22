@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/netip"
 	"os"
+	"strings"
 
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
@@ -318,6 +319,10 @@ func IP4SubnetDivide(ip string, bits int, secondaryBits int) {
 	}
 }
 
+const typeGlobalUnicast = "global-unicast"
+const typeLinkLocal = "link-local"
+const typeUniqueLocal = "unique-local"
+
 // IP6SubnetDescribe describe a link-local address
 func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 	var addr netip.Addr
@@ -330,14 +335,20 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 		}
 	} else {
 		var err error
-		if ip6Type == "global-unicast" {
+		if ip6Type == typeGlobalUnicast {
 			addr, err = ip6util.RandomAddrGlobalUnicast()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
-		} else if ip6Type == "link-local" {
+		} else if ip6Type == typeLinkLocal {
 			addr, err = ip6util.RandomAddrLinkLocal()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		} else if ip6Type == typeUniqueLocal {
+			addr, err = ip6util.RandomAddrUniqueLocal()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -370,65 +381,17 @@ func ip6SubnetDisplay(s *ipv6subnet.Subnet) {
 
 	table.Body.Cells = append(table.Body.Cells, row("IP Type", ip6util.AddressType(s.Addr())))
 	table.Body.Cells = append(table.Body.Cells, row("IP", s.Addr().String()))
-	table.Body.Cells = append(table.Body.Cells, row("Interface ID", fmt.Sprintf("%s", s.InterfaceString())))
 	table.Body.Cells = append(table.Body.Cells, row("Prefix", s.Prefix().Masked()))
 	table.Body.Cells = append(table.Body.Cells, row("Routing Prefix", fmt.Sprintf("%s", s.RoutingPrefixString())))
-	table.Body.Cells = append(table.Body.Cells, row("Default Gateway", s.DefaultGatewayString()))
-	// table.Body.Cells = append(table.Body.Cells, row("Specific Prefix", fmt.Sprintf("%s", s.SpecificPrefixString())))
+	table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", s.GlobalIDString())))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet", fmt.Sprintf("%s", s.SubnetString())))
+	table.Body.Cells = append(table.Body.Cells, row("Interface ID", fmt.Sprintf("%s", s.InterfaceString())))
+	if !strings.HasPrefix(s.Addr().StringExpanded(), "fd") {
+		table.Body.Cells = append(table.Body.Cells, row("Default Gateway", s.DefaultGatewayString()))
+	}
 	table.Body.Cells = append(table.Body.Cells, row("ip6.arpa", fmt.Sprintf("%s", ip6util.IP6Arpa(s.Addr()))))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet first address", s.First().StringExpanded()))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet last address", s.Last().StringExpanded()))
 
 	fmt.Println(table.String())
 }
-
-// // SubnetIP6GlobalUnicastDescribe describe an IP6 Global unicast subnet
-// func SubnetIP6GlobalUnicastDescribe(ip string, bits int, random bool) {
-// 	var s *ipv6subnet.Subnet
-
-// 	if random {
-// 		addr, err := ip6util.RandomAddrGlobalUnicast()
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			os.Exit(1)
-// 		}
-// 		s, err = ipv6subnet.NewFromIPAndBits(addr.StringExpanded(), bits)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			os.Exit(1)
-// 		}
-// 	} else {
-// 		if ip == "" {
-// 			fmt.Println("No ip and no -random argument")
-// 			os.Exit(1)
-// 		}
-// 		addr, err := netip.ParseAddr(ip)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			os.Exit(1)
-// 		}
-// 		s, err = ipv6subnet.NewFromIPAndBits(addr.StringExpanded(), bits)
-// 		if err != nil {
-// 			fmt.Println(err)
-// 			os.Exit(1)
-// 		}
-// 	}
-// 	table := simpletable.New()
-// 	table.SetStyle(simpletable.StyleCompactLite)
-
-// 	table.Header = &simpletable.Header{
-// 		Cells: []*simpletable.Cell{
-// 			{Align: simpletable.AlignCenter, Text: "Category"},
-// 			{Align: simpletable.AlignCenter, Text: "Value"},
-// 		},
-// 	}
-// 	table.Body.Cells = append(table.Body.Cells, row("Subnet IP", s.Addr().String()))
-// 	table.Body.Cells = append(table.Body.Cells, row("Subnet", s.Prefix().Masked()))
-// 	table.Body.Cells = append(table.Body.Cells, row("IP Type", ip6util.AddressType(s.Addr())))
-// 	table.Body.Cells = append(table.Body.Cells, row("Subnet", fmt.Sprintf("%s", s.SubnetString())))
-// 	table.Body.Cells = append(table.Body.Cells, row("Subnet first address", s.First().StringExpanded()))
-// 	table.Body.Cells = append(table.Body.Cells, row("Subnet last address", s.Last().StringExpanded()))
-
-// 	fmt.Println(table.String())
-// }

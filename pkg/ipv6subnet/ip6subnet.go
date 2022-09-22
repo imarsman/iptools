@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/netip"
+	"strings"
 
 	"github.com/imarsman/iptools/pkg/ipv6subnet/util"
 	"gopkg.in/yaml.v2"
@@ -74,6 +75,11 @@ func (s *Subnet) Last() netip.Addr {
 	return addr
 }
 
+// GlobalIDString get the string global ID a hex string
+func (s *Subnet) GlobalIDString() string {
+	return util.Bytes2Hex(util.AddrGlobalID(s.Addr()))
+}
+
 // SubnetString get the string subnet section as a hex string
 func (s *Subnet) SubnetString() string {
 	return util.Bytes2Hex(util.AddrSubnetSection(s.Addr()))
@@ -86,6 +92,9 @@ func (s *Subnet) DefaultGatewayString() string {
 
 // RoutingPrefixString get the routing prefix as a hex string
 func (s *Subnet) RoutingPrefixString() string {
+	if strings.HasPrefix(s.Addr().StringExpanded(), "fd00") {
+		return fmt.Sprintf("%s::/%d", "fd00", 48)
+	}
 	return fmt.Sprintf("%s::/%d", util.Bytes2Hex(util.AddrRoutingPrefixSecion(s.Addr())), 48)
 }
 
