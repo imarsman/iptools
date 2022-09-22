@@ -255,19 +255,19 @@ Commands:
 $ iptools subnetip6 describe -h
 iptools
 -------
-Commit:  4ef1383
-Date:    2022-09-22T00:23:25Z
+Commit:  954eb63
+Date:    2022-09-22T03:02:28Z
 Tag:     v0.1.21
 OS:      darwin
 ARCH:    arm64
 
-Usage: iptools subnetip6 describe [--ip IP] [--random] [--bits BITS] --type TYPE
+Usage: iptools subnetip6 describe [--ip IP] [--random] [--bits BITS] [--type TYPE]
 
 Options:
   --ip IP, -i IP         IP address
   --random, -r           generate random IP
   --bits BITS, -b BITS   subnet bits
-  --type TYPE, -t TYPE
+  --type TYPE, -t TYPE   global-unicast, link-local, unique-local
   --help, -h             display this help and exit
   --version              display version and exit
 ```
