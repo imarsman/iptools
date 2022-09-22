@@ -170,13 +170,12 @@ func mac2GlobalUnicast(s string) (netip.Addr, error) {
 
 	// global unicast must start with 2000 to 3fff
 	// The first 8 bytes define the range
-	// min: 32 = hex 20
-	// max: 63 = hex 3f
+	// min: 32 = hex 20 = 0010000000000000 = 2000
+	// max: 63 = hex 3f = 0011111111111111 = 3FFF
 	inRange := rand.Intn(63-32) + 32
 
 	// db8:cafe
 	ip := []byte{
-		// 0x20, 0x01, 0xd, 0xb8, 0xca, 0xfe, byte(rand.Intn(256)), byte(rand.Intn(256)), // prepend with 2001::
 		byte(inRange), 0x01, 0xd, 0xb8, 0xca, 0xfe, byte(rand.Intn(256)), byte(rand.Intn(256)),
 		mac[0], mac[1], mac[2], 0xff, 0xfe, mac[3], mac[4], mac[5], // insert ff:fe in the middle
 	}
