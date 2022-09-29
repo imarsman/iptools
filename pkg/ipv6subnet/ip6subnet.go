@@ -90,11 +90,12 @@ func (s *Subnet) DefaultGatewayString() string {
 	return fmt.Sprintf("%s::%d", util.Bytes2Hex(util.AddrDefaultGateway(s.Addr())), 1)
 }
 
-// Type prefix make a prefix for a type
+// TypePrefix prefix make a prefix for a type
 func (s *Subnet) TypePrefix() (prefix netip.Prefix) {
 	kind := util.AddressType(s.Addr())
 	var err error
 	switch kind {
+	// unique local ipv6 address prefix
 	case util.UniqueLocal:
 		prefix, err = netip.ParsePrefix("fd00::/8")
 		if err != nil {
