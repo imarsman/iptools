@@ -14,6 +14,7 @@ import (
 	"github.com/imarsman/iptools/pkg/ipv4subnet"
 	ip4util "github.com/imarsman/iptools/pkg/ipv4subnet/util"
 	"github.com/imarsman/iptools/pkg/ipv6subnet"
+	"github.com/imarsman/iptools/pkg/ipv6subnet/util"
 	ip6util "github.com/imarsman/iptools/pkg/ipv6subnet/util"
 )
 
@@ -400,6 +401,9 @@ func ip6SubnetDisplay(s *ipv6subnet.Subnet) {
 	table.Body.Cells = append(table.Body.Cells, row("ip6.arpa", fmt.Sprintf("%s", ip6util.IP6Arpa(s.Addr()))))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet first address", s.First().StringExpanded()))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet last address", s.Last().StringExpanded()))
+	part := strings.Split(util.AddrToBitString(s.Addr()), ".")[0]
+	part = fmt.Sprintf("%s%s", strings.Repeat("0", 16-len(part)), part)
+	table.Body.Cells = append(table.Body.Cells, row("first address field binary", part))
 
 	fmt.Println(table.String())
 }

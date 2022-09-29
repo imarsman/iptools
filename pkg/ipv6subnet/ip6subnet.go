@@ -131,6 +131,7 @@ func (s *Subnet) TypePrefix() (prefix netip.Prefix) {
 		if err != nil {
 			prefix = netip.Prefix{}
 		}
+		// i.e. unique local
 	case util.Private:
 		prefix, err = netip.ParsePrefix("fc00::/7")
 		if err != nil {

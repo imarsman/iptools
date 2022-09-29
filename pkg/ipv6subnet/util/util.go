@@ -236,6 +236,7 @@ func mac2UniqueLocal(s string) (netip.Addr, error) {
 
 	rand.Seed(time.Now().Unix())
 
+	// fc00::/8 is currently not defined
 	ip := []byte{
 		0xfd, 0x0, byte(rand.Intn(256)), byte(rand.Intn(256)), byte(rand.Intn(256)), byte(rand.Intn(256)), byte(rand.Intn(256)), byte(rand.Intn(256)), // prepend with fd00::
 		mac[0], mac[1], mac[2], 0xff, 0xfe, mac[3], mac[4], mac[5], // insert ff:fe in the middle
