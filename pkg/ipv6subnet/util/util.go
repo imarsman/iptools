@@ -10,6 +10,19 @@ import (
 	"time"
 )
 
+const (
+	GlobalUnicast = iota
+	UniqueLocal
+	InterfaceLocalMulticast
+	LinkLocalMulticast
+	LinkLocalUnicast
+	Loopback
+	Multicast
+	Private
+	Unspecified
+	Unknown
+)
+
 // AddrGlobalID get IP global ID
 func AddrGlobalID(addr netip.Addr) []byte {
 	bytes := addr.As16()
@@ -92,27 +105,53 @@ func Bytes2Hex(bytes []byte) string {
 	return sb.String()
 }
 
-// AddressType the type of address for the subnet
-// https://www.networkacademy.io/ccna/ipv6/ipv6-address-types
-func AddressType(addr netip.Addr) string {
+func AddressType(addr netip.Addr) int {
 	switch {
 	case strings.HasPrefix(addr.StringExpanded(), "fd00"):
-		return "Unique local"
+		return UniqueLocal
 	case addr.IsGlobalUnicast(): // 2001
-		return "Global unicast"
+		return GlobalUnicast
 	case addr.IsInterfaceLocalMulticast(): // fe80::/10
-		return "Interface local multicast"
+		return InterfaceLocalMulticast
 	case addr.IsLinkLocalMulticast(): // ff00::/8 ff02
-		return "Link local muticast"
+		return LinkLocalMulticast
 	case addr.IsLinkLocalUnicast(): // fe80::/10
-		return "Link local unicast"
+		return LinkLocalUnicast
 	case addr.IsLoopback(): // ::1/128
-		return "Loopback"
+		return Loopback
 	case addr.IsMulticast(): // ff00::/8
-		return "Multicast"
+		return Multicast
 	case addr.IsPrivate(): // fc00::/7
-		return "Private"
+		return Private
 	case addr.IsUnspecified():
+		return Unspecified
+	default:
+		return Unknown
+	}
+
+}
+
+// AddressTypeName the type of address for the subnet
+// https://www.networkacademy.io/ccna/ipv6/ipv6-address-types
+func AddressTypeName(addr netip.Addr) string {
+	switch AddressType(addr) {
+	case UniqueLocal:
+		return "Unique local"
+	case GlobalUnicast:
+		return "Global unicast"
+	case InterfaceLocalMulticast:
+		return "Interface local multicast"
+	case LinkLocalMulticast:
+		return "Link local muticast"
+	case LinkLocalUnicast:
+		return "Link local unicast"
+	case Loopback:
+		return "Loopback"
+	case Multicast:
+		return "Multicast"
+	case Private:
+		return "Private"
+	case Unspecified:
 		return "Unspecified"
 	default:
 		return "Unknown"

@@ -90,6 +90,60 @@ func (s *Subnet) DefaultGatewayString() string {
 	return fmt.Sprintf("%s::%d", util.Bytes2Hex(util.AddrDefaultGateway(s.Addr())), 1)
 }
 
+// Type prefix make a prefix for a type
+func (s *Subnet) TypePrefix() (prefix netip.Prefix) {
+	kind := util.AddressType(s.Addr())
+	var err error
+	switch kind {
+	case util.UniqueLocal:
+		prefix, err = netip.ParsePrefix("fd00::/8")
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+	case util.GlobalUnicast:
+		prefix, err = netip.ParsePrefix("2000::/3")
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+	case util.InterfaceLocalMulticast:
+		prefix, err = netip.ParsePrefix("FF00::/8")
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+	case util.LinkLocalMulticast:
+		prefix, err = netip.ParsePrefix("ff00::/8")
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+	case util.LinkLocalUnicast:
+		prefix, err = netip.ParsePrefix("fe80::/10")
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+	case util.Loopback:
+		prefix, err = netip.ParsePrefix("::1/128")
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+	case util.Multicast:
+		prefix, err = netip.ParsePrefix("ff00::/8")
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+	case util.Private:
+		prefix, err = netip.ParsePrefix("fc00::/7")
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+	case util.Unspecified:
+		prefix = netip.Prefix{}
+	default:
+		prefix = netip.Prefix{}
+	}
+
+	return
+}
+
 // RoutingPrefixString get the routing prefix as a hex string
 func (s *Subnet) RoutingPrefixString() string {
 	if strings.HasPrefix(s.Addr().StringExpanded(), "fd00") {

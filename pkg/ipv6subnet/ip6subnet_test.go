@@ -26,21 +26,22 @@ func TestNewSubnet(t *testing.T) {
 	t.Log("subnet", s.SubnetString())
 	t.Log("interface", s.InterfaceString())
 	t.Log("is global unicast", s.Addr().IsGlobalUnicast())
-	t.Log("Address type", util.AddressType(s.Addr()))
+	t.Log("Address type", util.AddressTypeName(s.Addr()))
+	t.Log("Address prefix", s.TypePrefix().Masked().String())
 }
 
 func TestRandomGlobalUnicast(t *testing.T) {
 	is := is.New(t)
 	addr, err := util.RandomAddrGlobalUnicast()
 	is.NoErr(err)
-	t.Log(util.AddressType(addr))
+	t.Log(util.AddressTypeName(addr))
 }
 
 func TestRandomLinkLocal(t *testing.T) {
 	is := is.New(t)
 	addr, err := util.RandomAddrLinkLocal()
 	is.NoErr(err)
-	t.Log(util.AddressType(addr))
+	t.Log(util.AddressTypeName(addr))
 }
 
 type parentChild struct {
