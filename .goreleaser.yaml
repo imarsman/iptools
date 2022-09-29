@@ -36,6 +36,9 @@ release:
 
     iptools is a set of IP and network tools
 
+    v0.1.23
+    Handling of type prefixes
+
     v0.1.22
     Added random IPV6 IPs call
 
