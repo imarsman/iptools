@@ -36,6 +36,9 @@ release:
 
     iptools is a set of IP and network tools
 
+    v0.1.24
+    Global ID handling
+
     v0.1.23
     Handling of type prefixes
 
