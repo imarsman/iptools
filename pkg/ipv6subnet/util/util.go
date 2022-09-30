@@ -12,23 +12,27 @@ import (
 )
 
 const (
+	// GlobalUnicast IPV6 type
 	GlobalUnicast = iota
+	// UniqueLocal IPV6 type
 	UniqueLocal
+	// InterfaceLocalMulticast IPV6 type
 	InterfaceLocalMulticast
+	// LinkLocalMulticast IPV6 type
 	LinkLocalMulticast
+	// LinkLocalUnicast IPV6 type
 	LinkLocalUnicast
+	// Loopback IPV6 type
 	Loopback
+	// Multicast IPV6 type
 	Multicast
+	// Private IPV6 type
 	Private
+	// Unspecified IPV6 type
 	Unspecified
+	// Unknown IPV6 type
 	Unknown
 )
-
-// AddrGlobalID get IP global ID
-func AddrGlobalID(addr netip.Addr) []byte {
-	bytes := addr.As16()
-	return bytes[2:6]
-}
 
 // AddrDefaultGateway get IP default gateway for IP
 func AddrDefaultGateway(addr netip.Addr) []byte {
@@ -60,6 +64,7 @@ func AddrInterfaceSection(addr netip.Addr) []byte {
 	return bytes[8:]
 }
 
+// AddrToBitString complete address binary to 16 bit sections
 func AddrToBitString(addr netip.Addr) (result string) {
 	str := addr.StringExpanded()
 
@@ -106,6 +111,7 @@ func Bytes2Hex(bytes []byte) string {
 	return sb.String()
 }
 
+// TypePrefix the prefix for the IP type
 func TypePrefix(addr netip.Addr) (prefix netip.Prefix) {
 	kind := AddressType(addr)
 	var err error
@@ -161,6 +167,7 @@ func TypePrefix(addr netip.Addr) (prefix netip.Prefix) {
 	return
 }
 
+// AddressType get address type as int
 func AddressType(addr netip.Addr) int {
 	switch {
 	case strings.HasPrefix(addr.StringExpanded(), "fd00"):

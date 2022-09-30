@@ -77,7 +77,7 @@ func (s *Subnet) Last() netip.Addr {
 
 // GlobalIDString get the string global ID a hex string
 func (s *Subnet) GlobalIDString() string {
-	return util.Bytes2Hex(util.AddrGlobalID(s.Addr()))
+	return util.Bytes2Hex([]byte(util.GlobalID(s.Addr())))
 }
 
 // SubnetString get the string subnet section as a hex string
@@ -92,56 +92,6 @@ func (s *Subnet) DefaultGatewayString() string {
 
 // TypePrefix prefix make a prefix for a type
 func (s *Subnet) TypePrefix() (prefix netip.Prefix) {
-	// kind := util.AddressType(s.Addr())
-	// var err error
-	// switch kind {
-	// // unique local ipv6 address prefix
-	// case util.UniqueLocal:
-	// 	prefix, err = netip.ParsePrefix("fd00::/8")
-	// 	if err != nil {
-	// 		prefix = netip.Prefix{}
-	// 	}
-	// case util.GlobalUnicast:
-	// 	prefix, err = netip.ParsePrefix("2000::/3")
-	// 	if err != nil {
-	// 		prefix = netip.Prefix{}
-	// 	}
-	// case util.InterfaceLocalMulticast:
-	// 	prefix, err = netip.ParsePrefix("FF00::/8")
-	// 	if err != nil {
-	// 		prefix = netip.Prefix{}
-	// 	}
-	// case util.LinkLocalMulticast:
-	// 	prefix, err = netip.ParsePrefix("ff00::/8")
-	// 	if err != nil {
-	// 		prefix = netip.Prefix{}
-	// 	}
-	// case util.LinkLocalUnicast:
-	// 	prefix, err = netip.ParsePrefix("fe80::/10")
-	// 	if err != nil {
-	// 		prefix = netip.Prefix{}
-	// 	}
-	// case util.Loopback:
-	// 	prefix, err = netip.ParsePrefix("::1/128")
-	// 	if err != nil {
-	// 		prefix = netip.Prefix{}
-	// 	}
-	// case util.Multicast:
-	// 	prefix, err = netip.ParsePrefix("ff00::/8")
-	// 	if err != nil {
-	// 		prefix = netip.Prefix{}
-	// 	}
-	// 	// i.e. unique local
-	// case util.Private:
-	// 	prefix, err = netip.ParsePrefix("fc00::/7")
-	// 	if err != nil {
-	// 		prefix = netip.Prefix{}
-	// 	}
-	// case util.Unspecified:
-	// 	prefix = netip.Prefix{}
-	// default:
-	// 	prefix = netip.Prefix{}
-	// }
 
 	return util.TypePrefix(s.Addr())
 }
