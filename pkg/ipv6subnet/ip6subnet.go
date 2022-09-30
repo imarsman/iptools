@@ -90,6 +90,11 @@ func (s *Subnet) DefaultGatewayString() string {
 	return fmt.Sprintf("%s::%d", util.Bytes2Hex(util.AddrDefaultGateway(s.Addr())), 1)
 }
 
+// Link link version of address
+func (s *Subnet) Link() (url string) {
+	return fmt.Sprintf("http://[%s]/", s.Addr().String())
+}
+
 // TypePrefix prefix make a prefix for a type
 func (s *Subnet) TypePrefix() (prefix netip.Prefix) {
 

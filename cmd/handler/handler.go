@@ -399,6 +399,7 @@ func ip6SubnetDisplay(s *ipv6subnet.Subnet) {
 	if !strings.HasPrefix(s.Addr().StringExpanded(), "fd") {
 		table.Body.Cells = append(table.Body.Cells, row("Default Gateway", s.DefaultGatewayString()))
 	}
+	table.Body.Cells = append(table.Body.Cells, row("Link", s.Link()))
 	if ip6util.AddressType(s.Addr()) == ip6util.GlobalUnicast {
 		table.Body.Cells = append(table.Body.Cells, row("ip6.arpa", fmt.Sprintf("%s", ip6util.IP6Arpa(s.Addr()))))
 	}
