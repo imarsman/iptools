@@ -323,9 +323,13 @@ func IP4SubnetDivide(ip string, bits int, secondaryBits int) {
 const typeGlobalUnicast = "global-unicast"
 const typeLinkLocal = "link-local"
 const typeUniqueLocal = "unique-local"
+const typeMulticast = "multicast"
 
 // IP6SubnetDescribe describe a link-local address
 func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
+	if bits == 0 {
+		bits = 64
+	}
 	if ip6Type == "" && ip == "" {
 		fmt.Println("If no IP then type must be supplied")
 		os.Exit(1)
@@ -361,6 +365,12 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 				fmt.Println(err)
 				os.Exit(1)
 			}
+		} else if ip6Type == typeMulticast {
+			addr, err = ip6util.RandomAddrMulticast()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
 		} else {
 			fmt.Println("No valid type specified")
 			os.Exit(1)
@@ -390,21 +400,24 @@ func ip6SubnetDisplay(s *ipv6subnet.Subnet) {
 	table.Body.Cells = append(table.Body.Cells, row("IP Type", ip6util.AddressTypeName(s.Addr())))
 	table.Body.Cells = append(table.Body.Cells, row("Type Prefix", s.TypePrefix().Masked()))
 	table.Body.Cells = append(table.Body.Cells, row("IP", s.Addr().String()))
-	table.Body.Cells = append(table.Body.Cells, row("Prefix", s.Prefix().Masked()))
-	table.Body.Cells = append(table.Body.Cells, row("Routing Prefix", fmt.Sprintf("%s", s.RoutingPrefixString())))
-	table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", util.GlobalID(s.Addr()))))
-	// table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", s.GlobalIDString())))
-	table.Body.Cells = append(table.Body.Cells, row("Interface ID", fmt.Sprintf("%s", s.InterfaceString())))
-	table.Body.Cells = append(table.Body.Cells, row("Subnet", fmt.Sprintf("%s", s.SubnetString())))
-	if !strings.HasPrefix(s.Addr().StringExpanded(), "fd") {
-		table.Body.Cells = append(table.Body.Cells, row("Default Gateway", s.DefaultGatewayString()))
+	if !(s.Addr().IsMulticast() || s.Addr().IsInterfaceLocalMulticast()) {
+		table.Body.Cells = append(table.Body.Cells, row("Prefix", s.Prefix().Masked()))
+		table.Body.Cells = append(table.Body.Cells, row("Routing Prefix", fmt.Sprintf("%s", s.RoutingPrefixString())))
+		table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", util.GlobalID(s.Addr()))))
+		table.Body.Cells = append(table.Body.Cells, row("Interface ID", fmt.Sprintf("%s", s.InterfaceString())))
+		table.Body.Cells = append(table.Body.Cells, row("Subnet", fmt.Sprintf("%s", s.SubnetString())))
+		if !strings.HasPrefix(s.Addr().StringExpanded(), "fd") {
+			table.Body.Cells = append(table.Body.Cells, row("Default Gateway", s.DefaultGatewayString()))
+		}
 	}
 	table.Body.Cells = append(table.Body.Cells, row("Link", s.Link()))
 	if ip6util.AddressType(s.Addr()) == ip6util.GlobalUnicast {
 		table.Body.Cells = append(table.Body.Cells, row("ip6.arpa", fmt.Sprintf("%s", ip6util.IP6Arpa(s.Addr()))))
 	}
-	table.Body.Cells = append(table.Body.Cells, row("Subnet first address", s.First().StringExpanded()))
-	table.Body.Cells = append(table.Body.Cells, row("Subnet last address", s.Last().StringExpanded()))
+	if !(s.Addr().IsMulticast() || s.Addr().IsInterfaceLocalMulticast()) {
+		table.Body.Cells = append(table.Body.Cells, row("Subnet first address", s.First().StringExpanded()))
+		table.Body.Cells = append(table.Body.Cells, row("Subnet last address", s.Last().StringExpanded()))
+	}
 	part := strings.Split(util.AddrToBitString(s.Addr()), ".")[0]
 	part = fmt.Sprintf("%s%s", strings.Repeat("0", 16-len(part)), part)
 	table.Body.Cells = append(table.Body.Cells, row("first address field binary", part))

@@ -16,6 +16,7 @@ var IP6Types = []string{
 	"global-unicast",
 	"link-local",
 	"unique-local",
+	"multicast",
 }
 
 // Define command structure to enable completion

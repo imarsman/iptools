@@ -73,9 +73,10 @@ type IP6SubnetGlobalUnicastDescribe struct {
 	Bits   int    `arg:"-b,--bits" help:"subnet bits"`
 }
 
+// IP6RandomIPs get random list of IPs of type
 type IP6RandomIPs struct {
 	Number int    `arg:"-n,--number" help:"generate random IP"`
-	Type   string `arg:"-t,--type" help:"global-unicast, link-local, unique-local"`
+	Type   string `arg:"-t,--type" help:"global-unicast, link-local, unique-local, multicast"`
 }
 
 // IP6SubnetDescribe for calls to describe a subnet
@@ -83,7 +84,7 @@ type IP6SubnetDescribe struct {
 	IP     string `arg:"-i,--ip" help:"IP address"`
 	Random bool   `arg:"-r,--random" help:"generate random IP"`
 	Bits   int    `arg:"-b,--bits" help:"subnet bits"`
-	Type   string `arg:"-t,--type" help:"global-unicast, link-local, unique-local"`
+	Type   string `arg:"-t,--type" help:"global-unicast, link-local, unique-local, multicast"`
 }
 
 // IP6Subnet IP6 calls
