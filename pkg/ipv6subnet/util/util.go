@@ -241,20 +241,22 @@ func AddressTypeName(addr netip.Addr) string {
 }
 
 // bytesToMacAddr transform a 6 byte array to a mac address
-func bytesToMacAddr(bytes []byte) string {
+func bytesToMacAddr(bytes [6]byte) string {
 	macAddress := fmt.Sprintf("%02x:%02x:%02x:%02x:%02x:%02x", bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5])
 
 	return macAddress
 }
 
-func bytes2MacAddrBytes(mac [6]byte) ([]byte, error) {
+func randomMacBytes2MacAddrBytes(mac [6]byte) ([6]byte, error) {
 	addr := net.HardwareAddr(mac[:])
+	var bytes [6]byte
+	copy(bytes[:], addr[:5])
 
-	return addr, nil
+	return bytes, nil
 }
 
-// makeMacAddress make a random mac address of a 6 byte array
-func makeMacAddress() (buf [6]byte, err error) {
+// randomMacAddress make a random mac address of a 6 byte array
+func randomMacAddress() (buf [6]byte, err error) {
 	buf = [6]byte{}
 	_, err = rand.Read(buf[:])
 	if err != nil {
@@ -383,11 +385,11 @@ func mac2LinkLocal(s string) (netip.Addr, error) {
 
 // RandomAddrGlobalUnicast get a global unicast random IPV6 address
 func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {
-	bytes, err := makeMacAddress()
+	bytes, err := randomMacAddress()
 	if err != nil {
 		return
 	}
-	macAddrBytes, err := bytes2MacAddrBytes(bytes)
+	macAddrBytes, err := randomMacBytes2MacAddrBytes(bytes)
 	if err != nil {
 		return
 	}
@@ -401,11 +403,11 @@ func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {
 
 // RandomAddrLinkLocal get a link-local random IPV6 address
 func RandomAddrLinkLocal() (addr netip.Addr, err error) {
-	bytes, err := makeMacAddress()
+	bytes, err := randomMacAddress()
 	if err != nil {
 		return
 	}
-	macAddrBytes, err := bytes2MacAddrBytes(bytes)
+	macAddrBytes, err := randomMacBytes2MacAddrBytes(bytes)
 	if err != nil {
 		return
 	}
@@ -419,11 +421,11 @@ func RandomAddrLinkLocal() (addr netip.Addr, err error) {
 
 // RandomAddrUniqueLocal get a unique local random IPV6 address
 func RandomAddrUniqueLocal() (addr netip.Addr, err error) {
-	bytes, err := makeMacAddress()
+	bytes, err := randomMacAddress()
 	if err != nil {
 		return
 	}
-	macAddrBytes, err := bytes2MacAddrBytes(bytes)
+	macAddrBytes, err := randomMacBytes2MacAddrBytes(bytes)
 	if err != nil {
 		return
 	}
