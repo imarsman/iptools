@@ -255,6 +255,9 @@ func GlobalID(addr netip.Addr) (hex string) {
 		return "0000:0000"
 	}
 	dataStr := strconv.FormatUint(data, 16)
+	// hexStr := dataStr
+
+	// remainder := len(hexStr) % 4
 
 	parts := strings.Split(dataStr, "")
 	reverse(parts)
@@ -269,8 +272,14 @@ func GlobalID(addr netip.Addr) (hex string) {
 		}
 	}
 
+	// fmt.Println(remainder)
+	// if remainder != 0 {
+	// 	fmt.Println("remainder", remainder, len(dataStr), len(hexStr))
+	// }
+
 	parts = strings.Split(sb.String(), "")
 	reverse(parts)
+
 	hex = strings.Join(parts, "")
 
 	return
