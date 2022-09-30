@@ -4,13 +4,17 @@ This project was done as a learning experience for things like IP subnetting. Mo
 about ipv4 subnets and splitting up subnets into equal ranges and defining things like the network ID and broadcast
 address for subnets. This is a way for me to better establish my knowledge of this subject.
 
+Given that this code represents me learning I do not recommend using it for production purposes, as the standards being
+implemented are very strict. I may easily have made errors that I have yet to catch and fix.
+
 This utility can have completion enabled by typing `COMP_INSTALL=1 iptools`.
 
 This utility currently does three things with IPV4. It splits a subnet into networks and into networks by a differing subnet size,
 it splits a subnet into a set of ranges for its networks, and it gives summary information for a subnet.
 
-For IPV6 a random IPV6 IP can be generated (or manually entered as a parameter) and described. Currently global unicast and link
-local addresses are handled. The full range of address types will at tome point be supported
+For IPV6 a random IPV6 IP can be generated (or manually entered as a parameter) and described. Currently global unicast, link
+local, and unique local addresses are handled. The full range of address types will at tome point be supported where it
+makes sense.
 
 The IP package used, `net/netip`, is in Go 1.18. It is slightly different in API compared to the
 [netaddr](https://github.com/inetaf/netaddr) package that came first. Sadly, the `netip` package loses the IPRange
@@ -177,35 +181,58 @@ $ iptools subnetip4 describe -ip 10.32.0.0 -bits 16 -secondary-bits 18
 
 ```
 $ iptools subnetip6 describe -bits 64 -type global-unicast -random
-       Category                                          Value
----------------------- --------------------------------------------------------------------------
- IP Type                Global unicast
- IP                     2001:db8:cafe:19b7:ba3a:40ff:fe77:1928
- Interface ID           ba3a:40ff:fe77:1928
- Prefix                 2001:db8:cafe:19b7::/64
- Routing Prefix         2001:0db8:cafe::/48
- Default Gateway        2001:0db8:cafe::1
- Subnet                 19b7
- ip6.arpa               8.2.9.1.7.7.e.f.f.f.0.4.a.3.a.b.7.b.9.1.e.f.a.c.8.b.d.0.1.0.0.2.ip6.arpa
- Subnet first address   2001:0db8:cafe:19b7:0000:0000:0000:0000
- Subnet last address    2001:0db8:cafe:19b7:ffff:ffff:ffff:ffff
+          Category                                             Value
+---------------------------- --------------------------------------------------------------------------
+ IP Type                      Global unicast
+ Type Prefix                  2000::/3
+ IP                           2a01:db8:cafe:b73d:b66b:80ff:fe88:9a7e
+ Prefix                       2a01:db8:cafe:b73d::/64
+ Routing Prefix               2a01:0db8:cafe::/48
+ Global ID                    a01:0db8:cafe
+ Interface ID                 b66b:80ff:fe88:9a7e
+ Subnet                       b73d
+ Default Gateway              2a01:0db8:cafe::1
+ Link                         http://[2a01:db8:cafe:b73d:b66b:80ff:fe88:9a7e]/
+ ip6.arpa                     e.7.a.9.8.8.e.f.f.f.0.8.b.6.6.b.d.3.7.b.e.f.a.c.8.b.d.0.1.0.a.2.ip6.arpa
+ Subnet first address         2a01:0db8:cafe:b73d:0000:0000:0000:0000
+ Subnet last address          2a01:0db8:cafe:b73d:ffff:ffff:ffff:ffff
+ first address field binary   0010101000000001
 ```
 
 ### IPV6 Link local address
 ```
 $ iptools subnetip6 describe -bits 64 -type link-local -random
-       Category                                          Value
----------------------- --------------------------------------------------------------------------
- IP Type                Link local unicast
- IP                     fe80::750f:b0ff:feac:de48
- Interface ID           750f:b0ff:feac:de48
- Prefix                 fe80::/64
- Routing Prefix         fe80:0000:0000::/48
- Default Gateway        fe80:0000:0000::1
- Subnet                 0000
- ip6.arpa               8.4.e.d.c.a.e.f.f.f.0.b.f.0.5.7.0.0.0.0.0.0.0.0.0.0.0.0.0.8.e.f.ip6.arpa
- Subnet first address   fe80:0000:0000:0000:0000:0000:0000:0000
- Subnet last address    fe80:0000:0000:0000:ffff:ffff:ffff:ffff
+iptools subnetip6 describe -bits 64 -type link-local -random
+          Category                             Value
+---------------------------- -----------------------------------------
+ IP Type                      Link local unicast
+ Type Prefix                  fe80::/10
+ IP                           fe80::ef49:50ff:fea9:449f
+ Prefix                       fe80::/64
+ Routing Prefix               fe80:0000:0000::/48
+ Global ID                    0000:0000
+ Interface ID                 ef49:50ff:fea9:449f
+ Subnet                       0000
+ Default Gateway              fe80:0000:0000::1
+ Link                         http://[fe80::ef49:50ff:fea9:449f]/
+ Subnet first address         fe80:0000:0000:0000:0000:0000:0000:0000
+ Subnet last address          fe80:0000:0000:0000:ffff:ffff:ffff:ffff
+ first address field binary   1111111010000000
+```
+
+### Generate random IPs
+```
+$ iptools subnetip6 random-ips -number 10 -type unique-local
+fd00:0fc3:d81c:ebbd:211d:58ff:fe21:054b
+fd00:5b7e:2277:4ace:2171:51ff:fe8b:b8bb
+fd00:07a9:cf42:f39f:bf25:b9ff:fe57:bd24
+fd00:2dc6:322e:e46c:023f:b1ff:fea8:9650
+fd00:ee0f:dde0:2d8b:f841:c0ff:fe3c:8665
+fd00:5d4a:4b6c:ba79:8c74:66ff:fee1:4115
+fd00:3340:3705:3a15:36bd:eaff:fee1:6e9d
+fd00:0092:8f02:e97a:8eef:b4ff:feeb:28bb
+fd00:a954:b6c1:3e94:c070:e3ff:fe9c:42ea
+fd00:6df2:ea4f:5d05:52cb:feff:fe81:e3b1
 ```
 
 ### Top level help
