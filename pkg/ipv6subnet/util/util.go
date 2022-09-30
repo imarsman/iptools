@@ -1,14 +1,14 @@
 package util
 
 import (
+	"crypto/rand"
 	"encoding/binary"
 	"fmt"
-	"math/rand"
+	"math/big"
 	"net"
 	"net/netip"
 	"strconv"
 	"strings"
-	"time"
 )
 
 const (
@@ -33,6 +33,25 @@ const (
 	// Unknown IPV6 type
 	Unknown
 )
+
+// For fun with generics
+func reverse[T any](s []T) {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
+}
+
+// Use crypto/rand to generate a uint64 with value [0,max]
+// There will be no error if max is > 0
+func randUInt64(max int64) uint64 {
+	bigVal, err := rand.Int(rand.Reader, big.NewInt(max))
+	if err != nil {
+		panic(err)
+	}
+	inRange := bigVal.Uint64()
+
+	return inRange
+}
 
 // AddrDefaultGateway get IP default gateway for IP
 func AddrDefaultGateway(addr netip.Addr) []byte {
@@ -236,7 +255,6 @@ func bytes2MacAddrBytes(mac [6]byte) ([]byte, error) {
 
 // makeMacAddress make a random mac address of a 6 byte array
 func makeMacAddress() (buf [6]byte, err error) {
-	rand.Seed(time.Now().UnixNano())
 	buf = [6]byte{}
 	_, err = rand.Read(buf[:])
 	if err != nil {
@@ -251,6 +269,11 @@ func makeMacAddress() (buf [6]byte, err error) {
 func GlobalID(addr netip.Addr) (hex string) {
 	start := TypePrefix(addr).Bits() + 1
 
+	// for unique local account for L bit
+	if AddressType(addr) == UniqueLocal {
+		start = start + 1
+	}
+
 	bytes := addr.As16()
 	var arr [8]byte
 	copy(arr[:], bytes[0:7])
@@ -262,9 +285,6 @@ func GlobalID(addr netip.Addr) (hex string) {
 		return "0000:0000"
 	}
 	dataStr := strconv.FormatUint(data, 16)
-	// hexStr := dataStr
-
-	// remainder := len(hexStr) % 4
 
 	parts := strings.Split(dataStr, "")
 	reverse(parts)
@@ -279,11 +299,6 @@ func GlobalID(addr netip.Addr) (hex string) {
 		}
 	}
 
-	// fmt.Println(remainder)
-	// if remainder != 0 {
-	// 	fmt.Println("remainder", remainder, len(dataStr), len(hexStr))
-	// }
-
 	parts = strings.Split(sb.String(), "")
 	reverse(parts)
 
@@ -294,11 +309,7 @@ func GlobalID(addr netip.Addr) (hex string) {
 
 // RandomSubnet get a random subnet for IPV6
 func RandomSubnet() uint16 {
-	rand.Seed(time.Now().UnixNano())
-
-	max := 65_536
-
-	rand := rand.Intn(max)
+	rand := randUInt64(65_536)
 
 	return uint16(rand)
 }
@@ -313,17 +324,11 @@ func mac2GlobalUnicast(s string) (netip.Addr, error) {
 	// Invert the bit at the index 6 (counting from 0)
 	mac[0] ^= (1 << (2 - 1))
 
-	rand.Seed(time.Now().UnixNano())
-
-	// global unicast must start with 2000 to 3fff
-	// The first 8 bytes define the range
-	// min: 32 = hex 20 = 0010000000000000 = 2000
-	// max: 63 = hex 3f = 0011111111111111 = 3FFF
-	inRange := rand.Intn(63-32) + 32
+	inRange := randUInt64(63-32) + 32
 
 	// db8:cafe
 	ip := []byte{
-		byte(inRange), 0x01, 0xd, 0xb8, 0xca, 0xfe, byte(rand.Intn(256)), byte(rand.Intn(256)),
+		byte(inRange), 0x01, 0xd, 0xb8, 0xca, 0xfe, byte(randUInt64(256)), byte(randUInt64(256)),
 		mac[0], mac[1], mac[2], 0xff, 0xfe, mac[3], mac[4], mac[5], // insert ff:fe in the middle
 	}
 	var addrBytes [16]byte
@@ -342,11 +347,9 @@ func mac2UniqueLocal(s string) (netip.Addr, error) {
 	// Invert the bit at the index 6 (counting from 0)
 	mac[0] ^= (1 << (2 - 1))
 
-	rand.Seed(time.Now().Unix())
-
 	// fc00::/8 is currently not defined
 	ip := []byte{
-		0xfd, 0x0, byte(rand.Intn(256)), byte(rand.Intn(256)), byte(rand.Intn(256)), byte(rand.Intn(256)), byte(rand.Intn(256)), byte(rand.Intn(256)), // prepend with fd00::
+		0xfd, 0x0, byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), // prepend with fd00::
 		mac[0], mac[1], mac[2], 0xff, 0xfe, mac[3], mac[4], mac[5], // insert ff:fe in the middle
 	}
 	var addrBytes [16]byte
@@ -430,11 +433,4 @@ func RandomAddrUniqueLocal() (addr netip.Addr, err error) {
 	}
 
 	return
-}
-
-// For fun with generics
-func reverse[T any](s []T) {
-	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
-		s[i], s[j] = s[j], s[i]
-	}
 }
