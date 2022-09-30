@@ -411,35 +411,30 @@ func mac2Multicast(s string) (netip.Addr, error) {
 	flags := []string{"0", "1", "3", "7"}
 	element := randUInt64(4) + 1
 	flagStr := flags[element-1]
-	// flagVal, err := strconv.ParseInt(flagStr, 16, 64)
-	// if err != nil {
-	// 	panic(err)
-	// }
 
 	scopes := []string{"1", "2", "3", "4", "5", "8", "e", "f"}
 	element = randUInt64(8) + 1
 	scopeStr := scopes[element-1]
-	scopeVal, err := strconv.ParseInt(scopeStr, 16, 64)
-	if err != nil {
-		panic(err)
-	}
 
-	flagScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
+	// scopeVal, err := strconv.ParseInt(scopeStr, 16, 64)
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
 
 	ip := []byte{
-		0xff, byte(flagScope),
-		0x0, 0x0, 0x0, 0x0, 0x0, byte(scopeVal),
-		mac[0], mac[1], mac[2], 0xff, 0xfe, mac[3], mac[4], mac[5],
-		// byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)),
-		// mac[0], mac[1], mac[2], 0xff, 0xfe, mac[3], mac[4], mac[5],
+		0xff, byte(flagAndScope),
+		0x0, 0x0, byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)),
 	}
 	var addrBytes [16]byte
 	copy(addrBytes[:], ip)
 
 	return netip.AddrFrom16(addrBytes), nil
 }
-
-// https://en.wikipedia.org/wiki/IPv6_address
 
 // RandomAddrGlobalUnicast get a global unicast random IPV6 address
 func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {
