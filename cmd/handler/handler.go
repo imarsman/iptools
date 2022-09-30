@@ -392,7 +392,8 @@ func ip6SubnetDisplay(s *ipv6subnet.Subnet) {
 	table.Body.Cells = append(table.Body.Cells, row("IP", s.Addr().String()))
 	table.Body.Cells = append(table.Body.Cells, row("Prefix", s.Prefix().Masked()))
 	table.Body.Cells = append(table.Body.Cells, row("Routing Prefix", fmt.Sprintf("%s", s.RoutingPrefixString())))
-	table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", s.GlobalIDString())))
+	table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", util.GlobalID(s.Addr()))))
+	// table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", s.GlobalIDString())))
 	table.Body.Cells = append(table.Body.Cells, row("Interface ID", fmt.Sprintf("%s", s.InterfaceString())))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet", fmt.Sprintf("%s", s.SubnetString())))
 	if !strings.HasPrefix(s.Addr().StringExpanded(), "fd") {

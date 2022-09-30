@@ -1,6 +1,7 @@
 package util
 
 import (
+	"encoding/binary"
 	"fmt"
 	"math/rand"
 	"net"
@@ -105,6 +106,61 @@ func Bytes2Hex(bytes []byte) string {
 	return sb.String()
 }
 
+func TypePrefix(addr netip.Addr) (prefix netip.Prefix) {
+	kind := AddressType(addr)
+	var err error
+	switch kind {
+	// unique local ipv6 address prefix
+	case UniqueLocal:
+		prefix, err = netip.ParsePrefix("fd00::/8")
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+	case GlobalUnicast:
+		prefix, err = netip.ParsePrefix("2000::/3")
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+	case InterfaceLocalMulticast:
+		prefix, err = netip.ParsePrefix("FF00::/8")
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+	case LinkLocalMulticast:
+		prefix, err = netip.ParsePrefix("ff00::/8")
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+	case LinkLocalUnicast:
+		prefix, err = netip.ParsePrefix("fe80::/10")
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+	case Loopback:
+		prefix, err = netip.ParsePrefix("::1/128")
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+	case Multicast:
+		prefix, err = netip.ParsePrefix("ff00::/8")
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+		// i.e. unique local
+	case Private:
+		prefix, err = netip.ParsePrefix("fc00::/7")
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+	case Unspecified:
+		prefix = netip.Prefix{}
+	default:
+		prefix = netip.Prefix{}
+	}
+
+	return
+}
+
 func AddressType(addr netip.Addr) int {
 	switch {
 	case strings.HasPrefix(addr.StringExpanded(), "fd00"):
@@ -180,6 +236,42 @@ func makeMacAddress() (buf [6]byte, err error) {
 		fmt.Println("error:", err)
 		return
 	}
+
+	return
+}
+
+// GlobalID get subsection of bits in network part of IP
+func GlobalID(addr netip.Addr) (hex string) {
+	start := TypePrefix(addr).Bits() + 1
+
+	bytes := addr.As16()
+	var arr [8]byte
+	copy(arr[:], bytes[0:7])
+
+	data := binary.BigEndian.Uint64(arr[:])
+	data = data << start
+	data = data >> uint64(64+start-48)
+	if data == 0 {
+		return "0000:0000"
+	}
+	dataStr := strconv.FormatUint(data, 16)
+
+	parts := strings.Split(dataStr, "")
+	reverse(parts)
+
+	var sb strings.Builder
+
+	for i, letter := range parts {
+		sb.WriteString(letter)
+		// add colon every 4th letter unless at very end
+		if (i+1)%4 == 0 && i != len(parts)-1 {
+			sb.WriteString(":")
+		}
+	}
+
+	parts = strings.Split(sb.String(), "")
+	reverse(parts)
+	hex = strings.Join(parts, "")
 
 	return
 }

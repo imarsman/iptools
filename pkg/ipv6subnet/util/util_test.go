@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"net/netip"
 	"strconv"
 	"testing"
 
@@ -30,4 +31,18 @@ func TestRandomSubnet(t *testing.T) {
 	randSubnet := RandomSubnet()
 
 	t.Log(strconv.FormatInt(int64(randSubnet), 16))
+}
+
+func TestBits(t *testing.T) {
+	is := is.New(t)
+	ip, err := netip.ParseAddr("3501:db8:cafe:dcb2:f945:2aff:feee:f0d6")
+	t.Log(ip.StringExpanded())
+	is.NoErr(err)
+	bytes := ip.As16()
+	var toConvert [8]byte
+	copy(toConvert[:], bytes[0:7])
+
+	converted := GlobalID(ip)
+
+	t.Log(converted)
 }
