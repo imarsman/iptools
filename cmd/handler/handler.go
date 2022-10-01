@@ -382,7 +382,11 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 		os.Exit(1)
 	}
 
-	ip6SubnetDisplay(s)
+	if !(s.Addr().IsMulticast() || s.Addr().IsInterfaceLocalMulticast()) {
+		ip6SubnetDisplay(s)
+	} else {
+		ip6SubnetDisplayBasic(s)
+	}
 }
 
 // ip6SubnetDisplay describe a link local IP
@@ -400,24 +404,43 @@ func ip6SubnetDisplay(s *ipv6subnet.Subnet) {
 	table.Body.Cells = append(table.Body.Cells, row("IP Type", ip6util.AddressTypeName(s.Addr())))
 	table.Body.Cells = append(table.Body.Cells, row("Type Prefix", s.TypePrefix().Masked()))
 	table.Body.Cells = append(table.Body.Cells, row("IP", s.Addr().String()))
-	if !(s.Addr().IsMulticast() || s.Addr().IsInterfaceLocalMulticast()) {
-		table.Body.Cells = append(table.Body.Cells, row("Prefix", s.Prefix().Masked()))
-		table.Body.Cells = append(table.Body.Cells, row("Routing Prefix", fmt.Sprintf("%s", s.RoutingPrefixString())))
-		table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", util.GlobalID(s.Addr()))))
-		table.Body.Cells = append(table.Body.Cells, row("Interface ID", fmt.Sprintf("%s", s.InterfaceString())))
-		table.Body.Cells = append(table.Body.Cells, row("Subnet", fmt.Sprintf("%s", s.SubnetString())))
-		if !strings.HasPrefix(s.Addr().StringExpanded(), "fd") {
-			table.Body.Cells = append(table.Body.Cells, row("Default Gateway", s.DefaultGatewayString()))
-		}
+	table.Body.Cells = append(table.Body.Cells, row("Prefix", s.Prefix().Masked()))
+	table.Body.Cells = append(table.Body.Cells, row("Routing Prefix", fmt.Sprintf("%s", s.RoutingPrefixString())))
+	table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", util.GlobalID(s.Addr()))))
+	table.Body.Cells = append(table.Body.Cells, row("Interface ID", fmt.Sprintf("%s", s.InterfaceString())))
+	table.Body.Cells = append(table.Body.Cells, row("Subnet", fmt.Sprintf("%s", s.SubnetString())))
+	if !strings.HasPrefix(s.Addr().StringExpanded(), "fd") {
+		table.Body.Cells = append(table.Body.Cells, row("Default Gateway", s.DefaultGatewayString()))
 	}
 	table.Body.Cells = append(table.Body.Cells, row("Link", s.Link()))
 	if ip6util.AddressType(s.Addr()) == ip6util.GlobalUnicast {
 		table.Body.Cells = append(table.Body.Cells, row("ip6.arpa", fmt.Sprintf("%s", ip6util.IP6Arpa(s.Addr()))))
 	}
-	if !(s.Addr().IsMulticast() || s.Addr().IsInterfaceLocalMulticast()) {
-		table.Body.Cells = append(table.Body.Cells, row("Subnet first address", s.First().StringExpanded()))
-		table.Body.Cells = append(table.Body.Cells, row("Subnet last address", s.Last().StringExpanded()))
+	table.Body.Cells = append(table.Body.Cells, row("Subnet first address", s.First().StringExpanded()))
+	table.Body.Cells = append(table.Body.Cells, row("Subnet last address", s.Last().StringExpanded()))
+	part := strings.Split(util.AddrToBitString(s.Addr()), ".")[0]
+	part = fmt.Sprintf("%s%s", strings.Repeat("0", 16-len(part)), part)
+	table.Body.Cells = append(table.Body.Cells, row("first address field binary", part))
+
+	fmt.Println(table.String())
+}
+
+// ip6SubnetDisplay describe a link local IP
+func ip6SubnetDisplayBasic(s *ipv6subnet.Subnet) {
+	table := simpletable.New()
+	table.SetStyle(simpletable.StyleCompactLite)
+
+	table.Header = &simpletable.Header{
+		Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Text: "Category"},
+			{Align: simpletable.AlignCenter, Text: "Value"},
+		},
 	}
+
+	table.Body.Cells = append(table.Body.Cells, row("IP Type", ip6util.AddressTypeName(s.Addr())))
+	table.Body.Cells = append(table.Body.Cells, row("Type Prefix", s.TypePrefix().Masked()))
+	table.Body.Cells = append(table.Body.Cells, row("IP", s.Addr().String()))
+	table.Body.Cells = append(table.Body.Cells, row("Link", s.Link()))
 	part := strings.Split(util.AddrToBitString(s.Addr()), ".")[0]
 	part = fmt.Sprintf("%s%s", strings.Repeat("0", 16-len(part)), part)
 	table.Body.Cells = append(table.Body.Cells, row("first address field binary", part))
