@@ -56,6 +56,7 @@ func randUInt64(max int64) uint64 {
 // AddrDefaultGateway get IP default gateway for IP
 func AddrDefaultGateway(addr netip.Addr) []byte {
 	bytes := addr.As16()
+
 	return bytes[:6]
 }
 
@@ -409,17 +410,76 @@ func mac2Multicast(s string) (netip.Addr, error) {
 	mac[0] ^= (1 << (2 - 1))
 
 	flags := []string{"0", "1", "3", "7"}
-	element := randUInt64(4) + 1
+	element := randUInt64(int64(len(flags))) + 1
 	flagStr := flags[element-1]
 
 	scopes := []string{"1", "2", "3", "4", "5", "8", "e", "f"}
-	element = randUInt64(8) + 1
+	element = randUInt64(int64(len(scopes))) + 1
 	scopeStr := scopes[element-1]
 
-	// scopeVal, err := strconv.ParseInt(scopeStr, 16, 64)
-	// if err != nil {
-	// 	panic(err)
-	// }
+	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
+
+	ip := []byte{
+		0xff, byte(flagAndScope),
+		0x0, 0x0, byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)),
+	}
+	var addrBytes [16]byte
+	copy(addrBytes[:], ip)
+
+	return netip.AddrFrom16(addrBytes), nil
+}
+
+func mac2LinkLocalMulticast(s string) (netip.Addr, error) {
+	mac, err := net.ParseMAC(s)
+	if err != nil {
+		return netip.Addr{}, err
+	}
+
+	// Invert the bit at the index 6 (counting from 0)
+	mac[0] ^= (1 << (2 - 1))
+
+	flags := []string{"0", "1", "3", "7"}
+	element := randUInt64(int64(len(flags))) + 1
+	flagStr := flags[element-1]
+
+	scopes := []string{"2"}
+	element = randUInt64(int64(len(scopes))) + 1
+	scopeStr := scopes[element-1]
+
+	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
+
+	ip := []byte{
+		0xff, byte(flagAndScope),
+		0x0, 0x0, byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)),
+	}
+	var addrBytes [16]byte
+	copy(addrBytes[:], ip)
+
+	return netip.AddrFrom16(addrBytes), nil
+}
+
+func mac2InterfaceLocalMulticast(s string) (netip.Addr, error) {
+	mac, err := net.ParseMAC(s)
+	if err != nil {
+		return netip.Addr{}, err
+	}
+
+	// Invert the bit at the index 6 (counting from 0)
+	mac[0] ^= (1 << (2 - 1))
+
+	flags := []string{"0", "1", "3", "7"}
+	element := randUInt64(int64(len(flags))) + 1
+	flagStr := flags[element-1]
+
+	scopes := []string{"1"}
+	element = randUInt64(int64(len(scopes))) + 1
+	scopeStr := scopes[element-1]
 
 	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
 
@@ -501,6 +561,42 @@ func RandomAddrMulticast() (addr netip.Addr, err error) {
 		return
 	}
 	addr, err = mac2Multicast(bytesToMacAddr(macAddrBytes))
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// RandomAddrLinkLocalMulticast get a random link local multicast address
+func RandomAddrLinkLocalMulticast() (addr netip.Addr, err error) {
+	bytes, err := randomMacAddress()
+	if err != nil {
+		return
+	}
+	macAddrBytes, err := randomMacBytes2MacAddrBytes(bytes)
+	if err != nil {
+		return
+	}
+	addr, err = mac2LinkLocalMulticast(bytesToMacAddr(macAddrBytes))
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// RandomAddrInterfaceLocalMulticast get a random interface local multicast address
+func RandomAddrInterfaceLocalMulticast() (addr netip.Addr, err error) {
+	bytes, err := randomMacAddress()
+	if err != nil {
+		return
+	}
+	macAddrBytes, err := randomMacBytes2MacAddrBytes(bytes)
+	if err != nil {
+		return
+	}
+	addr, err = mac2InterfaceLocalMulticast(bytesToMacAddr(macAddrBytes))
 	if err != nil {
 		return
 	}

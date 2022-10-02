@@ -43,14 +43,18 @@ func (s *Subnet) Addr() netip.Addr {
 func (s *Subnet) First() netip.Addr {
 	addr := s.prefix.Addr()
 	bytes := addr.As16()
-	bytes[8] = 0x0
-	bytes[9] = 0x0
-	bytes[10] = 0x0
-	bytes[11] = 0x0
-	bytes[12] = 0x0
-	bytes[13] = 0x0
-	bytes[14] = 0x0
-	bytes[15] = 0x0
+
+	for i := 8; i <= 15; i++ {
+		bytes[i] = 0x0
+	}
+	// bytes[8] = 0x0
+	// bytes[9] = 0x0
+	// bytes[10] = 0x0
+	// bytes[11] = 0x0
+	// bytes[12] = 0x0
+	// bytes[13] = 0x0
+	// bytes[14] = 0x0
+	// bytes[15] = 0x0
 
 	addr = netip.AddrFrom16(bytes)
 
@@ -61,18 +65,41 @@ func (s *Subnet) First() netip.Addr {
 func (s *Subnet) Last() netip.Addr {
 	addr := s.prefix.Addr()
 	bytes := addr.As16()
-	bytes[8] = 0xff
-	bytes[9] = 0xff
-	bytes[10] = 0xff
-	bytes[11] = 0xff
-	bytes[12] = 0xff
-	bytes[13] = 0xff
-	bytes[14] = 0xff
-	bytes[15] = 0xff
+
+	for i := 8; i <= 15; i++ {
+		bytes[i] = 0xff
+	}
+
+	// bytes[8] = 0xff
+	// bytes[9] = 0xff
+	// bytes[10] = 0xff
+	// bytes[11] = 0xff
+	// bytes[12] = 0xff
+	// bytes[13] = 0xff
+	// bytes[14] = 0xff
+	// bytes[15] = 0xff
 
 	addr = netip.AddrFrom16(bytes)
 
 	return addr
+}
+
+// IsARPA is the address relevant to ARPA addressing?
+func (s *Subnet) IsARPA() (is bool) {
+	if util.AddressType(s.Addr()) == util.GlobalUnicast {
+		is = true
+	}
+
+	return
+}
+
+// IsRoutable is the address routable
+func (s *Subnet) IsRoutable() (is bool) {
+	if util.AddressType(s.Addr()) == util.LinkLocalUnicast {
+		is = true
+	}
+
+	return
 }
 
 // GlobalIDString get the string global ID a hex string
@@ -85,9 +112,12 @@ func (s *Subnet) SubnetString() string {
 	return util.Bytes2Hex(util.AddrSubnetSection(s.Addr()))
 }
 
-// DefaultGatewayString get the default gateway as a hex string
-func (s *Subnet) DefaultGatewayString() string {
-	return fmt.Sprintf("%s::%d", util.Bytes2Hex(util.AddrDefaultGateway(s.Addr())), 1)
+// LinkLocalDefaultGateway get the default gateway as a hex string
+func (s *Subnet) LinkLocalDefaultGateway() string {
+	gateway := fmt.Sprintf("%s::%d", util.Bytes2Hex(util.AddrDefaultGateway(s.Addr())), 1)
+	gateway = strings.ReplaceAll(gateway, "0000:", "")
+
+	return gateway
 }
 
 // Link link version of address
@@ -101,11 +131,11 @@ func (s *Subnet) TypePrefix() (prefix netip.Prefix) {
 	return util.TypePrefix(s.Addr())
 }
 
-// RoutingPrefixString get the routing prefix as a hex string
-func (s *Subnet) RoutingPrefixString() string {
-	if strings.HasPrefix(s.Addr().StringExpanded(), "fd00") {
-		return fmt.Sprintf("%s::/%d", "fd00", 48)
-	}
+// RoutingPrefix get the routing prefix as a hex string
+func (s *Subnet) RoutingPrefix() string {
+	// if util.AddressType(s.Addr()) == util.UniqueLocal {
+	// 	return fmt.Sprintf("%s::/%d", "fd00", 48)
+	// }
 	return fmt.Sprintf("%s::/%d", util.Bytes2Hex(util.AddrRoutingPrefixSecion(s.Addr())), 48)
 }
 
