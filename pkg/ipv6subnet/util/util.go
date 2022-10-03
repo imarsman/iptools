@@ -313,26 +313,26 @@ func fromRange(addr netip.Addr, start, end int) (hex string) {
 	} else {
 		copy(arr[:], bytes[startByte:endByte])
 	}
-	data := binary.BigEndian.Uint64(arr[:])
+	// data := binary.BigEndian.Uint64(arr[:])
 
 	var dataStr string
-	if AddressType(addr) == Multicast || AddressType(addr) == InterfaceLocalMulticast || AddressType(addr) == LinkLocalMulticast {
-		var arr [8]byte
-		copy(arr[:], bytes[startByte:])
-		data := binary.BigEndian.Uint64(arr[:])
-		// fmt.Println((128 - end), (128 - start))
-		remainder := start % 8
-		if (end - start) < 64 {
-			data = data << remainder
-			// fmt.Println("right", 64-(end-start))
-			data = data >> (64 - (end - start))
-		}
-		dataStr = strconv.FormatUint(data, 16)
-	} else {
-		data = data << start
-		data = data >> uint64(start)
-		dataStr = strconv.FormatUint(data, 16)
+	// if AddressType(addr) == Multicast || AddressType(addr) == InterfaceLocalMulticast || AddressType(addr) == LinkLocalMulticast {
+	// var arr [8]byte
+	copy(arr[:], bytes[startByte:])
+	data := binary.BigEndian.Uint64(arr[:])
+	// fmt.Println((128 - end), (128 - start))
+	remainder := start % 8
+	if (end - start) < 64 {
+		data = data << remainder
+		// fmt.Println("right", 64-(end-start))
+		data = data >> (64 - (end - start))
 	}
+	dataStr = strconv.FormatUint(data, 16)
+	// } else {
+	// 	data = data << start
+	// 	data = data >> uint64(start)
+	// 	dataStr = strconv.FormatUint(data, 16)
+	// }
 	if data == 0 {
 		return "0000:0000"
 	}
@@ -446,7 +446,7 @@ func mac2Multicast(s string) (netip.Addr, error) {
 	element := randUInt64(int64(len(flags))) + 1
 	flagStr := flags[element-1]
 
-	scopes := []string{"1", "2", "3", "4", "5", "8", "e", "f"}
+	scopes := []string{"3", "4", "5", "8", "e", "f"}
 	element = randUInt64(int64(len(scopes))) + 1
 	scopeStr := scopes[element-1]
 

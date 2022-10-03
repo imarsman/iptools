@@ -398,7 +398,7 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 		os.Exit(1)
 	}
 
-	if !(s.Addr().IsMulticast() || s.Addr().IsInterfaceLocalMulticast() || s.Addr().IsInterfaceLocalMulticast() || s.Addr().IsLinkLocalMulticast()) {
+	if !(s.Addr().IsMulticast() || s.Addr().IsInterfaceLocalMulticast() || s.Addr().IsLinkLocalMulticast()) {
 		ip6SubnetDisplay(s)
 	} else {
 		ip6SubnetDisplayBasic(s)
@@ -460,11 +460,8 @@ func ip6SubnetDisplayBasic(s *ipv6subnet.Subnet) {
 	table.Body.Cells = append(table.Body.Cells, row("IP Type", ip6util.AddressTypeName(s.Addr())))
 	table.Body.Cells = append(table.Body.Cells, row("Type Prefix", s.TypePrefix().Masked()))
 	table.Body.Cells = append(table.Body.Cells, row("IP", s.Addr().String()))
-	if strings.Contains(strings.ToLower(util.AddressTypeName(s.Addr())), "multicast") {
-		table.Body.Cells = append(table.Body.Cells, row("Network Prefix", fmt.Sprintf("%s", util.MulticastNetworkPrefix(s.Addr()))))
-		table.Body.Cells = append(table.Body.Cells, row("Group ID", fmt.Sprintf("%s", util.MulticastGroupID(s.Addr()))))
-	}
-	// table.Body.Cells = append(table.Body.Cells, row("Link", s.Link()))
+	table.Body.Cells = append(table.Body.Cells, row("Network Prefix", fmt.Sprintf("%s", util.MulticastNetworkPrefix(s.Addr()))))
+	table.Body.Cells = append(table.Body.Cells, row("Group ID", fmt.Sprintf("%s", util.MulticastGroupID(s.Addr()))))
 	part := strings.Split(util.AddrToBitString(s.Addr()), ".")[0]
 	part = fmt.Sprintf("%s%s", strings.Repeat("0", 16-len(part)), part)
 	table.Body.Cells = append(table.Body.Cells, row("first address field binary", part))
