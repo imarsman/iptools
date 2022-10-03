@@ -303,36 +303,27 @@ func fromRange(addr netip.Addr, start, end int) (hex string) {
 	if endByte == 17 {
 		endByte = 16
 	}
-	// fmt.Println("start", start, "startByte", startByte, "end", end, "endByte", endByte)
 
 	bytes := addr.As16()
 	var arr [8]byte
-	// copy(arr[:], bytes[0:7])
+
 	if endByte == 16 {
 		copy(arr[:], bytes[startByte:])
 	} else {
 		copy(arr[:], bytes[startByte:endByte])
 	}
-	// data := binary.BigEndian.Uint64(arr[:])
 
 	var dataStr string
-	// if AddressType(addr) == Multicast || AddressType(addr) == InterfaceLocalMulticast || AddressType(addr) == LinkLocalMulticast {
-	// var arr [8]byte
 	copy(arr[:], bytes[startByte:])
 	data := binary.BigEndian.Uint64(arr[:])
 	// fmt.Println((128 - end), (128 - start))
-	remainder := start % 8
+	remainder := start % 4
+	fmt.Println("remainder", remainder)
 	if (end - start) < 64 {
-		data = data << remainder
-		// fmt.Println("right", 64-(end-start))
+		data = data << (remainder + start)
 		data = data >> (64 - (end - start))
 	}
 	dataStr = strconv.FormatUint(data, 16)
-	// } else {
-	// 	data = data << start
-	// 	data = data >> uint64(start)
-	// 	dataStr = strconv.FormatUint(data, 16)
-	// }
 	if data == 0 {
 		return "0000:0000"
 	}
