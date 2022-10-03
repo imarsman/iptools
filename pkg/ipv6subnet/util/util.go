@@ -272,32 +272,65 @@ func randomMacAddress() (buf [6]byte, err error) {
 func GlobalID(addr netip.Addr) (hex string) {
 	start := TypePrefix(addr).Bits() + 1
 	end := 48
-
 	// for unique local account for L bit
 	if AddressType(addr) == UniqueLocal {
 		start = start + 1
 	}
-	// if AddressType(addr) == Multicast {
-	// 	start = 128 - 32
-	// 	end = 128
-	// }
+
+	return fromRange(addr, start, end)
+}
+
+// MulticastGroupID id from range for multicast addresses
+func MulticastGroupID(addr netip.Addr) (hex string) {
+	start := 128 - 32
+	end := 128
+	// fmt.Println("MulticastGroupID", start, end)
+
+	return fromRange(addr, start, end)
+}
+
+func MulticastNetworkPrefix(addr netip.Addr) (hex string) {
+	start := 32
+	end := 32 + 64
+	// fmt.Println("MulticastNetworkPrefix", start, end)
+
+	return fromRange(addr, start, end)
+}
+
+func fromRange(addr netip.Addr, start, end int) (hex string) {
+	startByte := start / 8
+	endByte := (end / 8) + 1
+	if endByte == 17 {
+		endByte = 16
+	}
+	// fmt.Println("start", start, "startByte", startByte, "end", end, "endByte", endByte)
 
 	bytes := addr.As16()
 	var arr [8]byte
-	copy(arr[:], bytes[0:7])
+	// copy(arr[:], bytes[0:7])
+	if endByte == 16 {
+		copy(arr[:], bytes[startByte:])
+	} else {
+		copy(arr[:], bytes[startByte:endByte])
+	}
 	data := binary.BigEndian.Uint64(arr[:])
 
 	var dataStr string
-	if AddressType(addr) == Multicast || AddressType(addr) == InterfaceLocalMulticast {
+	if AddressType(addr) == Multicast || AddressType(addr) == InterfaceLocalMulticast || AddressType(addr) == LinkLocalMulticast {
 		var arr [8]byte
-		copy(arr[:], bytes[8:])
+		copy(arr[:], bytes[startByte:])
 		data := binary.BigEndian.Uint64(arr[:])
-		data = data << 32
-		data = data >> 32
+		// fmt.Println((128 - end), (128 - start))
+		remainder := start % 8
+		if (end - start) < 64 {
+			data = data << remainder
+			// fmt.Println("right", 64-(end-start))
+			data = data >> (64 - (end - start))
+		}
 		dataStr = strconv.FormatUint(data, 16)
 	} else {
 		data = data << start
-		data = data >> uint64(64+start-end)
+		data = data >> uint64(start)
 		dataStr = strconv.FormatUint(data, 16)
 	}
 	if data == 0 {
