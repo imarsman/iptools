@@ -11,10 +11,11 @@ import (
 
 	"github.com/alexeyco/simpletable"
 	"github.com/imarsman/iptools/cmd/args"
-	"github.com/imarsman/iptools/pkg/ipv4subnet"
-	"github.com/imarsman/iptools/pkg/ipv4subnet/ip4util"
-	"github.com/imarsman/iptools/pkg/ipv6subnet"
 
+	"github.com/imarsman/iptools/pkg/ipv4subnet"
+	ip4util "github.com/imarsman/iptools/pkg/ipv4subnet/ip4util"
+
+	"github.com/imarsman/iptools/pkg/ipv6subnet"
 	ip6util "github.com/imarsman/iptools/pkg/ipv6subnet/ip6util"
 )
 
