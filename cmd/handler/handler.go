@@ -515,6 +515,24 @@ func IP6RandomIPs(ip6Type string, number int) {
 			}
 			fmt.Println(addr.StringExpanded())
 		}
+	} else if ip6Type == typeInterfaceLocalMulticast {
+		for i := 0; i < number; i++ {
+			addr, err = ip6util.RandomAddrInterfaceLocalMulticast()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			fmt.Println(addr.StringExpanded())
+		}
+	} else if ip6Type == typeLinkLocalMulticast {
+		for i := 0; i < number; i++ {
+			addr, err = ip6util.RandomAddrLinkLocalMulticast()
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			fmt.Println(addr.StringExpanded())
+		}
 	} else {
 		fmt.Println("No valid type specified")
 		os.Exit(1)
