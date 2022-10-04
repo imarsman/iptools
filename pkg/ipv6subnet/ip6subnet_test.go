@@ -3,7 +3,7 @@ package ipv6subnet
 import (
 	"testing"
 
-	"github.com/imarsman/iptools/pkg/ipv6subnet/util"
+	"github.com/imarsman/iptools/pkg/ipv6subnet/ip6util"
 	"github.com/matryer/is"
 )
 
@@ -13,7 +13,7 @@ import (
 func TestNewSubnet(t *testing.T) {
 	is := is.New(t)
 
-	addr, err := util.RandomAddrGlobalUnicast()
+	addr, err := ip6util.RandomAddrGlobalUnicast()
 	is.NoErr(err)
 	s, err := NewFromIPAndBits(addr.StringExpanded(), 64)
 	is.NoErr(err)
@@ -26,22 +26,22 @@ func TestNewSubnet(t *testing.T) {
 	t.Log("subnet", s.SubnetString())
 	t.Log("interface", s.InterfaceString())
 	t.Log("is global unicast", s.Addr().IsGlobalUnicast())
-	t.Log("Address type", util.AddressTypeName(s.Addr()))
+	t.Log("Address type", ip6util.AddressTypeName(s.Addr()))
 	t.Log("Address prefix", s.TypePrefix().Masked().String())
 }
 
 func TestRandomGlobalUnicast(t *testing.T) {
 	is := is.New(t)
-	addr, err := util.RandomAddrGlobalUnicast()
+	addr, err := ip6util.RandomAddrGlobalUnicast()
 	is.NoErr(err)
-	t.Log(util.AddressTypeName(addr))
+	t.Log(ip6util.AddressTypeName(addr))
 }
 
 func TestRandomLinkLocal(t *testing.T) {
 	is := is.New(t)
-	addr, err := util.RandomAddrLinkLocal()
+	addr, err := ip6util.RandomAddrLinkLocal()
 	is.NoErr(err)
-	t.Log(util.AddressTypeName(addr))
+	t.Log(ip6util.AddressTypeName(addr))
 }
 
 type parentChild struct {

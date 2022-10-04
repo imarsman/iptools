@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/imarsman/iptools/pkg/ipv4subnet/util"
+	"github.com/imarsman/iptools/pkg/ipv4subnet/ip4util"
 	"github.com/matryer/is"
 )
 
@@ -112,7 +112,7 @@ func TestBitString(t *testing.T) {
 	is := is.New(t)
 	ip, err := netip.ParseAddr("127.0.0.1")
 	is.NoErr(err)
-	bitStr := util.BitStr4(ip, ".")
+	bitStr := ip4util.BitStr4(ip, ".")
 	t.Log(bitStr)
 }
 
@@ -122,10 +122,10 @@ func TestIPString(t *testing.T) {
 	ip, err := netip.ParseAddr(start)
 	is.NoErr(err)
 
-	bitStr := util.BitStr4(ip, ".")
+	bitStr := ip4util.BitStr4(ip, ".")
 	t.Log("bitStr for 127.0.0.1", bitStr)
 
-	bytes, err := util.BinaryIP4StrToBytes(bitStr)
+	bytes, err := ip4util.BinaryIP4StrToBytes(bitStr)
 	is.NoErr(err)
 
 	list := make([]byte, 0, 0)
@@ -138,7 +138,7 @@ func TestIPString(t *testing.T) {
 	start = "99.236.32.0"
 	bitStr = "01100011.11101100.00100000.00000000"
 	t.Log("bitStr for 99.236.32.0", bitStr)
-	bytes, err = util.BinaryIP4StrToBytes(bitStr)
+	bytes, err = ip4util.BinaryIP4StrToBytes(bitStr)
 	is.NoErr(err)
 
 	list = make([]byte, 0, 0)
@@ -157,7 +157,7 @@ func TestIPStringSplit(t *testing.T) {
 
 	for _, bitStr := range list {
 		// bitStr := "01100011.11101100.00100000.00000000"
-		bytes, err := util.BinaryIP4StrToBytes(bitStr)
+		bytes, err := ip4util.BinaryIP4StrToBytes(bitStr)
 		is.NoErr(err)
 		t.Log(bytes)
 	}

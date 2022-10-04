@@ -9,7 +9,7 @@ import (
 	"net/netip"
 	"strings"
 
-	"github.com/imarsman/iptools/pkg/ipv6subnet/util"
+	"github.com/imarsman/iptools/pkg/ipv6subnet/ip6util"
 	"gopkg.in/yaml.v2"
 )
 
@@ -86,7 +86,7 @@ func (s *Subnet) Last() netip.Addr {
 
 // IsARPA is the address relevant to ARPA addressing?
 func (s *Subnet) IsARPA() (is bool) {
-	if util.AddressType(s.Addr()) == util.GlobalUnicast {
+	if ip6util.AddressType(s.Addr()) == ip6util.GlobalUnicast {
 		is = true
 	}
 
@@ -95,7 +95,7 @@ func (s *Subnet) IsARPA() (is bool) {
 
 // IsRoutable is the address routable
 func (s *Subnet) IsRoutable() (is bool) {
-	if util.AddressType(s.Addr()) == util.LinkLocalUnicast {
+	if ip6util.AddressType(s.Addr()) == ip6util.LinkLocalUnicast {
 		is = true
 	}
 
@@ -104,17 +104,17 @@ func (s *Subnet) IsRoutable() (is bool) {
 
 // GlobalIDString get the string global ID a hex string
 func (s *Subnet) GlobalIDString() string {
-	return util.Bytes2Hex([]byte(util.GlobalID(s.Addr())))
+	return ip6util.Bytes2Hex([]byte(ip6util.GlobalID(s.Addr())))
 }
 
 // SubnetString get the string subnet section as a hex string
 func (s *Subnet) SubnetString() string {
-	return util.Bytes2Hex(util.AddrSubnetSection(s.Addr()))
+	return ip6util.Bytes2Hex(ip6util.AddrSubnetSection(s.Addr()))
 }
 
 // LinkLocalDefaultGateway get the default gateway as a hex string
 func (s *Subnet) LinkLocalDefaultGateway() string {
-	gateway := fmt.Sprintf("%s::%d", util.Bytes2Hex(util.AddrDefaultGateway(s.Addr())), 1)
+	gateway := fmt.Sprintf("%s::%d", ip6util.Bytes2Hex(ip6util.AddrDefaultGateway(s.Addr())), 1)
 	gateway = strings.ReplaceAll(gateway, "0000:", "")
 
 	return gateway
@@ -128,20 +128,17 @@ func (s *Subnet) Link() (url string) {
 // TypePrefix prefix make a prefix for a type
 func (s *Subnet) TypePrefix() (prefix netip.Prefix) {
 
-	return util.TypePrefix(s.Addr())
+	return ip6util.TypePrefix(s.Addr())
 }
 
 // RoutingPrefix get the routing prefix as a hex string
 func (s *Subnet) RoutingPrefix() string {
-	// if util.AddressType(s.Addr()) == util.UniqueLocal {
-	// 	return fmt.Sprintf("%s::/%d", "fd00", 48)
-	// }
-	return fmt.Sprintf("%s::/%d", util.Bytes2Hex(util.AddrRoutingPrefixSecion(s.Addr())), 48)
+	return fmt.Sprintf("%s::/%d", ip6util.Bytes2Hex(ip6util.AddrRoutingPrefixSecion(s.Addr())), 48)
 }
 
 // InterfaceString get the string representation in hex of the interface bits
 func (s *Subnet) InterfaceString() string {
-	return util.Bytes2Hex(util.AddrInterfaceSection(s.Addr()))
+	return ip6util.Bytes2Hex(ip6util.AddrInterfaceSection(s.Addr()))
 }
 
 // String get string representing subnet of the subnet prefix
