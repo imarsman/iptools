@@ -52,7 +52,7 @@ var cmd = &complete.Command{
 				},
 			},
 		},
-		"subnetip6": {
+		"ip6": {
 			Sub: map[string]*complete.Command{
 				// Describe an IP
 				"describe": {

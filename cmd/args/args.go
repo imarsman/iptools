@@ -104,7 +104,7 @@ type IP4Subnet struct {
 // Args container for cli pargs
 type Args struct {
 	IP4Subnet *IP4Subnet `arg:"subcommand:subnetip4" help:"Get networks for subnet"`
-	IP6Subnet *IP6Subnet `arg:"subcommand:subnetip6" help:"Get IP6 address information"`
+	IP6Subnet *IP6Subnet `arg:"subcommand:ip6" help:"Get IP6 address information"`
 }
 
 // CLIArgs the args structure to be filled at runtime
