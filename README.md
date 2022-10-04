@@ -14,7 +14,7 @@ it splits a subnet into a set of ranges for its networks, and it gives summary i
 
 For IPV6 a random IPV6 IP can be generated (or manually entered as a parameter) and described. Currently global unicast, link
 local, and unique local addresses are handled. The full range of address types will at tome point be supported where it
-makes sense.
+makes sense. 
 
 The IP package used, `net/netip`, is in Go 1.18. It is slightly different in API compared to the
 [netaddr](https://github.com/inetaf/netaddr) package that came first. Sadly, the `netip` package loses the IPRange
