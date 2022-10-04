@@ -284,7 +284,6 @@ func GlobalID(addr netip.Addr) (hex string) {
 func MulticastGroupID(addr netip.Addr) (hex string) {
 	start := 128 - 32
 	end := 128
-	// fmt.Println("MulticastGroupID", start, end)
 
 	return fromRange(addr, start, end)
 }
@@ -292,7 +291,6 @@ func MulticastGroupID(addr netip.Addr) (hex string) {
 func MulticastNetworkPrefix(addr netip.Addr) (hex string) {
 	start := 32
 	end := 32 + 64
-	// fmt.Println("MulticastNetworkPrefix", start, end)
 
 	return fromRange(addr, start, end)
 }
@@ -316,13 +314,14 @@ func fromRange(addr netip.Addr, start, end int) (hex string) {
 	var dataStr string
 	copy(arr[:], bytes[startByte:])
 	data := binary.BigEndian.Uint64(arr[:])
-	// fmt.Println((128 - end), (128 - start))
-	remainder := start % 4
-	fmt.Println("remainder", remainder)
-	if (end - start) < 64 {
-		data = data << (remainder + start)
-		data = data >> (64 - (end - start))
-	}
+
+	// remainder is the part of a byte that does not start at the boundary
+	// e.g. 3
+	remainder := start % 8
+	data = data << remainder
+	dataStr = strconv.FormatUint(data, 16)
+	data = data >> (64 - (end - start))
+
 	dataStr = strconv.FormatUint(data, 16)
 	if data == 0 {
 		return "0000:0000"
