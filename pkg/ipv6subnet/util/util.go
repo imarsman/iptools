@@ -277,7 +277,15 @@ func GlobalID(addr netip.Addr) (hex string) {
 		start = start + 1
 	}
 
-	return fromRange(addr, start, end)
+	return extractByRange(addr, start, end)
+}
+
+// MulticastNetworkPrefix get prefix specific to multicast (at end of IP before Group ID)
+func MulticastNetworkPrefix(addr netip.Addr) (hex string) {
+	start := 32
+	end := 32 + 64
+
+	return extractByRange(addr, start, end)
 }
 
 // MulticastGroupID id from range for multicast addresses
@@ -285,17 +293,10 @@ func MulticastGroupID(addr netip.Addr) (hex string) {
 	start := 128 - 32
 	end := 128
 
-	return fromRange(addr, start, end)
+	return extractByRange(addr, start, end)
 }
 
-func MulticastNetworkPrefix(addr netip.Addr) (hex string) {
-	start := 32
-	end := 32 + 64
-
-	return fromRange(addr, start, end)
-}
-
-func fromRange(addr netip.Addr, start, end int) (hex string) {
+func extractByRange(addr netip.Addr, start, end int) (hex string) {
 	startByte := start / 8
 	endByte := (end / 8) + 1
 	if endByte == 17 {
