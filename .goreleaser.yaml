@@ -36,6 +36,9 @@ release:
 
     iptools is a set of IP and network tools
 
+    v0.1.27
+    Small fixes and review and docs
+
     v0.1.26
     Fixed bit range extraction and multicast
 
