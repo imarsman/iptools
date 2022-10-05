@@ -364,8 +364,10 @@ func bitRangeHex(addr netip.Addr, start, end int) (hex string) {
 
 	dataStr = strconv.FormatUint(data, 16)
 	if data == 0 {
-		return "0000:0000"
-	} else if len(dataStr) < expectedLen {
+		zeroes := strings.Repeat("0", (end-start)/8)
+		return hexStringToDelimited(zeroes)
+		// don't add zeroes if the section is not at the beginning of the IP
+	} else if len(dataStr) < expectedLen && end == 48 {
 		// need at least 40 bytes/ 10 hex chars for global id
 		prefix := strings.Repeat("0", expectedLen-len(dataStr))
 		dataStr = fmt.Sprintf("%s%s", prefix, dataStr)
