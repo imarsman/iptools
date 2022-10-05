@@ -104,17 +104,17 @@ func (s *Subnet) IsRoutable() (is bool) {
 
 // GlobalIDString get the string global ID a hex string
 func (s *Subnet) GlobalIDString() string {
-	return ip6util.Bytes2Hex([]byte(ip6util.GlobalID(s.Addr())))
+	return ip6util.ByteSlice2Hex([]byte(ip6util.GlobalID(s.Addr())))
 }
 
 // SubnetString get the string subnet section as a hex string
 func (s *Subnet) SubnetString() string {
-	return ip6util.Bytes2Hex(ip6util.AddrSubnetSection(s.Addr()))
+	return ip6util.ByteSlice2Hex(ip6util.AddrSubnetSection(s.Addr()))
 }
 
 // LinkLocalDefaultGateway get the default gateway as a hex string
 func (s *Subnet) LinkLocalDefaultGateway() string {
-	gateway := fmt.Sprintf("%s::%d", ip6util.Bytes2Hex(ip6util.AddrDefaultGateway(s.Addr())), 1)
+	gateway := fmt.Sprintf("%s::%d", ip6util.ByteSlice2Hex(ip6util.AddrDefaultGateway(s.Addr())), 1)
 	gateway = strings.ReplaceAll(gateway, "0000:", "")
 
 	return gateway
@@ -133,12 +133,12 @@ func (s *Subnet) TypePrefix() (prefix netip.Prefix) {
 
 // RoutingPrefix get the routing prefix as a hex string
 func (s *Subnet) RoutingPrefix() string {
-	return fmt.Sprintf("%s::/%d", ip6util.Bytes2Hex(ip6util.AddrRoutingPrefixSecion(s.Addr())), 48)
+	return fmt.Sprintf("%s::/%d", ip6util.ByteSlice2Hex(ip6util.AddrRoutingPrefixSecion(s.Addr())), 48)
 }
 
 // InterfaceString get the string representation in hex of the interface bits
 func (s *Subnet) InterfaceString() string {
-	return ip6util.Bytes2Hex(ip6util.AddrInterfaceSection(s.Addr()))
+	return ip6util.ByteSlice2Hex(ip6util.AddrInterfaceSection(s.Addr()))
 }
 
 // String get string representing subnet of the subnet prefix

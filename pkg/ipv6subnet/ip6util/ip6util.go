@@ -34,6 +34,14 @@ const (
 	Unknown
 )
 
+// For fun with generics
+func reverse[T any](s []T) {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
+}
+
+// HasType is address const one of a list of candidates
 func HasType(t int, candidates ...int) (hasType bool) {
 	for _, candidate := range candidates {
 		if t == candidate {
@@ -45,21 +53,14 @@ func HasType(t int, candidates ...int) (hasType bool) {
 	return
 }
 
-// For fun with generics
-func reverse[T any](s []T) {
-	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
-		s[i], s[j] = s[j], s[i]
-	}
-}
-
 // Use crypto/rand to generate a uint64 with value [0,max]
 // There will be no error if max is > 0
 func randUInt64(max int64) uint64 {
-	bigVal, err := rand.Int(rand.Reader, big.NewInt(max))
+	bigInt, err := rand.Int(rand.Reader, big.NewInt(max))
 	if err != nil {
 		panic(err)
 	}
-	inRange := bigVal.Uint64()
+	inRange := bigInt.Uint64()
 
 	return inRange
 }
@@ -126,8 +127,9 @@ func IP6Arpa(addr netip.Addr) string {
 	return addrStr
 }
 
-// Bytes2Hex get string with two byte sets delimited by colon
-func Bytes2Hex(bytes []byte) string {
+// ByteSlice2Hex get string with two byte sets delimited by colon
+func ByteSlice2Hex(bytes []byte) string {
+	// reverse(bytes)
 	var sb strings.Builder
 	for i, byte := range bytes {
 		part := fmt.Sprintf("%x", byte)
@@ -139,6 +141,7 @@ func Bytes2Hex(bytes []byte) string {
 			sb.WriteString(":")
 		}
 	}
+	// reverse(bytes)
 	return sb.String()
 }
 
@@ -307,6 +310,30 @@ func MulticastGroupID(addr netip.Addr) (hex string) {
 	return bitRangeHex(addr, start, end)
 }
 
+// hexStringToDelimited make a string of hex digits into an ipv6 colon delimited string
+func hexStringToDelimited(input string) (hex string) {
+	parts := strings.Split(input, "")
+	reverse(parts)
+
+	var sb strings.Builder
+
+	// break output into groups of 4 separated by colon
+	for i, letter := range parts {
+		sb.WriteString(letter)
+		// add colon every 4th letter unless at very end
+		if (i+1)%4 == 0 && i != len(parts)-1 {
+			sb.WriteString(":")
+		}
+	}
+
+	parts = strings.Split(sb.String(), "")
+	reverse(parts)
+
+	hex = strings.Join(parts, "")
+
+	return
+}
+
 func bitRangeHex(addr netip.Addr, start, end int) (hex string) {
 	expectedLen := 10
 	startByte := start / 8
@@ -344,24 +371,7 @@ func bitRangeHex(addr netip.Addr, start, end int) (hex string) {
 		dataStr = fmt.Sprintf("%s%s", prefix, dataStr)
 	}
 
-	parts := strings.Split(dataStr, "")
-	reverse(parts)
-
-	var sb strings.Builder
-
-	// break output into groups of 4 separated by colon
-	for i, letter := range parts {
-		sb.WriteString(letter)
-		// add colon every 4th letter unless at very end
-		if (i+1)%4 == 0 && i != len(parts)-1 {
-			sb.WriteString(":")
-		}
-	}
-
-	parts = strings.Split(sb.String(), "")
-	reverse(parts)
-
-	hex = strings.Join(parts, "")
+	hex = hexStringToDelimited(dataStr)
 
 	return
 }
