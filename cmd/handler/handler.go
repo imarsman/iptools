@@ -423,11 +423,11 @@ func ip6SubnetDisplay(s *ipv6subnet.Subnet) {
 	if ip6util.AddressType(s.Addr()) == ip6util.GlobalUnicast {
 		table.Body.Cells = append(table.Body.Cells, row("Routing Prefix", fmt.Sprintf("%s", s.RoutingPrefix())))
 	}
-	if ip6util.AddressType(s.Addr()) == ip6util.GlobalUnicast {
+	if ip6util.HasType(ip6util.AddressType(s.Addr()), ip6util.GlobalUnicast, ip6util.UniqueLocal) {
 		table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", ip6util.GlobalID(s.Addr()))))
 	}
 	table.Body.Cells = append(table.Body.Cells, row("Interface ID", fmt.Sprintf("%s", s.InterfaceString())))
-	table.Body.Cells = append(table.Body.Cells, row("Subnet", fmt.Sprintf("%s", s.SubnetString())))
+	table.Body.Cells = append(table.Body.Cells, row("Subnet ID", fmt.Sprintf("%s", s.SubnetString())))
 	if ip6util.AddressType(s.Addr()) == ip6util.LinkLocalUnicast {
 		table.Body.Cells = append(table.Body.Cells, row("Default Gateway", s.LinkLocalDefaultGateway()))
 	}

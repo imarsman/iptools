@@ -10,7 +10,7 @@ import (
 
 	"net/netip"
 
-	util "github.com/imarsman/iptools/pkg/ipv4subnet/ip4util"
+	"github.com/imarsman/iptools/pkg/ipv4subnet/ip4util"
 	"gopkg.in/yaml.v2"
 )
 
@@ -211,14 +211,14 @@ func (s *Subnet) CIDR() (cidr string) {
 
 // BinaryMask get dot delimited subnet mask in binary
 func (s *Subnet) BinaryMask() (mask string) {
-	mask = util.BitStr4(s.Prefix().Masked().Addr(), `.`)
+	mask = ip4util.BitStr4(s.Prefix().Masked().Addr(), `.`)
 
 	return
 }
 
 // BinaryID get the starting IP for subnet as binary
 func (s *Subnet) BinaryID() (mask string) {
-	mask = util.BitStr4(s.IP(), ``)
+	mask = ip4util.BitStr4(s.IP(), ``)
 
 	return
 }
@@ -327,7 +327,7 @@ func (s *Subnet) First() (ip netip.Addr, err error) {
 
 // Last get last IP for subnet
 func (s *Subnet) Last() (ip netip.Addr) {
-	ip, err := util.AddToAddr(s.prefix.Addr(), int32(s.Hosts()-1))
+	ip, err := ip4util.AddToAddr(s.prefix.Addr(), int32(s.Hosts()-1))
 	if err != nil {
 		return netip.Addr{}
 	}
@@ -387,7 +387,7 @@ func (s *Subnet) IPs() (ips []netip.Addr, err error) {
 func (s *Subnet) UsableIPRange() (r Range, err error) {
 	ip := s.Prefix().Addr()
 	startIP := ip
-	ip, err = util.AddToAddr(ip, int32(s.TotalHosts()))
+	ip, err = ip4util.AddToAddr(ip, int32(s.TotalHosts()))
 	if err != nil {
 		return
 	}
@@ -400,7 +400,7 @@ func (s *Subnet) UsableIPRange() (r Range, err error) {
 func (s *Subnet) IPRange() (r Range, err error) {
 	ip := s.Prefix().Addr()
 	startIP := ip
-	ip, err = util.AddToAddr(ip, int32(s.TotalHosts()))
+	ip, err = ip4util.AddToAddr(ip, int32(s.TotalHosts()))
 	if err != nil {
 		return
 	}
@@ -470,7 +470,7 @@ func (s *Subnet) ipRanges(secondarySubnet *Subnet) (ranges []Range, err error) {
 	ratio := int(math.Exp2(float64(secondarySubnet.Prefix().Bits() - s.Prefix().Bits())))
 	for j := 0; j < int(s.Networks()); j++ {
 		for r := 0; r < ratio; r++ {
-			ip, err := util.AddToAddr(ipStart, int32(secondarySubnet.Hosts()-1))
+			ip, err := ip4util.AddToAddr(ipStart, int32(secondarySubnet.Hosts()-1))
 			if err != nil {
 				//return
 			}

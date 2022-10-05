@@ -34,6 +34,17 @@ const (
 	Unknown
 )
 
+func HasType(t int, candidates ...int) (hasType bool) {
+	for _, candidate := range candidates {
+		if t == candidate {
+			hasType = true
+			break
+		}
+	}
+
+	return
+}
+
 // For fun with generics
 func reverse[T any](s []T) {
 	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
@@ -277,7 +288,7 @@ func GlobalID(addr netip.Addr) (hex string) {
 		start = start + 1
 	}
 
-	return extractByRange(addr, start, end)
+	return bitRangeHex(addr, start, end)
 }
 
 // MulticastNetworkPrefix get prefix specific to multicast (at end of IP before Group ID)
@@ -285,7 +296,7 @@ func MulticastNetworkPrefix(addr netip.Addr) (hex string) {
 	start := 32
 	end := 32 + 64
 
-	return extractByRange(addr, start, end)
+	return bitRangeHex(addr, start, end)
 }
 
 // MulticastGroupID id from range for multicast addresses
@@ -293,10 +304,11 @@ func MulticastGroupID(addr netip.Addr) (hex string) {
 	start := 128 - 32
 	end := 128
 
-	return extractByRange(addr, start, end)
+	return bitRangeHex(addr, start, end)
 }
 
-func extractByRange(addr netip.Addr, start, end int) (hex string) {
+func bitRangeHex(addr netip.Addr, start, end int) (hex string) {
+	expectedLen := 10
 	startByte := start / 8
 	endByte := (end / 8) + 1
 	if endByte == 17 {
@@ -320,12 +332,16 @@ func extractByRange(addr netip.Addr, start, end int) (hex string) {
 	// e.g. 3
 	remainder := start % 8
 	data = data << remainder
-	dataStr = strconv.FormatUint(data, 16)
+	// dataStr = strconv.FormatUint(data, 16)
 	data = data >> (64 - (end - start))
 
 	dataStr = strconv.FormatUint(data, 16)
 	if data == 0 {
 		return "0000:0000"
+	} else if len(dataStr) < expectedLen {
+		// need at least 40 bytes/ 10 hex chars for global id
+		prefix := strings.Repeat("0", expectedLen-len(dataStr))
+		dataStr = fmt.Sprintf("%s%s", prefix, dataStr)
 	}
 
 	parts := strings.Split(dataStr, "")
@@ -333,6 +349,7 @@ func extractByRange(addr netip.Addr, start, end int) (hex string) {
 
 	var sb strings.Builder
 
+	// break output into groups of 4 separated by colon
 	for i, letter := range parts {
 		sb.WriteString(letter)
 		// add colon every 4th letter unless at very end

@@ -5,20 +5,25 @@ about ipv4 subnets and splitting up subnets into equal ranges and defining thing
 address for subnets. This is a way for me to better establish my knowledge of this subject.
 
 Given that this code represents me learning I do not recommend using it for production purposes, as the standards being
-implemented are very strict. I may easily have made errors that I have yet to catch and fix.
+implemented are very strict for that. I may easily have made errors that I have yet to catch and fix.
 
 This utility can have completion enabled by typing `COMP_INSTALL=1 iptools`.
 
 This utility currently does three things with IPV4. It splits a subnet into networks and into networks by a differing subnet size,
 it splits a subnet into a set of ranges for its networks, and it gives summary information for a subnet.
 
-For IPV6 a random IPV6 IP can be generated (or manually entered as a parameter) and described. Currently global unicast, link
-local, and unique local addresses are handled. The full range of address types will at tome point be supported where it
-makes sense. 
+For IPV6 a random IPV6 IP can be generated (or manually entered as a parameter) and described. Currently global unicast,
+link local, and unique local addresses are handled along with multicast, interface local multicast, and
+link local multicast. The full range of address types will at tome point be supported where it makes sense. 
+
+Especially with IPV6 addresses contain a great amount of information that relies on external software to keep track of.
+It is possible to produce valid IPV6 addresses but the random numbers used to generate the addresses are in no way
+meaningfully tied to any system that might use them even if they are "valid". One possible exception would be Link local
+addresses which rely on a good random number generating algorithm for the interface ID.
 
 The IP package used, `net/netip`, is in Go 1.18. It is slightly different in API compared to the
 [netaddr](https://github.com/inetaf/netaddr) package that came first. Sadly, the `netip` package loses the IPRange
-struct, so I have added needed functionality here in the subnet package.
+struct, so I have added needed functionality here in the ipv4 subnet package.
 
 I would be surprised if there were not errors due to coding or to a lack of understanding of IPV4 and IPV6. I will work
 to reduce both my ignorance and errors.
@@ -180,44 +185,97 @@ $ iptools subnetip4 describe -ip 10.32.0.0 -bits 16 -secondary-bits 18
 ### IPV6 Global unicast address
 
 ```
-$ iptools subnetip6 describe -bits 64 -type global-unicast -random
+$ iptools ip6 describe -bits 64 -type global-unicast -random
           Category                                             Value
 ---------------------------- --------------------------------------------------------------------------
  IP Type                      Global unicast
  Type Prefix                  2000::/3
- IP                           2a01:db8:cafe:b73d:b66b:80ff:fe88:9a7e
- Prefix                       2a01:db8:cafe:b73d::/64
- Routing Prefix               2a01:0db8:cafe::/48
- Global ID                    a01:0db8:cafe
- Interface ID                 b66b:80ff:fe88:9a7e
- Subnet                       b73d
- Default Gateway              2a01:0db8:cafe::1
- Link                         http://[2a01:db8:cafe:b73d:b66b:80ff:fe88:9a7e]/
- ip6.arpa                     e.7.a.9.8.8.e.f.f.f.0.8.b.6.6.b.d.3.7.b.e.f.a.c.8.b.d.0.1.0.a.2.ip6.arpa
- Subnet first address         2a01:0db8:cafe:b73d:0000:0000:0000:0000
- Subnet last address          2a01:0db8:cafe:b73d:ffff:ffff:ffff:ffff
- first address field binary   0010101000000001
+ IP                           2e01:db8:cafe:f715:da59:16ff:fe65:46d8
+ Prefix                       2e01:db8:cafe:f715::/64
+ Routing Prefix               2e01:0db8:cafe::/48
+ Global ID                    e01:0db8:cafe
+ Interface ID                 da59:16ff:fe65:46d8
+ Subnet ID                    f715
+ Link                         http://[2e01:db8:cafe:f715:da59:16ff:fe65:46d8]/
+ ip6.arpa                     8.d.6.4.5.6.e.f.f.f.6.1.9.5.a.d.5.1.7.f.e.f.a.c.8.b.d.0.1.0.e.2.ip6.arpa
+ Subnet first address         2e01:0db8:cafe:f715:0000:0000:0000:0000
+ Subnet last address          2e01:0db8:cafe:f715:ffff:ffff:ffff:ffff
+ first address field binary   0010111000000001
 ```
 
 ### IPV6 Link local address
 ```
-$ iptools subnetip6 describe -bits 64 -type link-local -random
-iptools subnetip6 describe -bits 64 -type link-local -random
+$ iptools ip6 describe -bits 64 -type link-local -random
           Category                             Value
 ---------------------------- -----------------------------------------
  IP Type                      Link local unicast
  Type Prefix                  fe80::/10
- IP                           fe80::ef49:50ff:fea9:449f
+ IP                           fe80::1568:49ff:fe79:dbd2
  Prefix                       fe80::/64
- Routing Prefix               fe80:0000:0000::/48
- Global ID                    0000:0000
- Interface ID                 ef49:50ff:fea9:449f
- Subnet                       0000
- Default Gateway              fe80:0000:0000::1
- Link                         http://[fe80::ef49:50ff:fea9:449f]/
+ Interface ID                 1568:49ff:fe79:dbd2
+ Subnet ID                    0000
+ Default Gateway              fe80::1
+ Link                         http://[fe80::1568:49ff:fe79:dbd2]/
  Subnet first address         fe80:0000:0000:0000:0000:0000:0000:0000
  Subnet last address          fe80:0000:0000:0000:ffff:ffff:ffff:ffff
  first address field binary   1111111010000000
+ ```
+
+### IPV6 Unique local address
+```
+$ iptools ip6 describe -bits 64 -random -type unique-local
+          Category                                  Value
+---------------------------- ---------------------------------------------------
+ IP Type                      Unique local
+ Type Prefix                  fd00::/8
+ IP                           fd00:1fc6:4f1e:9209:67dd:7bff:fedf:94c2
+ Prefix                       fd00:1fc6:4f1e:9209::/64
+ Global ID                    00:1fc6:4f1e
+ Interface ID                 67dd:7bff:fedf:94c2
+ Subnet ID                    9209
+ Link                         http://[fd00:1fc6:4f1e:9209:67dd:7bff:fedf:94c2]/
+ Subnet first address         fd00:1fc6:4f1e:9209:0000:0000:0000:0000
+ Subnet last address          fd00:1fc6:4f1e:9209:ffff:ffff:ffff:ffff
+ first address field binary   1111110100000000
+```
+
+### IPV6 multicast
+```
+$ iptools ip6 describe -bits 64 -random -type multicast
+          Category                           Value
+---------------------------- --------------------------------------
+ IP Type                      Multicast
+ Type Prefix                  ff00::/8
+ IP                           ff1f:0:5419:9893:cba3:6592:2aa9:dc95
+ Network Prefix               5419:9893:cba3:6592
+ Group ID                     00:2aa9:dc95
+ first address field binary   1111111100011111
+```
+
+### IPV6 Interface local multicast
+```
+$ iptools ip6 describe -bits 64 -random -type interface-local-multicast
+          Category                           Value
+---------------------------- --------------------------------------
+ IP Type                      Interface local multicast
+ Type Prefix                  ff00::/8
+ IP                           ff31:0:3907:4492:6c5a:cc21:5397:1259
+ Network Prefix               3907:4492:6c5a:cc21
+ Group ID                     00:5397:1259
+ first address field binary   1111111100110001
+```
+
+### IPV6 Link local multicast
+```
+$ iptools ip6 describe -bits 64 -random -type link-local-multicast
+          Category                           Value
+---------------------------- -------------------------------------
+ IP Type                      Link local muticast
+ Type Prefix                  ff00::/8
+ IP                           ff02:0:3c06:5f2b:1959:e37d:5a4b:8f6
+ Network Prefix               3c06:5f2b:1959:e37d
+ Group ID                     00:5a4b:08f6
+ first address field binary   1111111100000010
 ```
 
 ### Generate random IPs
@@ -255,7 +313,7 @@ Options:
 
 Commands:
   subnetip4              Get networks for subnet
-  subnetip6              Get IP6 address information
+  ip6                    Get IP6 address information
 ```
 
 ### Help for subnet options
@@ -279,7 +337,7 @@ Commands:
   divide                 divide a subnet into smaller subnets
   describe               describe a subnet
 
-$ iptools subnetip6 describe -h
+$ iptools ip6 describe -h
 iptools
 -------
 Commit:  954eb63
@@ -288,7 +346,7 @@ Tag:     v0.1.21
 OS:      darwin
 ARCH:    arm64
 
-Usage: iptools subnetip6 describe [--ip IP] [--random] [--bits BITS] [--type TYPE]
+Usage: iptools ip6 describe [--ip IP] [--random] [--bits BITS] [--type TYPE]
 
 Options:
   --ip IP, -i IP         IP address
@@ -306,9 +364,9 @@ $ gocloc pkg cmd README.md
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Go                              12            324            308           1528
-Markdown                         1             46              0            239
+Go                              12            387            234           2033
+Markdown                         1             52              0            315
 -------------------------------------------------------------------------------
-TOTAL                           13            370            308           1767
+TOTAL                           13            439            234           2348
 -------------------------------------------------------------------------------
 ```
