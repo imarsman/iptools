@@ -383,14 +383,17 @@ func RandomSubnet() uint16 {
 	return uint16(rand)
 }
 
-// mac2GlobalUnicast transform a mac address to a globaal unicast address
-func mac2GlobalUnicast(s string) (netip.Addr, error) {
+// mac2InterfaceID transform a mac address to a globaal unicast address
+// https://support.lenovo.com/ca/en/solutions/ht509925-how-to-convert-a-mac-address-into-an-ipv6-link-local-address-eui-64
+func mac2InterfaceID(s string) (netip.Addr, error) {
 	mac, err := net.ParseMAC(s)
 	if err != nil {
 		return netip.Addr{}, err
 	}
 
 	// Invert the bit at the index 6 (counting from 0)
+	// This is position 6 of 8 (counting from 0)
+	// e.g. 00001000 -> 00001010
 	mac[0] ^= (1 << (2 - 1))
 
 	inRange := randUInt64(63-32) + 32
@@ -400,6 +403,7 @@ func mac2GlobalUnicast(s string) (netip.Addr, error) {
 		byte(inRange), 0x01, 0xd, 0xb8, 0xca, 0xfe, byte(randUInt64(256)), byte(randUInt64(256)),
 		mac[0], mac[1], mac[2], 0xff, 0xfe, mac[3], mac[4], mac[5], // insert ff:fe in the middle
 	}
+
 	var addrBytes [16]byte
 	copy(addrBytes[:], ip)
 
@@ -557,7 +561,7 @@ func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {
 	if err != nil {
 		return
 	}
-	addr, err = mac2GlobalUnicast(bytesToMacAddr(macAddrBytes))
+	addr, err = mac2InterfaceID(bytesToMacAddr(macAddrBytes))
 	if err != nil {
 		return
 	}

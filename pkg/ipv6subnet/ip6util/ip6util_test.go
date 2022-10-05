@@ -22,7 +22,7 @@ func TestMakeMacAddress(t *testing.T) {
 	addr, err := mac2LinkLocal(bytesToMacAddr(macAddrBytes))
 	is.NoErr(err)
 	t.Log("link local address", addr)
-	addr, err = mac2GlobalUnicast(bytesToMacAddr(macAddrBytes))
+	addr, err = mac2InterfaceID(bytesToMacAddr(macAddrBytes))
 	is.NoErr(err)
 	t.Log("global unicast address", addr)
 }
