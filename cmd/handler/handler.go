@@ -459,6 +459,7 @@ func ip6SubnetDisplayBasic(s *ipv6subnet.Subnet) {
 	table.Body.Cells = append(table.Body.Cells, row("IP Type", ip6util.AddressTypeName(s.Addr())))
 	table.Body.Cells = append(table.Body.Cells, row("Type Prefix", s.TypePrefix().Masked()))
 	table.Body.Cells = append(table.Body.Cells, row("IP", s.Addr().String()))
+	table.Body.Cells = append(table.Body.Cells, row("Prefix", s.Prefix().Masked()))
 	table.Body.Cells = append(table.Body.Cells, row("Network Prefix", fmt.Sprintf("%s", ip6util.MulticastNetworkPrefix(s.Addr()))))
 	table.Body.Cells = append(table.Body.Cells, row("Group ID", fmt.Sprintf("%s", ip6util.MulticastGroupID(s.Addr()))))
 	part := strings.Split(ip6util.AddrToBitString(s.Addr()), ".")[0]
