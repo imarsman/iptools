@@ -124,35 +124,33 @@ func SolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error) {
 		err = errors.New("not a unicast address")
 		return
 	}
-	// newIPStr := "FF02::1:"
-
+	// we need the last six characters from the address or 24 bits or 3 bytes
 	start := 104
 	end := 128
-	// for unique local account for L bit
-	if AddressType(addr) == UniqueLocal {
-		start = start + 1
-	}
+
 	// get range hex
 	unique := bitRangeHex(addr, start, end)
 	// strip colons
 	unique = strings.ReplaceAll(unique, ":", "")
 
 	// hex.DecodeString requires an even number of characters to make bytes
+	// and we definitely need 6 characters/3 bytes
 	if len(unique) < 6 {
 		unique = fmt.Sprintf("%s%s", strings.Repeat("0", 6-len(unique)), unique)
 	}
 
 	// get bytes for decoded string - it will be up to 3 bytes
-	data, err := hex.DecodeString(unique)
+	rangeBytes, err := hex.DecodeString(unique)
 	if err != nil {
 		panic(err)
 	}
 	// copy bytes in range to an array of length 3
 	var source [3]byte
-	copy(source[:], data)
+	copy(source[:], rangeBytes)
 
+	// Create the IP based on the rule for solicited node multicast
 	// ff02::1:ffca:2fdf
-	ip := []byte{
+	ipBytes := []byte{
 		0xff, 0x2,
 		0x0, 0x0,
 		0x0, 0x0,
@@ -164,22 +162,10 @@ func SolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error) {
 	}
 
 	var addrBytes [16]byte
-	copy(addrBytes[:], ip)
+	copy(addrBytes[:], ipBytes)
+	newAddr = netip.AddrFrom16(addrBytes)
 
-	return netip.AddrFrom16(addrBytes), nil
-
-	// if len(unique) < 6 {
-	// 	unique = fmt.Sprintf("%s%s", strings.Repeat("0", 6-len(unique)), unique)
-	// }
-	// unique = hexStringToDelimited(unique)
-
-	// newIPStr = fmt.Sprintf("%sff%s", newIPStr, unique)
-	// newAddr, err = netip.ParseAddr(newIPStr)
-	// if err != nil {
-	// 	return
-	// }
-
-	// return
+	return
 }
 
 // IP6Arpa get the IPV6 ARPA address
@@ -479,13 +465,13 @@ func mac2InterfaceID(s string) (netip.Addr, error) {
 	inRange := randUInt64(63-32) + 32
 
 	// db8:cafe
-	ip := []byte{
+	ipBytes := []byte{
 		byte(inRange), 0x01, 0xd, 0xb8, 0xca, 0xfe, byte(randUInt64(256)), byte(randUInt64(256)),
 		mac[0], mac[1], mac[2], 0xff, 0xfe, mac[3], mac[4], mac[5], // insert ff:fe in the middle
 	}
 
 	var addrBytes [16]byte
-	copy(addrBytes[:], ip)
+	copy(addrBytes[:], ipBytes)
 
 	return netip.AddrFrom16(addrBytes), nil
 }
@@ -501,12 +487,12 @@ func mac2UniqueLocal(s string) (netip.Addr, error) {
 	mac[0] ^= (1 << (2 - 1))
 
 	// fc00::/8 is currently not defined
-	ip := []byte{
+	ipBytes := []byte{
 		0xfd, 0x0, byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), // prepend with fd00::
 		mac[0], mac[1], mac[2], 0xff, 0xfe, mac[3], mac[4], mac[5], // insert ff:fe in the middle
 	}
 	var addrBytes [16]byte
-	copy(addrBytes[:], ip)
+	copy(addrBytes[:], ipBytes)
 
 	return netip.AddrFrom16(addrBytes), nil
 }
@@ -522,12 +508,12 @@ func mac2LinkLocal(s string) (netip.Addr, error) {
 	mac[0] ^= (1 << (2 - 1))
 
 	// link local can be fc00::/7 to fdff::/7
-	ip := []byte{
+	ipBytes := []byte{
 		0xfe, 0x80, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, // prepend with fe80::
 		mac[0], mac[1], mac[2], 0xff, 0xfe, mac[3], mac[4], mac[5], // insert ff:fe in the middle
 	}
 	var addrBytes [16]byte
-	copy(addrBytes[:], ip)
+	copy(addrBytes[:], ipBytes)
 
 	return netip.AddrFrom16(addrBytes), nil
 }
@@ -554,7 +540,7 @@ func mac2Multicast(s string) (netip.Addr, error) {
 
 	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
 
-	ip := []byte{
+	ipBytes := []byte{
 		0xff, byte(flagAndScope),
 		0x0, 0x0, byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)),
 		byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)),
@@ -562,7 +548,7 @@ func mac2Multicast(s string) (netip.Addr, error) {
 		byte(randUInt64(256)),
 	}
 	var addrBytes [16]byte
-	copy(addrBytes[:], ip)
+	copy(addrBytes[:], ipBytes)
 
 	return netip.AddrFrom16(addrBytes), nil
 }
@@ -586,7 +572,7 @@ func mac2LinkLocalMulticast(s string) (netip.Addr, error) {
 
 	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
 
-	ip := []byte{
+	ipBytes := []byte{
 		0xff, byte(flagAndScope),
 		0x0, 0x0, byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)),
 		byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)),
@@ -594,7 +580,7 @@ func mac2LinkLocalMulticast(s string) (netip.Addr, error) {
 		byte(randUInt64(256)),
 	}
 	var addrBytes [16]byte
-	copy(addrBytes[:], ip)
+	copy(addrBytes[:], ipBytes)
 
 	return netip.AddrFrom16(addrBytes), nil
 }
@@ -618,7 +604,7 @@ func mac2InterfaceLocalMulticast(s string) (netip.Addr, error) {
 
 	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
 
-	ip := []byte{
+	ipBytes := []byte{
 		0xff, byte(flagAndScope),
 		0x0, 0x0, byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)),
 		byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)), byte(randUInt64(256)),
@@ -626,7 +612,7 @@ func mac2InterfaceLocalMulticast(s string) (netip.Addr, error) {
 		byte(randUInt64(256)),
 	}
 	var addrBytes [16]byte
-	copy(addrBytes[:], ip)
+	copy(addrBytes[:], ipBytes)
 
 	return netip.AddrFrom16(addrBytes), nil
 }
