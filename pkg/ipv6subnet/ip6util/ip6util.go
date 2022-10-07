@@ -116,6 +116,26 @@ func AddrToBitString(addr netip.Addr) (result string) {
 	return result
 }
 
+func SolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error) {
+	newIPStr := "FF02::1:"
+
+	start := 104
+	end := 128
+	// for unique local account for L bit
+	if AddressType(addr) == UniqueLocal {
+		start = start + 1
+	}
+
+	unique := bitRangeHex(addr, start, end)
+	newIPStr = fmt.Sprintf("%sff%s", newIPStr, unique)
+	newAddr, err = netip.ParseAddr(newIPStr)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 // IP6Arpa get the IPV6 ARPA address
 func IP6Arpa(addr netip.Addr) string {
 	addrStr := addr.StringExpanded()
@@ -330,6 +350,17 @@ func hexStringToDelimited(input string) (hex string) {
 	reverse(parts)
 
 	hex = strings.Join(parts, "")
+
+	return
+}
+
+func hexStringToBytes(hex string) (rangeBytes [8]byte, err error) {
+	hex = strings.ReplaceAll(hex, ":", "")
+	value, err := strconv.ParseUint(hex, 64, 16)
+	if err != nil {
+		return
+	}
+	binary.LittleEndian.PutUint64(rangeBytes[:], value)
 
 	return
 }
