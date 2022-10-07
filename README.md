@@ -185,37 +185,39 @@ $ iptools subnetip4 describe -ip 10.32.0.0 -bits 16 -secondary-bits 18
 ### IPV6 Global unicast address
 
 ```
-$ iptools ip6 describe -bits 64 -type global-unicast -random
+$ iptools ip6 describe -random -type global-unicast
           Category                                             Value
 ---------------------------- --------------------------------------------------------------------------
  IP Type                      Global unicast
  Type Prefix                  2000::/3
- IP                           2e01:db8:cafe:f715:da59:16ff:fe65:46d8
- Prefix                       2e01:db8:cafe:f715::/64
- Routing Prefix               2e01:0db8:cafe::/48
- Global ID                    e01:0db8:cafe
- Interface ID                 da59:16ff:fe65:46d8
- Subnet ID                    f715
- Link                         http://[2e01:db8:cafe:f715:da59:16ff:fe65:46d8]/
- ip6.arpa                     8.d.6.4.5.6.e.f.f.f.6.1.9.5.a.d.5.1.7.f.e.f.a.c.8.b.d.0.1.0.e.2.ip6.arpa
- Subnet first address         2e01:0db8:cafe:f715:0000:0000:0000:0000
- Subnet last address          2e01:0db8:cafe:f715:ffff:ffff:ffff:ffff
- first address field binary   0010111000000001
+ IP                           2501:db8:cafe:4232:c544:2fff:fe1e:331d
+ Solicited node multicast     ff02::1:ff1e:331d
+ Prefix                       2501:db8:cafe:4232::/64
+ Routing Prefix               2501:0db8:cafe::/48
+ Global ID                    501:0db8:cafe
+ Interface ID                 c544:2fff:fe1e:331d
+ Subnet ID                    4232
+ Link                         http://[2501:db8:cafe:4232:c544:2fff:fe1e:331d]/
+ ip6.arpa                     d.1.3.3.e.1.e.f.f.f.f.2.4.4.5.c.2.3.2.4.e.f.a.c.8.b.d.0.1.0.5.2.ip6.arpa
+ Subnet first address         2501:0db8:cafe:4232:0000:0000:0000:0000
+ Subnet last address          2501:0db8:cafe:4232:ffff:ffff:ffff:ffff
+ first address field binary   0010010100000001
 ```
 
 ### IPV6 Link local address
 ```
-$ iptools ip6 describe -bits 64 -type link-local -random
+$ iptools ip6 describe -random -type link-local
           Category                             Value
 ---------------------------- -----------------------------------------
  IP Type                      Link local unicast
  Type Prefix                  fe80::/10
- IP                           fe80::1568:49ff:fe79:dbd2
+ IP                           fe80::1eaa:72ff:fefa:b575
+ Solicited node multicast     ff02::1:fffa:b575
  Prefix                       fe80::/64
- Interface ID                 1568:49ff:fe79:dbd2
+ Interface ID                 1eaa:72ff:fefa:b575
  Subnet ID                    0000
  Default Gateway              fe80::1
- Link                         http://[fe80::1568:49ff:fe79:dbd2]/
+ Link                         http://[fe80::1eaa:72ff:fefa:b575]/
  Subnet first address         fe80:0000:0000:0000:0000:0000:0000:0000
  Subnet last address          fe80:0000:0000:0000:ffff:ffff:ffff:ffff
  first address field binary   1111111010000000
@@ -223,19 +225,20 @@ $ iptools ip6 describe -bits 64 -type link-local -random
 
 ### IPV6 Unique local address
 ```
-$ iptools ip6 describe -bits 64 -random -type unique-local
-          Category                                  Value
----------------------------- ---------------------------------------------------
+$ iptools ip6 describe -random -type unique-local
+          Category                                 Value
+---------------------------- --------------------------------------------------
  IP Type                      Unique local
  Type Prefix                  fd00::/8
- IP                           fd00:1fc6:4f1e:9209:67dd:7bff:fedf:94c2
- Prefix                       fd00:1fc6:4f1e:9209::/64
- Global ID                    00:1fc6:4f1e
- Interface ID                 67dd:7bff:fedf:94c2
- Subnet ID                    9209
- Link                         http://[fd00:1fc6:4f1e:9209:67dd:7bff:fedf:94c2]/
- Subnet first address         fd00:1fc6:4f1e:9209:0000:0000:0000:0000
- Subnet last address          fd00:1fc6:4f1e:9209:ffff:ffff:ffff:ffff
+ IP                           fd00:8167:f33f:cc7:42b6:41ff:fe0b:d947
+ Solicited node multicast     ff02::1:ff0b:d947
+ Prefix                       fd00:8167:f33f:cc7::/64
+ Global ID                    00:8167:f33f
+ Interface ID                 42b6:41ff:fe0b:d947
+ Subnet ID                    0cc7
+ Link                         http://[fd00:8167:f33f:cc7:42b6:41ff:fe0b:d947]/
+ Subnet first address         fd00:8167:f33f:0cc7:0000:0000:0000:0000
+ Subnet last address          fd00:8167:f33f:0cc7:ffff:ffff:ffff:ffff
  first address field binary   1111110100000000
 ```
 
@@ -364,9 +367,9 @@ $ gocloc pkg cmd README.md
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Go                              12            387            234           2033
-Markdown                         1             52              0            315
+Go                              12            400            252           2122
+Markdown                         1             53              0            322
 -------------------------------------------------------------------------------
-TOTAL                           13            439            234           2348
+TOTAL                           13            453            252           2444
 -------------------------------------------------------------------------------
 ```
