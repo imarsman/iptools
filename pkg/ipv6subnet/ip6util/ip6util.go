@@ -3,6 +3,7 @@ package ip6util
 import (
 	"crypto/rand"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"math/big"
 	"net"
@@ -116,7 +117,12 @@ func AddrToBitString(addr netip.Addr) (result string) {
 	return result
 }
 
+// SolicitedNodeMulticast get solicited node multicast address for incoming unicast address
 func SolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error) {
+	if !(HasType(AddressType(addr), GlobalUnicast, LinkLocalUnicast, UniqueLocal)) {
+		err = errors.New("not a unicast address")
+		return
+	}
 	newIPStr := "FF02::1:"
 
 	start := 104
