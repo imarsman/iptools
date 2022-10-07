@@ -3,6 +3,7 @@ package ip6util
 import (
 	"crypto/rand"
 	"encoding/binary"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"math/big"
@@ -123,7 +124,7 @@ func SolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error) {
 		err = errors.New("not a unicast address")
 		return
 	}
-	newIPStr := "FF02::1:"
+	// newIPStr := "FF02::1:"
 
 	start := 104
 	end := 128
@@ -131,15 +132,54 @@ func SolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error) {
 	if AddressType(addr) == UniqueLocal {
 		start = start + 1
 	}
-
+	// get range hex
 	unique := bitRangeHex(addr, start, end)
-	newIPStr = fmt.Sprintf("%sff%s", newIPStr, unique)
-	newAddr, err = netip.ParseAddr(newIPStr)
-	if err != nil {
-		return
+	// strip colons
+	unique = strings.ReplaceAll(unique, ":", "")
+
+	// hex.DecodeString requires an even number of characters to make bytes
+	if len(unique) < 6 {
+		unique = fmt.Sprintf("%s%s", strings.Repeat("0", 6-len(unique)), unique)
 	}
 
-	return
+	// get bytes for decoded string - it will be up to 3 bytes
+	data, err := hex.DecodeString(unique)
+	if err != nil {
+		panic(err)
+	}
+	// copy bytes in range to an array of length 3
+	var source [3]byte
+	copy(source[:], data)
+
+	// ff02::1:ffca:2fdf
+	ip := []byte{
+		0xff, 0x2,
+		0x0, 0x0,
+		0x0, 0x0,
+		0x0, 0x0,
+		0x0, 0x0,
+		0x0, 0x1,
+		0xff, source[0],
+		source[1], source[2],
+	}
+
+	var addrBytes [16]byte
+	copy(addrBytes[:], ip)
+
+	return netip.AddrFrom16(addrBytes), nil
+
+	// if len(unique) < 6 {
+	// 	unique = fmt.Sprintf("%s%s", strings.Repeat("0", 6-len(unique)), unique)
+	// }
+	// unique = hexStringToDelimited(unique)
+
+	// newIPStr = fmt.Sprintf("%sff%s", newIPStr, unique)
+	// newAddr, err = netip.ParseAddr(newIPStr)
+	// if err != nil {
+	// 	return
+	// }
+
+	// return
 }
 
 // IP6Arpa get the IPV6 ARPA address
@@ -338,6 +378,7 @@ func MulticastGroupID(addr netip.Addr) (hex string) {
 
 // hexStringToDelimited make a string of hex digits into an ipv6 colon delimited string
 func hexStringToDelimited(input string) (hex string) {
+	input = strings.ReplaceAll(input, ":", "")
 	parts := strings.Split(input, "")
 	reverse(parts)
 
