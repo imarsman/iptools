@@ -705,7 +705,7 @@ func RandomAddrInterfaceLocalMulticast() (addr netip.Addr, err error) {
 
 // SolicitedNodeMulticastAddress get solicited node multicast address for incoming unicast address
 func SolicitedNodeMulticastAddress(addr netip.Addr) (newAddr netip.Addr, err error) {
-	if !(HasType(AddressType(addr), GlobalUnicast, LinkLocalUnicast, UniqueLocal)) {
+	if !(HasType(AddressType(addr), GlobalUnicast, LinkLocalUnicast, UniqueLocal, Private)) {
 		err = errors.New("not a unicast address")
 		return
 	}
