@@ -131,7 +131,6 @@ func IP6Arpa(addr netip.Addr) string {
 
 // ByteSlice2Hex get string with two byte sets delimited by colon
 func ByteSlice2Hex(bytes []byte) string {
-	// reverse(bytes)
 	var sb strings.Builder
 	for i, byte := range bytes {
 		part := fmt.Sprintf("%x", byte)
@@ -143,7 +142,6 @@ func ByteSlice2Hex(bytes []byte) string {
 			sb.WriteString(":")
 		}
 	}
-	// reverse(bytes)
 	return sb.String()
 }
 
