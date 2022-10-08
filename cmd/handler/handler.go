@@ -511,7 +511,7 @@ func IP6RandomIPs(ip6Type string, number int) {
 			}
 			fmt.Println(addr.StringExpanded())
 		}
-	} else if ip6Type == typeUniqueLocal {
+	} else if ip6Type == typePrivate {
 		for i := 0; i < number; i++ {
 			addr, err = ip6util.RandomAddrPrivate()
 			if err != nil {
