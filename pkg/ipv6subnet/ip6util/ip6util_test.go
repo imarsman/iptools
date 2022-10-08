@@ -10,19 +10,19 @@ import (
 )
 
 func TestMakeMacAddress(t *testing.T) {
-	bytes, err := randomMacAddress()
+	// bytes, err := randomMacAddress()
 	is := is.New(t)
-	is.NoErr(err)
+	// is.NoErr(err)
 
+	bytes, err := randomMacBytesForInterface()
+	is.NoErr(err)
 	macAddress := fmt.Sprintf("%02x:%02x:%02x:%02x:%02x:%02x", bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5])
 	t.Log("MAC address", macAddress)
-	macAddrBytes, err := randomMacBytes2MacAddrBytes(bytes)
-	is.NoErr(err)
-	t.Log(bytesToMacAddr(macAddrBytes))
-	addr, err := mac2LinkLocal(bytesToMacAddr(macAddrBytes))
+	t.Log(bytes2MacAddr(bytes))
+	addr, err := randomLinkLocal()
 	is.NoErr(err)
 	t.Log("link local address", addr)
-	addr, err = mac2InterfaceID(bytesToMacAddr(macAddrBytes))
+	addr, err = randomGlobalUnicast()
 	is.NoErr(err)
 	t.Log("global unicast address", addr)
 }

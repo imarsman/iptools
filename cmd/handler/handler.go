@@ -421,7 +421,7 @@ func ip6SubnetDisplay(s *ipv6subnet.Subnet) {
 	table.Body.Cells = append(table.Body.Cells, row("Type Prefix", s.TypePrefix().Masked()))
 	table.Body.Cells = append(table.Body.Cells, row("IP", s.Addr().String()))
 	if ip6util.HasType(ip6util.AddressType(s.Addr()), ip6util.GlobalUnicast, ip6util.LinkLocalUnicast, ip6util.UniqueLocal, ip6util.Private) {
-		solicitedNodeAddr, err := ip6util.SolicitedNodeMulticastAddress(s.Addr())
+		solicitedNodeAddr, err := ip6util.SolicitedNodeMulticast(s.Addr())
 		if err != nil {
 			panic(err)
 		}

@@ -257,19 +257,29 @@ func AddressTypeName(addr netip.Addr) string {
 	}
 }
 
-// bytesToMacAddr transform a 6 byte array to a mac address
-func bytesToMacAddr(bytes [6]byte) string {
+// bytes2MacAddr transform a 6 byte array to a mac address
+func bytes2MacAddr(bytes [6]byte) string {
 	macAddress := fmt.Sprintf("%02x:%02x:%02x:%02x:%02x:%02x", bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5])
 
 	return macAddress
 }
 
-func randomMacBytes2MacAddrBytes(mac [6]byte) ([6]byte, error) {
+func randomMacBytesForInterface() (bytes [6]byte, err error) {
+	mac, err := randomMacAddress()
+	if err != nil {
+		return
+	}
+	// Set second last bit to 1 to indicate globally unique
+	// See also https://www.rfc-editor.org/rfc/rfc4291.html#section-2.5.1
+
+	// fmt.Printf("%08b\n", mac[0])
+	mac[0] |= (1 << (2 - 1))
 	addr := net.HardwareAddr(mac[:])
-	var bytes [6]byte
+	// fmt.Printf("%08b\n", addr[0])
+
 	copy(bytes[:], addr[:6])
 
-	return bytes, nil
+	return
 }
 
 // randomMacAddress make a random mac address of a 6 byte array
@@ -399,18 +409,18 @@ func RandomSubnet() uint16 {
 	return uint16(rand)
 }
 
-// mac2InterfaceID transform a mac address to a globaal unicast address
+// randomGlobalUnicast transform a mac address to a globaal unicast address
 // https://support.lenovo.com/ca/en/solutions/ht509925-how-to-convert-a-mac-address-into-an-ipv6-link-local-address-eui-64
-func mac2InterfaceID(s string) (netip.Addr, error) {
+func randomGlobalUnicast() (addr netip.Addr, err error) {
+	macAddrBytes, err := randomMacBytesForInterface()
+	if err != nil {
+		return
+	}
+	s := bytes2MacAddr(macAddrBytes)
 	mac, err := net.ParseMAC(s)
 	if err != nil {
-		return netip.Addr{}, err
+		return
 	}
-
-	// Invert the bit at the index 6 (counting from 0)
-	// This is position 6 of 8 (counting from 0)
-	// e.g. 00001000 -> 00001010
-	mac[0] ^= (1 << (2 - 1))
 
 	inRange := randUInt64(63-32) + 32
 
@@ -428,19 +438,22 @@ func mac2InterfaceID(s string) (netip.Addr, error) {
 
 	var addrBytes [16]byte
 	copy(addrBytes[:], ipBytes)
+	addr = netip.AddrFrom16(addrBytes)
 
-	return netip.AddrFrom16(addrBytes), nil
+	return
 }
 
 // mac2GlobalUnicast transform a mac address to a globaal unicast address
-func mac2UniqueLocal(s string) (netip.Addr, error) {
+func randomUniqueLocal() (addr netip.Addr, err error) {
+	macAddrBytes, err := randomMacBytesForInterface()
+	if err != nil {
+		return
+	}
+	s := bytes2MacAddr(macAddrBytes)
 	mac, err := net.ParseMAC(s)
 	if err != nil {
-		return netip.Addr{}, err
+		return
 	}
-
-	// Invert the bit at the index 6 (counting from 0)
-	mac[0] ^= (1 << (2 - 1))
 
 	// fc00::/8 is currently not defined
 	ipBytes := []byte{
@@ -455,20 +468,22 @@ func mac2UniqueLocal(s string) (netip.Addr, error) {
 	}
 	var addrBytes [16]byte
 	copy(addrBytes[:], ipBytes)
+	addr = netip.AddrFrom16(addrBytes)
 
-	return netip.AddrFrom16(addrBytes), nil
+	return
 }
 
-// mac2LinkLocal transform a mac address to a link local address
-func mac2LinkLocal(s string) (netip.Addr, error) {
-	fmt.Println("here")
+// randomLinkLocal transform a mac address to a link local address
+func randomLinkLocal() (addr netip.Addr, err error) {
+	macAddrBytes, err := randomMacBytesForInterface()
+	if err != nil {
+		return
+	}
+	s := bytes2MacAddr(macAddrBytes)
 	mac, err := net.ParseMAC(s)
 	if err != nil {
-		return netip.Addr{}, err
+		return
 	}
-
-	// Invert the bit at the index 6 (counting from 0)
-	mac[0] ^= (1 << (2 - 1))
 
 	// link local can be fc00::/7 to fdff::/7
 	ipBytes := []byte{
@@ -483,22 +498,15 @@ func mac2LinkLocal(s string) (netip.Addr, error) {
 	}
 	var addrBytes [16]byte
 	copy(addrBytes[:], ipBytes)
+	addr = netip.AddrFrom16(addrBytes)
 
-	return netip.AddrFrom16(addrBytes), nil
+	return
 }
 
 // mac2LinkLocal transform a mac address to a link local address
 // multicast is tricky - this is not properly implemented in terms of network prefix
 // and group id
-func mac2Multicast(s string) (netip.Addr, error) {
-	mac, err := net.ParseMAC(s)
-	if err != nil {
-		return netip.Addr{}, err
-	}
-
-	// Invert the bit at the index 6 (counting from 0)
-	mac[0] ^= (1 << (2 - 1))
-
+func randomMulticast() (addr netip.Addr, err error) {
 	flags := []string{"0", "1", "3", "7"}
 	element := randUInt64(int64(len(flags))) + 1
 	flagStr := flags[element-1]
@@ -521,19 +529,12 @@ func mac2Multicast(s string) (netip.Addr, error) {
 	}
 	var addrBytes [16]byte
 	copy(addrBytes[:], ipBytes)
+	addr = netip.AddrFrom16(addrBytes)
 
-	return netip.AddrFrom16(addrBytes), nil
+	return
 }
 
-func mac2LinkLocalMulticast(s string) (netip.Addr, error) {
-	mac, err := net.ParseMAC(s)
-	if err != nil {
-		return netip.Addr{}, err
-	}
-
-	// Invert the bit at the index 6 (counting from 0)
-	mac[0] ^= (1 << (2 - 1))
-
+func randomLinkLocalMulticast() (addr netip.Addr, err error) {
 	flags := []string{"0", "1", "3", "7"}
 	element := randUInt64(int64(len(flags))) + 1
 	flagStr := flags[element-1]
@@ -556,19 +557,12 @@ func mac2LinkLocalMulticast(s string) (netip.Addr, error) {
 	}
 	var addrBytes [16]byte
 	copy(addrBytes[:], ipBytes)
+	addr = netip.AddrFrom16(addrBytes)
 
-	return netip.AddrFrom16(addrBytes), nil
+	return
 }
 
-func mac2InterfaceLocalMulticast(s string) (netip.Addr, error) {
-	mac, err := net.ParseMAC(s)
-	if err != nil {
-		return netip.Addr{}, err
-	}
-
-	// Invert the bit at the index 6 (counting from 0)
-	mac[0] ^= (1 << (2 - 1))
-
+func randomInterfaceLocalMulticast() (addr netip.Addr, err error) {
 	flags := []string{"0", "1", "3", "7"}
 	element := randUInt64(int64(len(flags))) + 1
 	flagStr := flags[element-1]
@@ -591,21 +585,14 @@ func mac2InterfaceLocalMulticast(s string) (netip.Addr, error) {
 	}
 	var addrBytes [16]byte
 	copy(addrBytes[:], ipBytes)
+	addr = netip.AddrFrom16(addrBytes)
 
-	return netip.AddrFrom16(addrBytes), nil
+	return
 }
 
 // RandomAddrGlobalUnicast get a global unicast random IPV6 address
 func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {
-	bytes, err := randomMacAddress()
-	if err != nil {
-		return
-	}
-	macAddrBytes, err := randomMacBytes2MacAddrBytes(bytes)
-	if err != nil {
-		return
-	}
-	addr, err = mac2InterfaceID(bytesToMacAddr(macAddrBytes))
+	addr, err = randomGlobalUnicast()
 	if err != nil {
 		return
 	}
@@ -615,15 +602,7 @@ func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {
 
 // RandomAddrLinkLocal get a link-local random IPV6 address
 func RandomAddrLinkLocal() (addr netip.Addr, err error) {
-	bytes, err := randomMacAddress()
-	if err != nil {
-		return
-	}
-	macAddrBytes, err := randomMacBytes2MacAddrBytes(bytes)
-	if err != nil {
-		return
-	}
-	addr, err = mac2LinkLocal(bytesToMacAddr(macAddrBytes))
+	addr, err = randomLinkLocal()
 	if err != nil {
 		return
 	}
@@ -633,15 +612,7 @@ func RandomAddrLinkLocal() (addr netip.Addr, err error) {
 
 // RandomAddrUniqueLocal get a unique local random IPV6 address
 func RandomAddrUniqueLocal() (addr netip.Addr, err error) {
-	bytes, err := randomMacAddress()
-	if err != nil {
-		return
-	}
-	macAddrBytes, err := randomMacBytes2MacAddrBytes(bytes)
-	if err != nil {
-		return
-	}
-	addr, err = mac2UniqueLocal(bytesToMacAddr(macAddrBytes))
+	addr, err = randomUniqueLocal()
 	if err != nil {
 		return
 	}
@@ -651,15 +622,7 @@ func RandomAddrUniqueLocal() (addr netip.Addr, err error) {
 
 // RandomAddrMulticast get a random multicast address
 func RandomAddrMulticast() (addr netip.Addr, err error) {
-	bytes, err := randomMacAddress()
-	if err != nil {
-		return
-	}
-	macAddrBytes, err := randomMacBytes2MacAddrBytes(bytes)
-	if err != nil {
-		return
-	}
-	addr, err = mac2Multicast(bytesToMacAddr(macAddrBytes))
+	addr, err = randomMulticast()
 	if err != nil {
 		return
 	}
@@ -669,15 +632,7 @@ func RandomAddrMulticast() (addr netip.Addr, err error) {
 
 // RandomAddrLinkLocalMulticast get a random link local multicast address
 func RandomAddrLinkLocalMulticast() (addr netip.Addr, err error) {
-	bytes, err := randomMacAddress()
-	if err != nil {
-		return
-	}
-	macAddrBytes, err := randomMacBytes2MacAddrBytes(bytes)
-	if err != nil {
-		return
-	}
-	addr, err = mac2LinkLocalMulticast(bytesToMacAddr(macAddrBytes))
+	addr, err = randomLinkLocalMulticast()
 	if err != nil {
 		return
 	}
@@ -687,15 +642,7 @@ func RandomAddrLinkLocalMulticast() (addr netip.Addr, err error) {
 
 // RandomAddrInterfaceLocalMulticast get a random interface local multicast address
 func RandomAddrInterfaceLocalMulticast() (addr netip.Addr, err error) {
-	bytes, err := randomMacAddress()
-	if err != nil {
-		return
-	}
-	macAddrBytes, err := randomMacBytes2MacAddrBytes(bytes)
-	if err != nil {
-		return
-	}
-	addr, err = mac2InterfaceLocalMulticast(bytesToMacAddr(macAddrBytes))
+	addr, err = randomInterfaceLocalMulticast()
 	if err != nil {
 		return
 	}
@@ -703,8 +650,8 @@ func RandomAddrInterfaceLocalMulticast() (addr netip.Addr, err error) {
 	return
 }
 
-// SolicitedNodeMulticastAddress get solicited node multicast address for incoming unicast address
-func SolicitedNodeMulticastAddress(addr netip.Addr) (newAddr netip.Addr, err error) {
+// SolicitedNodeMulticast get solicited node multicast address for incoming unicast address
+func SolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error) {
 	if !(HasType(AddressType(addr), GlobalUnicast, LinkLocalUnicast, UniqueLocal, Private)) {
 		err = errors.New("not a unicast address")
 		return
