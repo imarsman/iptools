@@ -1,4 +1,4 @@
-package ip4util
+package ipv4util
 
 import (
 	"encoding/binary"

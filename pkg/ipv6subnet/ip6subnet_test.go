@@ -3,7 +3,7 @@ package ipv6subnet
 import (
 	"testing"
 
-	"github.com/imarsman/iptools/pkg/ipv6subnet/ip6util"
+	ip6util "github.com/imarsman/iptools/pkg/ipv6subnet/ipv6util"
 	"github.com/matryer/is"
 )
 

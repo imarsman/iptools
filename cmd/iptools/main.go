@@ -37,6 +37,9 @@ func main() {
 	}
 	if args.CLIArgs.IP6Subnet != nil {
 		if args.CLIArgs.IP6Subnet.IP6SubnetDescribe != nil {
+			if args.CLIArgs.IP6Subnet.IP6SubnetDescribe.IP == "" && !args.CLIArgs.IP6Subnet.IP6SubnetDescribe.Random {
+				args.CLIArgs.IP6Subnet.IP6SubnetDescribe.Random = true
+			}
 			handler.IP6SubnetDescribe(
 				args.CLIArgs.IP6Subnet.IP6SubnetDescribe.IP,
 				args.CLIArgs.IP6Subnet.IP6SubnetDescribe.Bits,

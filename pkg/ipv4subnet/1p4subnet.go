@@ -10,7 +10,7 @@ import (
 
 	"net/netip"
 
-	"github.com/imarsman/iptools/pkg/ipv4subnet/ip4util"
+	ip4util "github.com/imarsman/iptools/pkg/ipv4subnet/ipv4util"
 	"gopkg.in/yaml.v2"
 )
 

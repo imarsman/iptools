@@ -1,4 +1,4 @@
-package ip6util
+package ipv6util
 
 import (
 	"crypto/rand"

@@ -9,7 +9,7 @@ import (
 	"net/netip"
 	"strings"
 
-	"github.com/imarsman/iptools/pkg/ipv6subnet/ip6util"
+	ip6util "github.com/imarsman/iptools/pkg/ipv6subnet/ipv6util"
 	"gopkg.in/yaml.v2"
 )
 
