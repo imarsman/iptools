@@ -444,7 +444,7 @@ func randomGlobalUnicast() (addr netip.Addr, err error) {
 }
 
 // mac2GlobalUnicast transform a mac address to a globaal unicast address
-func randomUniqueLocal() (addr netip.Addr, err error) {
+func randomPrivate() (addr netip.Addr, err error) {
 	macAddrBytes, err := randomMacBytesForInterface()
 	if err != nil {
 		return
@@ -457,7 +457,7 @@ func randomUniqueLocal() (addr netip.Addr, err error) {
 
 	// fc00::/8 is currently not defined
 	ipBytes := []byte{
-		0xfd, 0x0,
+		0xfd, byte(randUInt64(256)),
 		byte(randUInt64(256)), byte(randUInt64(256)),
 		byte(randUInt64(256)), byte(randUInt64(256)),
 		byte(randUInt64(256)), byte(randUInt64(256)), // prepend with fd00::
@@ -610,9 +610,9 @@ func RandomAddrLinkLocal() (addr netip.Addr, err error) {
 	return
 }
 
-// RandomAddrUniqueLocal get a unique local random IPV6 address
-func RandomAddrUniqueLocal() (addr netip.Addr, err error) {
-	addr, err = randomUniqueLocal()
+// RandomAddrPrivate get a unique local random IPV6 address
+func RandomAddrPrivate() (addr netip.Addr, err error) {
+	addr, err = randomPrivate()
 	if err != nil {
 		return
 	}

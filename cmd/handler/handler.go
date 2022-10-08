@@ -364,7 +364,7 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 				os.Exit(1)
 			}
 		} else if ip6Type == typePrivate {
-			addr, err = ip6util.RandomAddrUniqueLocal()
+			addr, err = ip6util.RandomAddrPrivate()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -436,7 +436,7 @@ func ip6SubnetDisplay(s *ipv6subnet.Subnet) {
 	if ip6util.AddressType(s.Addr()) == ip6util.GlobalUnicast {
 		table.Body.Cells = append(table.Body.Cells, row("Routing Prefix", fmt.Sprintf("%s", s.RoutingPrefix())))
 	}
-	if ip6util.HasType(ip6util.AddressType(s.Addr()), ip6util.GlobalUnicast) {
+	if ip6util.HasType(ip6util.AddressType(s.Addr()), ip6util.GlobalUnicast, ip6util.Private) {
 		table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", ip6util.GlobalID(s.Addr()))))
 	}
 	table.Body.Cells = append(table.Body.Cells, row("Interface ID", fmt.Sprintf("%s", s.InterfaceString())))
@@ -512,7 +512,7 @@ func IP6RandomIPs(ip6Type string, number int) {
 		}
 	} else if ip6Type == typeUniqueLocal {
 		for i := 0; i < number; i++ {
-			addr, err = ip6util.RandomAddrUniqueLocal()
+			addr, err = ip6util.RandomAddrPrivate()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
