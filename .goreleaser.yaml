@@ -36,6 +36,9 @@ release:
 
     iptools is a set of IP and network tools
 
+    v0.1.30
+    Fixed logic for creating random mac addresses for interface IDs
+
     v0.1.29
     Switched from unique-local to private
 
