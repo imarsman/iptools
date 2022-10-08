@@ -265,10 +265,13 @@ func bytes2MacAddr(bytes [6]byte) string {
 }
 
 func randomMacBytesForInterface() (bytes [6]byte, err error) {
-	mac, err := randomMacAddress()
+	var mac [6]byte
+	_, err = rand.Read(mac[:])
 	if err != nil {
+		fmt.Println("error:", err)
 		return
 	}
+
 	// Set second last bit to 1 to indicate globally unique
 	// See also https://www.rfc-editor.org/rfc/rfc4291.html#section-2.5.1
 
@@ -278,18 +281,6 @@ func randomMacBytesForInterface() (bytes [6]byte, err error) {
 	// fmt.Printf("%08b\n", addr[0])
 
 	copy(bytes[:], addr[:6])
-
-	return
-}
-
-// randomMacAddress make a random mac address of a 6 byte array
-func randomMacAddress() (buf [6]byte, err error) {
-	buf = [6]byte{}
-	_, err = rand.Read(buf[:])
-	if err != nil {
-		fmt.Println("error:", err)
-		return
-	}
 
 	return
 }
@@ -407,6 +398,116 @@ func RandomSubnet() uint16 {
 	rand := randUInt64(65_536)
 
 	return uint16(rand)
+}
+
+// RandomAddrGlobalUnicast get a global unicast random IPV6 address
+func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {
+	addr, err = randomGlobalUnicast()
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// RandomAddrLinkLocal get a link-local random IPV6 address
+func RandomAddrLinkLocal() (addr netip.Addr, err error) {
+	addr, err = randomLinkLocal()
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// RandomAddrPrivate get a unique local random IPV6 address
+func RandomAddrPrivate() (addr netip.Addr, err error) {
+	addr, err = randomPrivate()
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// RandomAddrMulticast get a random multicast address
+func RandomAddrMulticast() (addr netip.Addr, err error) {
+	addr, err = randomMulticast()
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// RandomAddrLinkLocalMulticast get a random link local multicast address
+func RandomAddrLinkLocalMulticast() (addr netip.Addr, err error) {
+	addr, err = randomLinkLocalMulticast()
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// RandomAddrInterfaceLocalMulticast get a random interface local multicast address
+func RandomAddrInterfaceLocalMulticast() (addr netip.Addr, err error) {
+	addr, err = randomInterfaceLocalMulticast()
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// AddrSolicitedNodeMulticast get solicited node multicast address for incoming unicast address
+func AddrSolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error) {
+	if !(HasType(AddressType(addr), GlobalUnicast, LinkLocalUnicast, UniqueLocal, Private)) {
+		err = errors.New("not a unicast address")
+		return
+	}
+	// we need the last six characters from the address or 24 bits or 3 bytes
+	start := 104
+	end := 128
+
+	// get range hex
+	unique := bitRangeHex(addr, start, end)
+	// strip colons
+	unique = strings.ReplaceAll(unique, ":", "")
+
+	// hex.DecodeString requires an even number of characters to make bytes
+	// and we definitely need 6 characters/3 bytes
+	if len(unique) < 6 {
+		unique = fmt.Sprintf("%s%s", strings.Repeat("0", 6-len(unique)), unique)
+	}
+
+	// get bytes for decoded string - it will be up to 3 bytes
+	rangeBytes, err := hex.DecodeString(unique)
+	if err != nil {
+		panic(err)
+	}
+	// copy bytes in range to an array of length 3
+	var source [3]byte
+	copy(source[:], rangeBytes)
+
+	// Create the IP based on the rule for solicited node multicast
+	// ff02::1:ffca:2fdf
+	ipBytes := []byte{
+		0xff, 0x2,
+		0x0, 0x0,
+		0x0, 0x0,
+		0x0, 0x0,
+		0x0, 0x0,
+		0x0, 0x1,
+		0xff, source[0],
+		source[1], source[2],
+	}
+
+	var addrBytes [16]byte
+	copy(addrBytes[:], ipBytes)
+	newAddr = netip.AddrFrom16(addrBytes)
+
+	return
 }
 
 // randomGlobalUnicast transform a mac address to a globaal unicast address
@@ -594,116 +695,6 @@ func randomInterfaceLocalMulticast() (addr netip.Addr, err error) {
 	var addrBytes [16]byte
 	copy(addrBytes[:], ipBytes)
 	addr = netip.AddrFrom16(addrBytes)
-
-	return
-}
-
-// RandomAddrGlobalUnicast get a global unicast random IPV6 address
-func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {
-	addr, err = randomGlobalUnicast()
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-// RandomAddrLinkLocal get a link-local random IPV6 address
-func RandomAddrLinkLocal() (addr netip.Addr, err error) {
-	addr, err = randomLinkLocal()
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-// RandomAddrPrivate get a unique local random IPV6 address
-func RandomAddrPrivate() (addr netip.Addr, err error) {
-	addr, err = randomPrivate()
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-// RandomAddrMulticast get a random multicast address
-func RandomAddrMulticast() (addr netip.Addr, err error) {
-	addr, err = randomMulticast()
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-// RandomAddrLinkLocalMulticast get a random link local multicast address
-func RandomAddrLinkLocalMulticast() (addr netip.Addr, err error) {
-	addr, err = randomLinkLocalMulticast()
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-// RandomAddrInterfaceLocalMulticast get a random interface local multicast address
-func RandomAddrInterfaceLocalMulticast() (addr netip.Addr, err error) {
-	addr, err = randomInterfaceLocalMulticast()
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-// SolicitedNodeMulticast get solicited node multicast address for incoming unicast address
-func SolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error) {
-	if !(HasType(AddressType(addr), GlobalUnicast, LinkLocalUnicast, UniqueLocal, Private)) {
-		err = errors.New("not a unicast address")
-		return
-	}
-	// we need the last six characters from the address or 24 bits or 3 bytes
-	start := 104
-	end := 128
-
-	// get range hex
-	unique := bitRangeHex(addr, start, end)
-	// strip colons
-	unique = strings.ReplaceAll(unique, ":", "")
-
-	// hex.DecodeString requires an even number of characters to make bytes
-	// and we definitely need 6 characters/3 bytes
-	if len(unique) < 6 {
-		unique = fmt.Sprintf("%s%s", strings.Repeat("0", 6-len(unique)), unique)
-	}
-
-	// get bytes for decoded string - it will be up to 3 bytes
-	rangeBytes, err := hex.DecodeString(unique)
-	if err != nil {
-		panic(err)
-	}
-	// copy bytes in range to an array of length 3
-	var source [3]byte
-	copy(source[:], rangeBytes)
-
-	// Create the IP based on the rule for solicited node multicast
-	// ff02::1:ffca:2fdf
-	ipBytes := []byte{
-		0xff, 0x2,
-		0x0, 0x0,
-		0x0, 0x0,
-		0x0, 0x0,
-		0x0, 0x0,
-		0x0, 0x1,
-		0xff, source[0],
-		source[1], source[2],
-	}
-
-	var addrBytes [16]byte
-	copy(addrBytes[:], ipBytes)
-	newAddr = netip.AddrFrom16(addrBytes)
 
 	return
 }
