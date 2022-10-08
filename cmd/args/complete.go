@@ -15,7 +15,7 @@ var IP6PrefixBits = []string{"64", "48", "10", "8"}
 var IP6Types = []string{
 	"global-unicast",
 	"link-local",
-	"unique-local",
+	"private",
 	"multicast",
 	"interface-local-multicast",
 	"link-local-multicast",

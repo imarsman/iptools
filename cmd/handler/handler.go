@@ -324,6 +324,7 @@ func IP4SubnetDivide(ip string, bits int, secondaryBits int) {
 const typeGlobalUnicast = "global-unicast"
 const typeLinkLocal = "link-local"
 const typeUniqueLocal = "unique-local"
+const typePrivate = "private"
 const typeMulticast = "multicast"
 const typeInterfaceLocalMulticast = "interface-local-multicast"
 const typeLinkLocalMulticast = "link-local-multicast"
@@ -362,7 +363,7 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 				fmt.Println(err)
 				os.Exit(1)
 			}
-		} else if ip6Type == typeUniqueLocal {
+		} else if ip6Type == typePrivate {
 			addr, err = ip6util.RandomAddrUniqueLocal()
 			if err != nil {
 				fmt.Println(err)

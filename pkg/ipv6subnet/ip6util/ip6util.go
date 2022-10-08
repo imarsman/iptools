@@ -206,10 +206,8 @@ func TypePrefix(addr netip.Addr) (prefix netip.Prefix) {
 // AddressType get address type as int
 func AddressType(addr netip.Addr) int {
 	switch {
-	case strings.HasPrefix(addr.StringExpanded(), "fd00"):
-		return UniqueLocal
-	case addr.IsGlobalUnicast(): // 2001
-		return GlobalUnicast
+	// case strings.HasPrefix(addr.StringExpanded(), "fd00"):
+	// 	return UniqueLocal
 	case addr.IsInterfaceLocalMulticast(): // fe80::/10
 		return InterfaceLocalMulticast
 	case addr.IsLinkLocalMulticast(): // ff00::/8 ff02
@@ -218,10 +216,12 @@ func AddressType(addr netip.Addr) int {
 		return LinkLocalUnicast
 	case addr.IsLoopback(): // ::1/128
 		return Loopback
-	case addr.IsMulticast(): // ff00::/8
-		return Multicast
 	case addr.IsPrivate(): // fc00::/7
 		return Private
+	case addr.IsGlobalUnicast(): // 2001
+		return GlobalUnicast
+	case addr.IsMulticast(): // ff00::/8
+		return Multicast
 	case addr.IsUnspecified():
 		return Unspecified
 	default:
@@ -461,6 +461,7 @@ func mac2UniqueLocal(s string) (netip.Addr, error) {
 
 // mac2LinkLocal transform a mac address to a link local address
 func mac2LinkLocal(s string) (netip.Addr, error) {
+	fmt.Println("here")
 	mac, err := net.ParseMAC(s)
 	if err != nil {
 		return netip.Addr{}, err
