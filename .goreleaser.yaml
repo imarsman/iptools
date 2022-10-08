@@ -36,6 +36,9 @@ release:
 
     iptools is a set of IP and network tools
 
+    v0.1.29
+    Switched from unique-local to private
+
     v0.1.28
     Added solicited node multicast output
 
