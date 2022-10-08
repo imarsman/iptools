@@ -1,6 +1,6 @@
 # iptools
 
-This project was done as a learning experience for things like IP subnetting. Mostly I was interested in learning more
+This project is a learning experience for ipv4 subnetting and ipv6 addresses. Mostly I am interested in learning more
 about ipv4 subnets and splitting up subnets into equal ranges and defining things like the network ID and broadcast
 address for subnets. This is a way for me to better establish my knowledge of this subject.
 
@@ -9,15 +9,15 @@ implemented are very strict for that. I may easily have made errors that I have 
 
 This utility can have completion enabled by typing `COMP_INSTALL=1 iptools`.
 
-This utility currently does three things with IPV4. It splits a subnet into networks and into networks by a differing subnet size,
+This utility currently does three things with ipv4. It splits a subnet into networks and into networks by a differing subnet size,
 it splits a subnet into a set of ranges for its networks, and it gives summary information for a subnet.
 
-For IPV6 a random IPV6 IP can be generated (or manually entered as a parameter) and described. Currently global unicast,
-link local, and unique local addresses are handled along with multicast, interface local multicast, and
-link local multicast. The full range of address types will at tome point be supported where it makes sense. 
+For ipv6 a random ipv6 IP can be generated (or manually entered as a parameter) and described. Currently global unicast,
+link local, and private addresses are handled along with multicast, interface local multicast, and link local multicast.
+The full range of address types will at tome point be supported where it makes sense. 
 
-Especially with IPV6 addresses contain a great amount of information that relies on external software to keep track of.
-It is possible to produce valid IPV6 addresses but the random numbers used to generate the addresses are in no way
+Especially with ipv6 addresses contain a great amount of information that relies on external software to keep track of.
+It is possible to produce valid ipv6 addresses but the random numbers used to generate the addresses are in no way
 meaningfully tied to any system that might use them even if they are "valid". One possible exception would be Link local
 addresses which rely on a good random number generating algorithm for the interface ID.
 
@@ -25,8 +25,7 @@ The IP package used, `net/netip`, is in Go 1.18. It is slightly different in API
 [netaddr](https://github.com/inetaf/netaddr) package that came first. Sadly, the `netip` package loses the IPRange
 struct, so I have added needed functionality here in the ipv4 subnet package.
 
-I would be surprised if there were not errors due to coding or to a lack of understanding of IPV4 and IPV6. I will work
-to reduce both my ignorance and errors.
+I would be surprised if there were not errors due to coding or to a lack of understanding of ipv4 and ipv6.
 
 ### Subnet divisions split default
 
@@ -223,22 +222,21 @@ $ iptools ip6 describe -random -type link-local
  first address field binary   1111111010000000
  ```
 
-### IPV6 Unique local address
+### IPV6 private address
 ```
-$ iptools ip6 describe -random -type unique-local
+$ iptools ip6 describe -random -type private
           Category                                 Value
 ---------------------------- --------------------------------------------------
- IP Type                      Unique local
- Type Prefix                  fd00::/8
- IP                           fd00:8167:f33f:cc7:42b6:41ff:fe0b:d947
- Solicited node multicast     ff02::1:ff0b:d947
- Prefix                       fd00:8167:f33f:cc7::/64
- Global ID                    00:8167:f33f
- Interface ID                 42b6:41ff:fe0b:d947
- Subnet ID                    0cc7
- Link                         http://[fd00:8167:f33f:cc7:42b6:41ff:fe0b:d947]/
- Subnet first address         fd00:8167:f33f:0cc7:0000:0000:0000:0000
- Subnet last address          fd00:8167:f33f:0cc7:ffff:ffff:ffff:ffff
+ IP Type                      Private
+ Type Prefix                  fc00::/7
+ IP                           fd00:cb8e:e4a4:2708:2e2b:2ff:fe22:b549
+ Solicited node multicast     ff02::1:ff22:b549
+ Prefix                       fd00:cb8e:e4a4:2708::/64
+ Interface ID                 2e2b:02ff:fe22:b549
+ Subnet ID                    2708
+ Link                         http://[fd00:cb8e:e4a4:2708:2e2b:2ff:fe22:b549]/
+ Subnet first address         fd00:cb8e:e4a4:2708:0000:0000:0000:0000
+ Subnet last address          fd00:cb8e:e4a4:2708:ffff:ffff:ffff:ffff
  first address field binary   1111110100000000
 ```
 
