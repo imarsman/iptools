@@ -455,7 +455,7 @@ func randomPrivate() (addr netip.Addr, err error) {
 		return
 	}
 
-	// fc00::/8 is currently not defined
+	// fc00::/7 is currently not defined
 	ipBytes := []byte{
 		0xfd, byte(randUInt64(256)),
 		byte(randUInt64(256)), byte(randUInt64(256)),
@@ -485,7 +485,7 @@ func randomLinkLocal() (addr netip.Addr, err error) {
 		return
 	}
 
-	// link local can be fc00::/7 to fdff::/7
+	// link local has prefix FE80::/10
 	ipBytes := []byte{
 		0xfe, 0x80,
 		0x0, 0x0,
@@ -507,16 +507,20 @@ func randomLinkLocal() (addr netip.Addr, err error) {
 // multicast is tricky - this is not properly implemented in terms of network prefix
 // and group id
 func randomMulticast() (addr netip.Addr, err error) {
-	flags := []string{"0", "1", "3", "7"}
+	// flag for 0 is reserved currently
+	flags := []string{"1", "2", "3"}
 	element := randUInt64(int64(len(flags))) + 1
 	flagStr := flags[element-1]
 
+	// scope 1 is interface-local and defined in interfaceLocalMulticast
+	// scope 2 is link-local multicast defined in randomLinkLocalMulticast
 	scopes := []string{"3", "4", "5", "8", "e", "f"}
 	element = randUInt64(int64(len(scopes))) + 1
 	scopeStr := scopes[element-1]
 
 	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
 
+	// multicast has prefix ff00::/8
 	ipBytes := []byte{
 		0xff, byte(flagAndScope),
 		0x0, 0x0,
@@ -535,10 +539,12 @@ func randomMulticast() (addr netip.Addr, err error) {
 }
 
 func randomLinkLocalMulticast() (addr netip.Addr, err error) {
-	flags := []string{"0", "1", "3", "7"}
+	// flag for 0 is reserved currently
+	flags := []string{"1", "2", "3"}
 	element := randUInt64(int64(len(flags))) + 1
 	flagStr := flags[element-1]
 
+	// a single scope applies to link local
 	scopes := []string{"2"}
 	element = randUInt64(int64(len(scopes))) + 1
 	scopeStr := scopes[element-1]
@@ -563,10 +569,12 @@ func randomLinkLocalMulticast() (addr netip.Addr, err error) {
 }
 
 func randomInterfaceLocalMulticast() (addr netip.Addr, err error) {
-	flags := []string{"0", "1", "3", "7"}
+	// flag for 0 is reserved currently
+	flags := []string{"1", "2", "3"}
 	element := randUInt64(int64(len(flags))) + 1
 	flagStr := flags[element-1]
 
+	// a single scope applies to interface local
 	scopes := []string{"1"}
 	element = randUInt64(int64(len(scopes))) + 1
 	scopeStr := scopes[element-1]

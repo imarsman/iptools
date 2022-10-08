@@ -436,6 +436,7 @@ func ip6SubnetDisplay(s *ipv6subnet.Subnet) {
 	if ip6util.AddressType(s.Addr()) == ip6util.GlobalUnicast {
 		table.Body.Cells = append(table.Body.Cells, row("Routing Prefix", fmt.Sprintf("%s", s.RoutingPrefix())))
 	}
+	// Handle global id for appropriate types
 	if ip6util.HasType(ip6util.AddressType(s.Addr()), ip6util.GlobalUnicast, ip6util.Private) {
 		table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", ip6util.GlobalID(s.Addr()))))
 	}
