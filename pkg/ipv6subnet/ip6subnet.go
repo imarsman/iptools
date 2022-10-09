@@ -1,236 +1,208 @@
 package ipv6subnet
 
-import (
-	// "crypto/rand"
+// // Subnet an IP subnet
+// type Subnet struct {
+// 	name   string
+// 	prefix netip.Prefix
+// }
 
-	"encoding/json"
-	"errors"
-	"fmt"
-	"net/netip"
-	"strings"
+// // Name subnet name
+// func (s *Subnet) Name() string {
+// 	return s.name
+// }
 
-	ip6util "github.com/imarsman/iptools/pkg/ipv6subnet/ipv6util"
-	"gopkg.in/yaml.v2"
-)
+// // SetName set subnet name
+// func (s *Subnet) SetName(name string) {
+// 	s.name = name
+// }
 
-// Subnet an IP subnet
-type Subnet struct {
-	name   string
-	prefix netip.Prefix
-}
+// // Prefix get prefix for subnet
+// func (s *Subnet) Prefix() netip.Prefix {
+// 	return s.prefix
+// }
 
-// Name subnet name
-func (s *Subnet) Name() string {
-	return s.name
-}
+// // Addr get Addr for subnet
+// func (s *Subnet) Addr() netip.Addr {
+// 	return s.prefix.Addr()
+// }
 
-// SetName set subnet name
-func (s *Subnet) SetName(name string) {
-	s.name = name
-}
+// // First get firt IP from subnet
+// func (s *Subnet) First() netip.Addr {
+// 	addr := s.prefix.Addr()
+// 	bytes := addr.As16()
 
-// Prefix get prefix for subnet
-func (s *Subnet) Prefix() netip.Prefix {
-	return s.prefix
-}
+// 	for i := 8; i <= 15; i++ {
+// 		bytes[i] = 0x0
+// 	}
 
-// Addr get Addr for subnet
-func (s *Subnet) Addr() netip.Addr {
-	return s.prefix.Addr()
-}
+// 	addr = netip.AddrFrom16(bytes)
 
-// First get firt IP from subnet
-func (s *Subnet) First() netip.Addr {
-	addr := s.prefix.Addr()
-	bytes := addr.As16()
+// 	return addr
+// }
 
-	for i := 8; i <= 15; i++ {
-		bytes[i] = 0x0
-	}
-	// bytes[8] = 0x0
-	// bytes[9] = 0x0
-	// bytes[10] = 0x0
-	// bytes[11] = 0x0
-	// bytes[12] = 0x0
-	// bytes[13] = 0x0
-	// bytes[14] = 0x0
-	// bytes[15] = 0x0
+// // Last get last IP for subnet
+// func (s *Subnet) Last() netip.Addr {
+// 	addr := s.prefix.Addr()
+// 	bytes := addr.As16()
 
-	addr = netip.AddrFrom16(bytes)
+// 	for i := 8; i <= 15; i++ {
+// 		bytes[i] = 0xff
+// 	}
 
-	return addr
-}
+// 	addr = netip.AddrFrom16(bytes)
 
-// Last get last IP for subnet
-func (s *Subnet) Last() netip.Addr {
-	addr := s.prefix.Addr()
-	bytes := addr.As16()
+// 	return addr
+// }
 
-	for i := 8; i <= 15; i++ {
-		bytes[i] = 0xff
-	}
+// // IsARPA is the address relevant to ARPA addressing?
+// func (s *Subnet) IsARPA() (is bool) {
+// 	if ipv6util.AddressType(addr) == ipv6util.GlobalUnicast {
+// 		is = true
+// 	}
 
-	// bytes[8] = 0xff
-	// bytes[9] = 0xff
-	// bytes[10] = 0xff
-	// bytes[11] = 0xff
-	// bytes[12] = 0xff
-	// bytes[13] = 0xff
-	// bytes[14] = 0xff
-	// bytes[15] = 0xff
+// 	return
+// }
 
-	addr = netip.AddrFrom16(bytes)
+// // IsRoutable is the address routable
+// func (s *Subnet) IsRoutable() (is bool) {
+// 	if ipv6util.AddressType(s.Addr()) == ipv6util.LinkLocalUnicast {
+// 		is = true
+// 	}
 
-	return addr
-}
-
-// IsARPA is the address relevant to ARPA addressing?
-func (s *Subnet) IsARPA() (is bool) {
-	if ip6util.AddressType(s.Addr()) == ip6util.GlobalUnicast {
-		is = true
-	}
-
-	return
-}
-
-// IsRoutable is the address routable
-func (s *Subnet) IsRoutable() (is bool) {
-	if ip6util.AddressType(s.Addr()) == ip6util.LinkLocalUnicast {
-		is = true
-	}
-
-	return
-}
-
-// GlobalIDString get the string global ID a hex string
-func (s *Subnet) GlobalIDString() string {
-	return ip6util.ByteSlice2Hex([]byte(ip6util.GlobalID(s.Addr())))
-}
-
-// SubnetString get the string subnet section as a hex string
-func (s *Subnet) SubnetString() string {
-	return ip6util.ByteSlice2Hex(ip6util.AddrSubnetSection(s.Addr()))
-}
-
-// LinkLocalDefaultGateway get the default gateway as a hex string
-func (s *Subnet) LinkLocalDefaultGateway() string {
-	gateway := fmt.Sprintf("%s::%d", ip6util.ByteSlice2Hex(ip6util.AddrDefaultGateway(s.Addr())), 1)
-	gateway = strings.ReplaceAll(gateway, "0000:", "")
-
-	return gateway
-}
+// 	return
+// }
 
 // Link link version of address
-func (s *Subnet) Link() (url string) {
-	return fmt.Sprintf("http://[%s]/", s.Addr().String())
-}
+// func (s *Subnet) Link() (url string) {
+// 	return fmt.Sprintf("http://[%s]/", s.Addr().String())
+// }
 
-// TypePrefix prefix make a prefix for a type
-func (s *Subnet) TypePrefix() (prefix netip.Prefix) {
+// // TypePrefix prefix make a prefix for a type
+// func (s *Subnet) TypePrefix() (prefix netip.Prefix) {
 
-	return ip6util.TypePrefix(s.Addr())
-}
+// 	return ipv6util.TypePrefix(s.Addr())
+// }
 
-// RoutingPrefix get the routing prefix as a hex string
-func (s *Subnet) RoutingPrefix() string {
-	return fmt.Sprintf("%s::/%d", ip6util.ByteSlice2Hex(ip6util.AddrRoutingPrefixSecion(s.Addr())), 48)
-}
+// // RoutingPrefix get the routing prefix as a hex string
+// func (s *Subnet) RoutingPrefix() string {
+// 	return fmt.Sprintf("%s::/%d", ipv6util.ByteSlice2Hex(ipv6util.AddrRoutingPrefixSecion(s.Addr())), 48)
+// }
 
 // InterfaceString get the string representation in hex of the interface bits
-func (s *Subnet) InterfaceString() string {
-	return ip6util.ByteSlice2Hex(ip6util.AddrInterfaceSection(s.Addr()))
-}
+// func (s *Subnet) InterfaceString() string {
+// 	return ipv6util.ByteSlice2Hex(ipv6util.AddrInterfaceSection(s.Addr()))
+// }
 
-// String get string representing subnet of the subnet prefix
-func (s *Subnet) String() string {
-	return s.prefix.String()
-}
+// // String get string representing subnet of the subnet prefix
+// func (s *Subnet) String() string {
+// 	return s.prefix.String()
+// }
 
 // JSON get JSON for subnet
-func (s *Subnet) JSON() (bytes []byte, err error) {
-	var prefix = s.prefix.String()
-	bytes, err = json.MarshalIndent(&prefix, "", "  ")
-	if err != nil {
-		return
-	}
+// func (s *Subnet) JSON() (bytes []byte, err error) {
+// 	var prefix = s.prefix.String()
+// 	bytes, err = json.MarshalIndent(&prefix, "", "  ")
+// 	if err != nil {
+// 		return
+// 	}
 
-	return bytes, nil
-}
+// 	return bytes, nil
+// }
 
-// YAML get YAML for subnet
-func (s *Subnet) YAML() (bytes []byte, err error) {
-	var prefix = s.prefix.String()
-	bytes, err = yaml.Marshal(&prefix)
-	if err != nil {
-		return
-	}
+// // YAML get YAML for subnet
+// func (s *Subnet) YAML() (bytes []byte, err error) {
+// 	var prefix = s.prefix.String()
+// 	bytes, err = yaml.Marshal(&prefix)
+// 	if err != nil {
+// 		return
+// 	}
 
-	return bytes, nil
-}
+// 	return bytes, nil
+// }
 
-// NewNamedFromIPAndBits new with name using incoming prefix ip and network bits
-func NewNamedFromIPAndBits(addr string, bits int, name string) (subnet *Subnet, err error) {
-	subnet, err = newSubnet(addr, bits)
-	if err != nil {
-		return
-	}
-	subnet.name = name
+// // NewNamedFromIPAndBits new with name using incoming prefix ip and network bits
+// func NewNamedFromIPAndBits(addr string, bits int, name string) (subnet *Subnet, err error) {
+// 	subnet, err = newSubnet(addr, bits)
+// 	if err != nil {
+// 		return
+// 	}
+// 	subnet.name = name
 
-	return
-}
+// 	return
+// }
 
-// NewFromIPAndBits new using incoming prefix ip and network bits
-func NewFromIPAndBits(addr string, bits int) (subnet *Subnet, err error) {
-	return newSubnet(addr, bits)
-}
+// // NewFromAddrAndBits new subnet using address and prefix bits
+// func NewFromAddrAndBits(addr netip.Addr, bits int) (subnet *Subnet, err error) {
+// 	return newSubnetFromAddr(addr, bits)
+// }
 
-// NewNamedFromPrefix new with name using incoming prefix
-func NewNamedFromPrefix(prefix string, name string) (subnet *Subnet, err error) {
-	p, err := netip.ParseAddr(prefix)
-	if err != nil {
-		return
-	}
+// // NewFromIPAndBits new using incoming prefix ip and network bits
+// func NewFromIPAndBits(addr string, bits int) (subnet *Subnet, err error) {
+// 	return newSubnet(addr, bits)
+// }
 
-	subnet, err = newSubnet(p.String(), p.BitLen())
-	if err != nil {
-		return
-	}
-	subnet.name = name
+// // NewNamedFromPrefix new with name using incoming prefix
+// func NewNamedFromPrefix(prefix string, name string) (subnet *Subnet, err error) {
+// 	p, err := netip.ParseAddr(prefix)
+// 	if err != nil {
+// 		return
+// 	}
 
-	return
-}
+// 	subnet, err = newSubnet(p.String(), p.BitLen())
+// 	if err != nil {
+// 		return
+// 	}
+// 	subnet.name = name
 
-// NewFromPrefix new using incoming prefix
-func NewFromPrefix(prefix string) (subnet *Subnet, err error) {
-	p, err := netip.ParsePrefix(prefix)
-	if err != nil {
-		return
-	}
+// 	return
+// }
 
-	subnet, err = newSubnet(p.Addr().String(), p.Bits())
-	if err != nil {
-		return
-	}
+// // NewFromPrefix new using incoming prefix
+// func NewFromPrefix(prefix string) (subnet *Subnet, err error) {
+// 	p, err := netip.ParsePrefix(prefix)
+// 	if err != nil {
+// 		return
+// 	}
 
-	return
-}
+// 	subnet, err = newSubnet(p.Addr().String(), p.Bits())
+// 	if err != nil {
+// 		return
+// 	}
 
-// newSubnet new subnet with prefix ip and network bits
-func newSubnet(address string, bits int) (subnet *Subnet, err error) {
-	subnet = new(Subnet)
-	addr, err := netip.ParseAddr(address)
-	if err != nil {
-		fmt.Println("error", err)
-		return
-	}
-	if addr.Is4() {
-		return nil, errors.New("subnet too large for current implementation")
-	}
+// 	return
+// }
 
-	subnet.prefix = netip.PrefixFrom(addr, bits)
-	if err != nil {
-		return
-	}
+// // newSubnet new subnet with prefix ip and network bits
+// func newSubnet(address string, bits int) (subnet *Subnet, err error) {
+// 	subnet = new(Subnet)
+// 	addr, err := netip.ParseAddr(address)
+// 	if err != nil {
+// 		fmt.Println("error", err)
+// 		return
+// 	}
+// 	if addr.Is4() {
+// 		return nil, errors.New("subnet too large for current implementation")
+// 	}
 
-	return
-}
+// 	subnet.prefix = netip.PrefixFrom(addr, bits)
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	return
+// }
+
+// // newSubnet new subnet with prefix ip and network bits
+// func newSubnetFromAddr(addr netip.Addr, bits int) (subnet *Subnet, err error) {
+// 	subnet = new(Subnet)
+// 	if addr.Is4() {
+// 		return nil, errors.New("subnet too large for current implementation")
+// 	}
+
+// 	subnet.prefix = netip.PrefixFrom(addr, bits)
+// 	if err != nil {
+// 		return
+// 	}
+
+// 	return
+// }

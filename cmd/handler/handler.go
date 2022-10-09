@@ -15,7 +15,6 @@ import (
 	"github.com/imarsman/iptools/pkg/ipv4subnet"
 	ip4util "github.com/imarsman/iptools/pkg/ipv4subnet/ipv4util"
 
-	"github.com/imarsman/iptools/pkg/ipv6subnet"
 	"github.com/imarsman/iptools/pkg/ipv6subnet/ipv6util"
 )
 
@@ -392,21 +391,23 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 			os.Exit(1)
 		}
 	}
-	s, err := ipv6subnet.NewFromIPAndBits(addr.StringExpanded(), bits)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	// s, err := ipv6subnet.NewFromAddrAndBits(addr, bits)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	os.Exit(1)
+	// }
 
-	if !(s.Addr().IsMulticast() || s.Addr().IsInterfaceLocalMulticast() || s.Addr().IsLinkLocalMulticast()) {
-		ip6SubnetDisplay(s)
+	if !(addr.IsMulticast() || addr.IsInterfaceLocalMulticast() || addr.IsLinkLocalMulticast()) {
+		prefix := netip.PrefixFrom(addr, bits)
+		ip6SubnetDisplay(addr, prefix)
 	} else {
-		ip6SubnetDisplayBasic(s)
+		prefix := netip.PrefixFrom(addr, bits)
+		ip6SubnetDisplayBasic(addr, prefix)
 	}
 }
 
 // ip6SubnetDisplay describe a link local IP
-func ip6SubnetDisplay(s *ipv6subnet.Subnet) {
+func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 	table := simpletable.New()
 	table.SetStyle(simpletable.StyleCompactLite)
 
@@ -417,11 +418,11 @@ func ip6SubnetDisplay(s *ipv6subnet.Subnet) {
 		},
 	}
 
-	table.Body.Cells = append(table.Body.Cells, row("IP Type", ipv6util.AddressTypeName(s.Addr())))
-	table.Body.Cells = append(table.Body.Cells, row("Type Prefix", s.TypePrefix().Masked()))
-	table.Body.Cells = append(table.Body.Cells, row("IP", s.Addr().String()))
-	if ipv6util.HasType(ipv6util.AddressType(s.Addr()), ipv6util.GlobalUnicast, ipv6util.LinkLocalUnicast, ipv6util.UniqueLocal, ipv6util.Private) {
-		solicitedNodeAddr, err := ipv6util.AddrSolicitedNodeMulticast(s.Addr())
+	table.Body.Cells = append(table.Body.Cells, row("IP Type", ipv6util.AddressTypeName(addr)))
+	table.Body.Cells = append(table.Body.Cells, row("Type Prefix", ipv6util.TypePrefix(addr).Masked()))
+	table.Body.Cells = append(table.Body.Cells, row("IP", addr.String()))
+	if ipv6util.HasType(ipv6util.AddressType(addr), ipv6util.GlobalUnicast, ipv6util.LinkLocalUnicast, ipv6util.UniqueLocal, ipv6util.Private) {
+		solicitedNodeAddr, err := ipv6util.AddrSolicitedNodeMulticast(addr)
 		if err != nil {
 			panic(err)
 		}
@@ -432,26 +433,29 @@ func ip6SubnetDisplay(s *ipv6subnet.Subnet) {
 		)
 	}
 
-	table.Body.Cells = append(table.Body.Cells, row("Prefix", s.Prefix().Masked()))
-	if ipv6util.AddressType(s.Addr()) == ipv6util.GlobalUnicast {
-		table.Body.Cells = append(table.Body.Cells, row("Routing Prefix", fmt.Sprintf("%s", s.RoutingPrefix())))
+	table.Body.Cells = append(table.Body.Cells, row("Prefix", prefix.Masked()))
+	if ipv6util.AddressType(addr) == ipv6util.GlobalUnicast {
+		table.Body.Cells = append(
+			table.Body.Cells, row(
+				"Routing Prefix", fmt.Sprintf("%s", fmt.Sprintf("%s", ipv6util.RoutingPrefixString(addr)))),
+		)
 	}
 	// Handle global id for appropriate types
-	if ipv6util.HasType(ipv6util.AddressType(s.Addr()), ipv6util.GlobalUnicast, ipv6util.Private) {
-		table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", ipv6util.GlobalID(s.Addr()))))
+	if ipv6util.HasType(ipv6util.AddressType(addr), ipv6util.GlobalUnicast, ipv6util.Private) {
+		table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", ipv6util.GlobalID(addr))))
 	}
-	table.Body.Cells = append(table.Body.Cells, row("Interface ID", fmt.Sprintf("%s", s.InterfaceString())))
-	table.Body.Cells = append(table.Body.Cells, row("Subnet ID", fmt.Sprintf("%s", s.SubnetString())))
-	if ipv6util.AddressType(s.Addr()) == ipv6util.LinkLocalUnicast {
-		table.Body.Cells = append(table.Body.Cells, row("Default Gateway", s.LinkLocalDefaultGateway()))
+	table.Body.Cells = append(table.Body.Cells, row("Interface ID", fmt.Sprintf("%s", ipv6util.InterfaceString(addr))))
+	table.Body.Cells = append(table.Body.Cells, row("Subnet ID", fmt.Sprintf("%s", ipv6util.SubnetString(addr))))
+	if ipv6util.AddressType(addr) == ipv6util.LinkLocalUnicast {
+		table.Body.Cells = append(table.Body.Cells, row("Default Gateway", ipv6util.LinkLocalDefaultGateway(addr)))
 	}
-	table.Body.Cells = append(table.Body.Cells, row("Link", s.Link()))
-	if s.IsARPA() {
-		table.Body.Cells = append(table.Body.Cells, row("ip6.arpa", fmt.Sprintf("%s", ipv6util.IP6Arpa(s.Addr()))))
+	table.Body.Cells = append(table.Body.Cells, row("Link", ipv6util.Link(addr)))
+	if ipv6util.IsARPA(addr) {
+		table.Body.Cells = append(table.Body.Cells, row("ip6.arpa", fmt.Sprintf("%s", ipv6util.IP6Arpa(addr))))
 	}
-	table.Body.Cells = append(table.Body.Cells, row("Subnet first address", s.First().StringExpanded()))
-	table.Body.Cells = append(table.Body.Cells, row("Subnet last address", s.Last().StringExpanded()))
-	part := strings.Split(ipv6util.AddrToBitString(s.Addr()), ".")[0]
+	table.Body.Cells = append(table.Body.Cells, row("Subnet first address", ipv6util.First(addr).StringExpanded()))
+	table.Body.Cells = append(table.Body.Cells, row("Subnet last address", ipv6util.Last(addr).StringExpanded()))
+	part := strings.Split(ipv6util.AddrToBitString(addr), ".")[0]
 	part = fmt.Sprintf("%s%s", strings.Repeat("0", 16-len(part)), part)
 	table.Body.Cells = append(table.Body.Cells, row("first address field binary", part))
 
@@ -459,7 +463,7 @@ func ip6SubnetDisplay(s *ipv6subnet.Subnet) {
 }
 
 // ip6SubnetDisplay describe a link local IP
-func ip6SubnetDisplayBasic(s *ipv6subnet.Subnet) {
+func ip6SubnetDisplayBasic(addr netip.Addr, prefix netip.Prefix) {
 	table := simpletable.New()
 	table.SetStyle(simpletable.StyleCompactLite)
 
@@ -470,13 +474,13 @@ func ip6SubnetDisplayBasic(s *ipv6subnet.Subnet) {
 		},
 	}
 
-	table.Body.Cells = append(table.Body.Cells, row("IP Type", ipv6util.AddressTypeName(s.Addr())))
-	table.Body.Cells = append(table.Body.Cells, row("Type Prefix", s.TypePrefix().Masked()))
-	table.Body.Cells = append(table.Body.Cells, row("IP", s.Addr().String()))
-	table.Body.Cells = append(table.Body.Cells, row("Prefix", s.Prefix().Masked()))
-	table.Body.Cells = append(table.Body.Cells, row("Network Prefix", fmt.Sprintf("%s", ipv6util.MulticastNetworkPrefix(s.Addr()))))
-	table.Body.Cells = append(table.Body.Cells, row("Group ID", fmt.Sprintf("%s", ipv6util.MulticastGroupID(s.Addr()))))
-	part := strings.Split(ipv6util.AddrToBitString(s.Addr()), ".")[0]
+	table.Body.Cells = append(table.Body.Cells, row("IP Type", ipv6util.AddressTypeName(addr)))
+	table.Body.Cells = append(table.Body.Cells, row("Type Prefix", ipv6util.TypePrefix(addr).Masked()))
+	table.Body.Cells = append(table.Body.Cells, row("IP", addr.String()))
+	table.Body.Cells = append(table.Body.Cells, row("Prefix", prefix.Masked()))
+	table.Body.Cells = append(table.Body.Cells, row("Network Prefix", fmt.Sprintf("%s", ipv6util.MulticastNetworkPrefix(addr))))
+	table.Body.Cells = append(table.Body.Cells, row("Group ID", fmt.Sprintf("%s", ipv6util.MulticastGroupID(addr))))
+	part := strings.Split(ipv6util.AddrToBitString(addr), ".")[0]
 	part = fmt.Sprintf("%s%s", strings.Repeat("0", 16-len(part)), part)
 	table.Body.Cells = append(table.Body.Cells, row("first address field binary", part))
 

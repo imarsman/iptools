@@ -92,6 +92,16 @@ func AddrRoutingPrefixSecion(addr netip.Addr) []byte {
 	return bytes[:6]
 }
 
+// RoutingPrefixString get the routing prefix as a hex string
+func RoutingPrefixString(addr netip.Addr) string {
+	return fmt.Sprintf("%s::/%d", ByteSlice2Hex(AddrRoutingPrefixSecion(addr)), 48)
+}
+
+// InterfaceString get the string representation in hex of the interface bits
+func InterfaceString(addr netip.Addr) string {
+	return ByteSlice2Hex(AddrInterfaceSection(addr))
+}
+
 // AddrInterfaceSection get interface section for IP
 func AddrInterfaceSection(addr netip.Addr) []byte {
 	bytes := addr.As16()
@@ -253,6 +263,59 @@ func AddressTypeName(addr netip.Addr) string {
 	default:
 		return "Unknown"
 	}
+}
+
+// IsARPA is the address relevant to ARPA addressing?
+func IsARPA(addr netip.Addr) (is bool) {
+	if HasType(AddressType(addr), GlobalUnicast) {
+		is = true
+	}
+
+	return
+}
+
+// Link get link for address
+func Link(addr netip.Addr) (url string) {
+	return fmt.Sprintf("http://[%s]/", addr.String())
+}
+
+// SubnetString get the string subnet section as a hex string
+func SubnetString(addr netip.Addr) string {
+	return ByteSlice2Hex(AddrSubnetSection(addr))
+}
+
+// LinkLocalDefaultGateway get default gateway for link local
+func LinkLocalDefaultGateway(addr netip.Addr) string {
+	gateway := fmt.Sprintf("%s::%d", ByteSlice2Hex(AddrDefaultGateway(addr)), 1)
+	gateway = strings.ReplaceAll(gateway, "0000:", "")
+
+	return gateway
+}
+
+// First get firt IP from subnet
+func First(addr netip.Addr) netip.Addr {
+	bytes := addr.As16()
+
+	for i := 8; i <= 15; i++ {
+		bytes[i] = 0x0
+	}
+
+	addr = netip.AddrFrom16(bytes)
+
+	return addr
+}
+
+// Last get last IP for subnet
+func Last(addr netip.Addr) netip.Addr {
+	bytes := addr.As16()
+
+	for i := 8; i <= 15; i++ {
+		bytes[i] = 0xff
+	}
+
+	addr = netip.AddrFrom16(bytes)
+
+	return addr
 }
 
 // bytes2MacAddr transform a 6 byte array to a mac address

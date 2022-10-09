@@ -1,8 +1,10 @@
 package ipv6subnet
 
 import (
+	"net/netip"
 	"testing"
 
+	"github.com/imarsman/iptools/pkg/ipv6subnet/ipv6util"
 	ip6util "github.com/imarsman/iptools/pkg/ipv6subnet/ipv6util"
 	"github.com/matryer/is"
 )
@@ -14,20 +16,21 @@ func TestNewSubnet(t *testing.T) {
 	is := is.New(t)
 
 	addr, err := ip6util.RandomAddrGlobalUnicast()
+	prefix := netip.PrefixFrom(addr, 64)
 	is.NoErr(err)
-	s, err := NewFromIPAndBits(addr.StringExpanded(), 64)
-	is.NoErr(err)
-	t.Log("First in subnet", s.First().StringExpanded())
-	t.Log("Last in subnet", s.Last().StringExpanded())
-	t.Log(s.prefix.Masked())
-	t.Log(s.prefix)
-	t.Log(s.prefix.Addr().StringExpanded())
+	// s, err := NewFromIPAndBits(addr.StringExpanded(), 64)
+	// is.NoErr(err)
+	t.Log("First in subnet", ipv6util.First(addr).StringExpanded())
+	t.Log("Last in subnet", ipv6util.Last(addr).StringExpanded())
+	t.Log(prefix.Masked())
+	t.Log(prefix)
+	t.Log(prefix.Addr().StringExpanded())
 
-	t.Log("subnet", s.SubnetString())
-	t.Log("interface", s.InterfaceString())
-	t.Log("is global unicast", s.Addr().IsGlobalUnicast())
-	t.Log("Address type", ip6util.AddressTypeName(s.Addr()))
-	t.Log("Address prefix", s.TypePrefix().Masked().String())
+	t.Log("subnet", ipv6util.SubnetString(addr))
+	t.Log("interface", ipv6util.InterfaceString(addr))
+	t.Log("is global unicast", addr.IsGlobalUnicast())
+	t.Log("Address type", ip6util.AddressTypeName(addr))
+	t.Log("Address prefix", ipv6util.TypePrefix(addr).Masked().String())
 }
 
 func TestRandomGlobalUnicast(t *testing.T) {
