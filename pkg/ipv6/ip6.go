@@ -376,10 +376,15 @@ func randomMacBytesForInterface() (bytes [6]byte, err error) {
 func GlobalID(addr netip.Addr) (hex string) {
 	start := TypePrefix(addr).Bits() + 1
 	end := 48
-	// for unique local account for L bit
-	if AddressType(addr) == UniqueLocal {
-		start = start + 1
-	}
+	// For private IP account for L bit
+	// This changes the global ID range from 7-48 to 8-48
+	// https://blog.apnic.net/2020/05/20/getting-ipv6-private-addressing-right/
+	// https://study-ccna.com/ipv6-global-unicast-addresses/
+	// https://iplocation.io/ipv6-address-generator
+	// Skipping this for now
+	// if AddressType(addr) == Private {
+	// 	start = start + 1
+	// }
 
 	return bitRangeHex(addr, start, end)
 }
@@ -643,10 +648,12 @@ func randomPrivate() (addr netip.Addr, err error) {
 	if err != nil {
 		return
 	}
+	first := byte(0xfd)
+	first |= 0x1
 
 	// fc00::/7 is currently not defined
 	ipBytes := []byte{
-		0xfd, byte(randUInt64(256)),
+		first, byte(randUInt64(256)),
 		byte(randUInt64(256)), byte(randUInt64(256)),
 		byte(randUInt64(256)), byte(randUInt64(256)),
 		byte(randUInt64(256)), byte(randUInt64(256)), // prepend with fd00::
