@@ -1,4 +1,4 @@
-package ipv6util
+package ipv6
 
 import (
 	"net/netip"
