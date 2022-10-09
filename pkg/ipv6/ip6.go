@@ -648,7 +648,9 @@ func randomPrivate() (addr netip.Addr, err error) {
 	if err != nil {
 		return
 	}
-	first := byte(0xfd)
+	// Setting last bit to 1 ensures0xfd, which is supported
+	// The l bit needs to be 1
+	first := byte(0xfc)
 	first |= 0x1
 
 	// fc00::/7 is currently not defined
