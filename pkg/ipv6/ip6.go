@@ -128,15 +128,20 @@ func AddrToBitString(addr netip.Addr) (result string) {
 	return
 }
 
-// IP6Arpa get the IPV6 ARPA address
-func IP6Arpa(addr netip.Addr) string {
-	addrStr := addr.StringExpanded()
+// Arpa get the IPV6 ARPA address
+func Arpa(addr netip.Addr) (addrStr string) {
+	if HasType(AddressType(addr), GlobalUnicast) {
+		return
+	}
+
+	addrStr = addr.StringExpanded()
 	addrStr = strings.ReplaceAll(addrStr, ":", "")
 	addrSlice := strings.Split(addrStr, "")
 	reverse(addrSlice)
 
 	addrStr = fmt.Sprintf("%s.ip6.arpa", strings.Join(addrSlice, "."))
-	return addrStr
+
+	return
 }
 
 // ByteSlice2Hex get string with two byte sets delimited by colon
@@ -274,8 +279,11 @@ func IsARPA(addr netip.Addr) (is bool) {
 	return
 }
 
-// Link get link for address
-func Link(addr netip.Addr) (url string) {
+// AddrLink get link for address
+func AddrLink(addr netip.Addr) (url string) {
+	if HasType(AddressType(addr), GlobalUnicast) {
+		return
+	}
 	return fmt.Sprintf("http://[%s]/", addr.String())
 }
 

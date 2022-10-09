@@ -448,9 +448,9 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 	if ipv6.AddressType(addr) == ipv6.LinkLocalUnicast {
 		table.Body.Cells = append(table.Body.Cells, row("Default Gateway", ipv6.LinkLocalDefaultGateway(addr)))
 	}
-	table.Body.Cells = append(table.Body.Cells, row("Link", ipv6.Link(addr)))
+	table.Body.Cells = append(table.Body.Cells, row("Link", ipv6.AddrLink(addr)))
 	if ipv6.IsARPA(addr) {
-		table.Body.Cells = append(table.Body.Cells, row("ip6.arpa", fmt.Sprintf("%s", ipv6.IP6Arpa(addr))))
+		table.Body.Cells = append(table.Body.Cells, row("ip6.arpa", fmt.Sprintf("%s", ipv6.Arpa(addr))))
 	}
 	table.Body.Cells = append(table.Body.Cells, row("Subnet first address", ipv6.First(addr).StringExpanded()))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet last address", ipv6.Last(addr).StringExpanded()))
