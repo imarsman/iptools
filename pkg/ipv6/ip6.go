@@ -376,15 +376,6 @@ func randomMacBytesForInterface() (bytes [6]byte, err error) {
 func GlobalID(addr netip.Addr) (hex string) {
 	start := TypePrefix(addr).Bits() + 1
 	end := 48
-	// For private IP account for L bit
-	// This changes the global ID range from 7-48 to 8-48
-	// https://blog.apnic.net/2020/05/20/getting-ipv6-private-addressing-right/
-	// https://study-ccna.com/ipv6-global-unicast-addresses/
-	// https://iplocation.io/ipv6-address-generator
-	// Skipping this for now
-	// if AddressType(addr) == Private {
-	// 	start = start + 1
-	// }
 
 	return bitRangeHex(addr, start, end)
 }
@@ -494,60 +485,201 @@ func RandomSubnetID() uint16 {
 
 // RandomAddrGlobalUnicast get a global unicast random IPV6 address
 func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {
-	addr, err = randomGlobalUnicast()
+	macAddrBytes, err := randomMacBytesForInterface()
 	if err != nil {
 		return
 	}
+	s := bytes2MacAddr(macAddrBytes)
+	mac, err := net.ParseMAC(s)
+	if err != nil {
+		return
+	}
+
+	inRange := randUInt64(63-32) + 32
+
+	// db8:cafe
+	ipBytes := []byte{
+		byte(inRange), 0x01,
+		0xd, 0xb8,
+		0xca, 0xfe,
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		mac[0], mac[1],
+		mac[2], 0xff,
+		0xfe, mac[3],
+		mac[4], mac[5],
+	}
+
+	var addrBytes [16]byte
+	copy(addrBytes[:], ipBytes)
+	addr = netip.AddrFrom16(addrBytes)
 
 	return
 }
 
 // RandomAddrLinkLocal get a link-local random IPV6 address
 func RandomAddrLinkLocal() (addr netip.Addr, err error) {
-	addr, err = randomLinkLocal()
+	// addr, err = randomAddrLinkLocal()
+	// if err != nil {
+	// 	return
+	// }
+	macAddrBytes, err := randomMacBytesForInterface()
 	if err != nil {
 		return
 	}
+	s := bytes2MacAddr(macAddrBytes)
+	mac, err := net.ParseMAC(s)
+	if err != nil {
+		return
+	}
+
+	// link local has prefix FE80::/10
+	ipBytes := []byte{
+		0xfe, 0x80,
+		0x0, 0x0,
+		0x0, 0x0,
+		0x0, 0x0,
+		mac[0], mac[1],
+		mac[2], 0xff,
+		0xfe, mac[3],
+		mac[4], mac[5],
+	}
+	var addrBytes [16]byte
+	copy(addrBytes[:], ipBytes)
+	addr = netip.AddrFrom16(addrBytes)
 
 	return
 }
 
 // RandomAddrPrivate get a unique local random IPV6 address
 func RandomAddrPrivate() (addr netip.Addr, err error) {
-	addr, err = randomPrivate()
+	// addr, err = randomAddrPrivate()
+	// if err != nil {
+	// 	return
+	// }
+	macAddrBytes, err := randomMacBytesForInterface()
 	if err != nil {
 		return
 	}
+	s := bytes2MacAddr(macAddrBytes)
+	mac, err := net.ParseMAC(s)
+	if err != nil {
+		return
+	}
+
+	// Setting last bit (called the L bit) to 1 ensures 0xfd, which is supported
+	// The L bit needs to be 1
+	first := byte(0xfc)
+	first |= 0x1
+
+	// fc00::/7 is currently not defined
+	ipBytes := []byte{
+		first, byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)), // prepend with fd00::
+		mac[0], mac[1],
+		mac[2], 0xff,
+		0xfe, mac[3],
+		mac[4], mac[5],
+	}
+	var addrBytes [16]byte
+	copy(addrBytes[:], ipBytes)
+	addr = netip.AddrFrom16(addrBytes)
 
 	return
 }
 
 // RandomAddrMulticast get a random multicast address
 func RandomAddrMulticast() (addr netip.Addr, err error) {
-	addr, err = randomMulticast()
-	if err != nil {
-		return
+	// flag for 0 is reserved currently
+	flags := []string{"1", "2", "3"}
+	element := randUInt64(int64(len(flags))) + 1
+	flagStr := flags[element-1]
+
+	// scope 1 is interface-local and defined in interfaceLocalMulticast
+	// scope 2 is link-local multicast defined in randomLinkLocalMulticast
+	scopes := []string{"3", "4", "5", "8", "e", "f"}
+	element = randUInt64(int64(len(scopes))) + 1
+	scopeStr := scopes[element-1]
+
+	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
+
+	// multicast has prefix ff00::/8
+	ipBytes := []byte{
+		0xff, byte(flagAndScope),
+		0x0, 0x0,
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
 	}
+	var addrBytes [16]byte
+	copy(addrBytes[:], ipBytes)
+	addr = netip.AddrFrom16(addrBytes)
 
 	return
 }
 
 // RandomAddrLinkLocalMulticast get a random link local multicast address
 func RandomAddrLinkLocalMulticast() (addr netip.Addr, err error) {
-	addr, err = randomLinkLocalMulticast()
-	if err != nil {
-		return
+	// flag for 0 is reserved currently
+	flags := []string{"1", "2", "3"}
+	element := randUInt64(int64(len(flags))) + 1
+	flagStr := flags[element-1]
+
+	// a single scope applies to link local
+	scopes := []string{"2"}
+	element = randUInt64(int64(len(scopes))) + 1
+	scopeStr := scopes[element-1]
+
+	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
+
+	ipBytes := []byte{
+		0xff, byte(flagAndScope),
+		0x0, 0x0,
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
 	}
+	var addrBytes [16]byte
+	copy(addrBytes[:], ipBytes)
+	addr = netip.AddrFrom16(addrBytes)
 
 	return
 }
 
 // RandomAddrInterfaceLocalMulticast get a random interface local multicast address
 func RandomAddrInterfaceLocalMulticast() (addr netip.Addr, err error) {
-	addr, err = randomInterfaceLocalMulticast()
-	if err != nil {
-		return
+	// flag for 0 is reserved currently
+	flags := []string{"1", "2", "3"}
+	element := randUInt64(int64(len(flags))) + 1
+	flagStr := flags[element-1]
+
+	// a single scope applies to interface local
+	scopes := []string{"1"}
+	element = randUInt64(int64(len(scopes))) + 1
+	scopeStr := scopes[element-1]
+
+	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
+
+	ipBytes := []byte{
+		0xff, byte(flagAndScope),
+		0x0, 0x0,
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
 	}
+	var addrBytes [16]byte
+	copy(addrBytes[:], ipBytes)
+	addr = netip.AddrFrom16(addrBytes)
 
 	return
 }
@@ -599,200 +731,6 @@ func AddrSolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error)
 	var addrBytes [16]byte
 	copy(addrBytes[:], ipBytes)
 	newAddr = netip.AddrFrom16(addrBytes)
-
-	return
-}
-
-// randomGlobalUnicast transform a mac address to a globaal unicast address
-// https://support.lenovo.com/ca/en/solutions/ht509925-how-to-convert-a-mac-address-into-an-ipv6-link-local-address-eui-64
-func randomGlobalUnicast() (addr netip.Addr, err error) {
-	macAddrBytes, err := randomMacBytesForInterface()
-	if err != nil {
-		return
-	}
-	s := bytes2MacAddr(macAddrBytes)
-	mac, err := net.ParseMAC(s)
-	if err != nil {
-		return
-	}
-
-	inRange := randUInt64(63-32) + 32
-
-	// db8:cafe
-	ipBytes := []byte{
-		byte(inRange), 0x01,
-		0xd, 0xb8,
-		0xca, 0xfe,
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		mac[0], mac[1],
-		mac[2], 0xff,
-		0xfe, mac[3],
-		mac[4], mac[5],
-	}
-
-	var addrBytes [16]byte
-	copy(addrBytes[:], ipBytes)
-	addr = netip.AddrFrom16(addrBytes)
-
-	return
-}
-
-// mac2GlobalUnicast transform a mac address to a globaal unicast address
-func randomPrivate() (addr netip.Addr, err error) {
-	macAddrBytes, err := randomMacBytesForInterface()
-	if err != nil {
-		return
-	}
-	s := bytes2MacAddr(macAddrBytes)
-	mac, err := net.ParseMAC(s)
-	if err != nil {
-		return
-	}
-
-	// Setting last bit (called the L bit) to 1 ensures 0xfd, which is supported
-	// The L bit needs to be 1
-	first := byte(0xfc)
-	first |= 0x1
-
-	// fc00::/7 is currently not defined
-	ipBytes := []byte{
-		first, byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)), // prepend with fd00::
-		mac[0], mac[1],
-		mac[2], 0xff,
-		0xfe, mac[3],
-		mac[4], mac[5],
-	}
-	var addrBytes [16]byte
-	copy(addrBytes[:], ipBytes)
-	addr = netip.AddrFrom16(addrBytes)
-
-	return
-}
-
-// randomLinkLocal transform a mac address to a link local address
-func randomLinkLocal() (addr netip.Addr, err error) {
-	macAddrBytes, err := randomMacBytesForInterface()
-	if err != nil {
-		return
-	}
-	s := bytes2MacAddr(macAddrBytes)
-	mac, err := net.ParseMAC(s)
-	if err != nil {
-		return
-	}
-
-	// link local has prefix FE80::/10
-	ipBytes := []byte{
-		0xfe, 0x80,
-		0x0, 0x0,
-		0x0, 0x0,
-		0x0, 0x0,
-		mac[0], mac[1],
-		mac[2], 0xff,
-		0xfe, mac[3],
-		mac[4], mac[5],
-	}
-	var addrBytes [16]byte
-	copy(addrBytes[:], ipBytes)
-	addr = netip.AddrFrom16(addrBytes)
-
-	return
-}
-
-// mac2LinkLocal transform a mac address to a link local address
-// multicast is tricky - this is not properly implemented in terms of network prefix
-// and group id
-func randomMulticast() (addr netip.Addr, err error) {
-	// flag for 0 is reserved currently
-	flags := []string{"1", "2", "3"}
-	element := randUInt64(int64(len(flags))) + 1
-	flagStr := flags[element-1]
-
-	// scope 1 is interface-local and defined in interfaceLocalMulticast
-	// scope 2 is link-local multicast defined in randomLinkLocalMulticast
-	scopes := []string{"3", "4", "5", "8", "e", "f"}
-	element = randUInt64(int64(len(scopes))) + 1
-	scopeStr := scopes[element-1]
-
-	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
-
-	// multicast has prefix ff00::/8
-	ipBytes := []byte{
-		0xff, byte(flagAndScope),
-		0x0, 0x0,
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-	}
-	var addrBytes [16]byte
-	copy(addrBytes[:], ipBytes)
-	addr = netip.AddrFrom16(addrBytes)
-
-	return
-}
-
-func randomLinkLocalMulticast() (addr netip.Addr, err error) {
-	// flag for 0 is reserved currently
-	flags := []string{"1", "2", "3"}
-	element := randUInt64(int64(len(flags))) + 1
-	flagStr := flags[element-1]
-
-	// a single scope applies to link local
-	scopes := []string{"2"}
-	element = randUInt64(int64(len(scopes))) + 1
-	scopeStr := scopes[element-1]
-
-	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
-
-	ipBytes := []byte{
-		0xff, byte(flagAndScope),
-		0x0, 0x0,
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-	}
-	var addrBytes [16]byte
-	copy(addrBytes[:], ipBytes)
-	addr = netip.AddrFrom16(addrBytes)
-
-	return
-}
-
-func randomInterfaceLocalMulticast() (addr netip.Addr, err error) {
-	// flag for 0 is reserved currently
-	flags := []string{"1", "2", "3"}
-	element := randUInt64(int64(len(flags))) + 1
-	flagStr := flags[element-1]
-
-	// a single scope applies to interface local
-	scopes := []string{"1"}
-	element = randUInt64(int64(len(scopes))) + 1
-	scopeStr := scopes[element-1]
-
-	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
-
-	ipBytes := []byte{
-		0xff, byte(flagAndScope),
-		0x0, 0x0,
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-	}
-	var addrBytes [16]byte
-	copy(addrBytes[:], ipBytes)
-	addr = netip.AddrFrom16(addrBytes)
 
 	return
 }

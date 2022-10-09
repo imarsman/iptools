@@ -43,28 +43,28 @@ func TestRandomLinkLocal(t *testing.T) {
 
 func TestPrivate(t *testing.T) {
 	is := is.New(t)
-	addr, err := randomPrivate()
+	addr, err := RandomAddrPrivate()
 	is.NoErr(err)
 	t.Log(AddressTypeName(addr))
 }
 
 func TestMulticast(t *testing.T) {
 	is := is.New(t)
-	addr, err := randomMulticast()
+	addr, err := RandomAddrMulticast()
 	is.NoErr(err)
 	t.Log(AddressTypeName(addr))
 }
 
 func TestInterfaceLocalMulticast(t *testing.T) {
 	is := is.New(t)
-	addr, err := randomInterfaceLocalMulticast()
+	addr, err := RandomAddrInterfaceLocalMulticast()
 	is.NoErr(err)
 	t.Log(AddressTypeName(addr))
 }
 
 func TestLinkLocalMulticast(t *testing.T) {
 	is := is.New(t)
-	addr, err := randomLinkLocalMulticast()
+	addr, err := RandomAddrLinkLocalMulticast()
 	is.NoErr(err)
 	t.Log(AddressTypeName(addr))
 }
@@ -74,7 +74,7 @@ func TestMakeMacAddress(t *testing.T) {
 	is := is.New(t)
 	// is.NoErr(err)
 
-	bytes, err := randomMacBytesForInterface(true)
+	bytes, err := randomMacBytesForInterface()
 	is.NoErr(err)
 	macAddress := bytes2MacAddr(bytes)
 	// macAddress := fmt.Sprintf("%02x:%02x:%02x:%02x:%02x:%02x", bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5])
