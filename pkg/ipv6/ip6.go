@@ -598,7 +598,6 @@ func randomGlobalUnicast() (addr netip.Addr, err error) {
 		return
 	}
 	s := bytes2MacAddr(macAddrBytes)
-	fmt.Println(s)
 	mac, err := net.ParseMAC(s)
 	if err != nil {
 		return
