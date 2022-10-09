@@ -541,6 +541,7 @@ func RandomAddrInterfaceLocalMulticast() (addr netip.Addr, err error) {
 }
 
 // AddrSolicitedNodeMulticast get solicited node multicast address for incoming unicast address
+// EUI-64 compliance
 func AddrSolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error) {
 	if !(HasType(AddressType(addr), GlobalUnicast, LinkLocalUnicast, UniqueLocal, Private)) {
 		err = errors.New("not a unicast address")
