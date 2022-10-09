@@ -454,8 +454,8 @@ func bitRangeHex(addr netip.Addr, start, end int) (hex string) {
 	return
 }
 
-// RandomSubnet get a random subnet for IPV6
-func RandomSubnet() uint16 {
+// RandomSubnetID get a random subnet for IPV6
+func RandomSubnetID() uint16 {
 	rand := randUInt64(65_536)
 
 	return uint16(rand)

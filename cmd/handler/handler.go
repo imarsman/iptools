@@ -13,9 +13,8 @@ import (
 	"github.com/imarsman/iptools/cmd/args"
 
 	"github.com/imarsman/iptools/pkg/ipv4subnet"
-	ip4util "github.com/imarsman/iptools/pkg/ipv4subnet/ipv4util"
-
-	"github.com/imarsman/iptools/pkg/ipv6subnet/ipv6util"
+	"github.com/imarsman/iptools/pkg/ipv4subnet/ipv4util"
+	"github.com/imarsman/iptools/pkg/ipv6/ipv6util"
 )
 
 var printer = message.NewPrinter(language.English)
@@ -62,7 +61,7 @@ func IP4SubnetDescribe(ip string, bits int, secondaryBits int) {
 	table.Body.Cells = append(table.Body.Cells, row("Subnet", s.CIDR()))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet IP", s.IP().String()))
 	table.Body.Cells = append(table.Body.Cells, row("Broadcast Address", s.BroadcastAddr().String()))
-	table.Body.Cells = append(table.Body.Cells, row("Broadcast Address Hex ID", ip4util.IPToHexStr(s.Last())))
+	table.Body.Cells = append(table.Body.Cells, row("Broadcast Address Hex ID", ipv4util.IPToHexStr(s.Last())))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet Mask", s.SubnetMask()))
 	table.Body.Cells = append(table.Body.Cells, row("Wildcard Mask", s.WildcardMask()))
 
@@ -80,7 +79,7 @@ func IP4SubnetDescribe(ip string, bits int, secondaryBits int) {
 	table.Body.Cells = append(table.Body.Cells, row("Binary Subnet Mask", s.BinaryMask()))
 	table.Body.Cells = append(table.Body.Cells, row("Binary ID", s.BinaryID()))
 
-	table.Body.Cells = append(table.Body.Cells, row("in-addr.arpa", ip4util.InAddrArpa(s.Prefix().Addr())))
+	table.Body.Cells = append(table.Body.Cells, row("in-addr.arpa", ipv4util.InAddrArpa(s.Prefix().Addr())))
 
 	if secondaryBits != 0 {
 		table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet", s2.CIDR()))
