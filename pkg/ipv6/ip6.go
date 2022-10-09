@@ -648,8 +648,9 @@ func randomPrivate() (addr netip.Addr, err error) {
 	if err != nil {
 		return
 	}
-	// Setting last bit to 1 ensures0xfd, which is supported
-	// The l bit needs to be 1
+
+	// Setting last bit (called the L bit) to 1 ensures 0xfd, which is supported
+	// The L bit needs to be 1
 	first := byte(0xfc)
 	first |= 0x1
 
