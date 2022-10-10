@@ -115,9 +115,10 @@ func AddrToBitString(addr netip.Addr) (result string) {
 	var sb strings.Builder
 	parts := strings.Split(str, ":")
 	for _, p := range parts {
+		var value int64
 		value, err := strconv.ParseInt(p, 16, 64)
 		if err != nil {
-			return ""
+			return
 		}
 		sb.WriteString(fmt.Sprintf("%08b.", value))
 	}
@@ -130,7 +131,7 @@ func AddrToBitString(addr netip.Addr) (result string) {
 
 // Arpa get the IPV6 ARPA address
 func Arpa(addr netip.Addr) (addrStr string) {
-	if HasType(AddressType(addr), GlobalUnicast) {
+	if !HasType(AddressType(addr), GlobalUnicast) {
 		return
 	}
 
@@ -281,7 +282,7 @@ func IsARPA(addr netip.Addr) (is bool) {
 
 // AddrLink get link for address
 func AddrLink(addr netip.Addr) (url string) {
-	if HasType(AddressType(addr), GlobalUnicast) {
+	if !HasType(AddressType(addr), GlobalUnicast) {
 		return
 	}
 	return fmt.Sprintf("http://[%s]/", addr.String())
@@ -498,7 +499,8 @@ func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {
 		return
 	}
 	s := bytes2MacAddr(macAddrBytes)
-	mac, err := net.ParseMAC(s)
+	var mac net.HardwareAddr
+	mac, err = net.ParseMAC(s)
 	if err != nil {
 		return
 	}
@@ -526,10 +528,6 @@ func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {
 
 // RandomAddrLinkLocal get a link-local random IPV6 address
 func RandomAddrLinkLocal() (addr netip.Addr, err error) {
-	// addr, err = randomAddrLinkLocal()
-	// if err != nil {
-	// 	return
-	// }
 	macAddrBytes, err := randomMacBytesForInterface()
 	if err != nil {
 		return
@@ -560,16 +558,13 @@ func RandomAddrLinkLocal() (addr netip.Addr, err error) {
 
 // RandomAddrPrivate get a unique local random IPV6 address
 func RandomAddrPrivate() (addr netip.Addr, err error) {
-	// addr, err = randomAddrPrivate()
-	// if err != nil {
-	// 	return
-	// }
 	macAddrBytes, err := randomMacBytesForInterface()
 	if err != nil {
 		return
 	}
 	s := bytes2MacAddr(macAddrBytes)
-	mac, err := net.ParseMAC(s)
+	var mac net.HardwareAddr
+	mac, err = net.ParseMAC(s)
 	if err != nil {
 		return
 	}
@@ -642,7 +637,11 @@ func RandomAddrLinkLocalMulticast() (addr netip.Addr, err error) {
 	element = randUInt64(int64(len(scopes))) + 1
 	scopeStr := scopes[element-1]
 
-	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
+	var flagAndScope int64
+	flagAndScope, err = strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
+	if err != nil {
+		return
+	}
 
 	ipBytes := []byte{
 		0xff, byte(flagAndScope),
@@ -673,7 +672,11 @@ func RandomAddrInterfaceLocalMulticast() (addr netip.Addr, err error) {
 	element = randUInt64(int64(len(scopes))) + 1
 	scopeStr := scopes[element-1]
 
-	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
+	var flagAndScope int64
+	flagAndScope, err = strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
+	if err != nil {
+		return
+	}
 
 	ipBytes := []byte{
 		0xff, byte(flagAndScope),
@@ -717,7 +720,7 @@ func AddrSolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error)
 	// get bytes for decoded string - it will be up to 3 bytes
 	rangeBytes, err := hex.DecodeString(unique)
 	if err != nil {
-		panic(err)
+		return
 	}
 	// copy bytes in range to an array of length 3
 	var source [3]byte
