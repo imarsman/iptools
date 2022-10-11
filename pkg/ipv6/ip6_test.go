@@ -23,50 +23,50 @@ func TestSubnet(t *testing.T) {
 	t.Log("subnet", SubnetString(addr))
 	t.Log("interface", InterfaceString(addr))
 	t.Log("is global unicast", addr.IsGlobalUnicast())
-	t.Log("Address type", AddressTypeName(addr))
-	t.Log("Address prefix", TypePrefix(addr).Masked().String())
+	t.Log("Address type", AddrTypeName(addr))
+	t.Log("Address prefix", AddrTypePrefix(addr).Masked().String())
 }
 
 func TestRandomGlobalUnicast(t *testing.T) {
 	is := is.New(t)
 	addr, err := RandomAddrGlobalUnicast()
 	is.NoErr(err)
-	t.Log(AddressTypeName(addr))
+	t.Log(AddrTypeName(addr))
 }
 
 func TestRandomLinkLocal(t *testing.T) {
 	is := is.New(t)
 	addr, err := RandomAddrLinkLocal()
 	is.NoErr(err)
-	t.Log(AddressTypeName(addr))
+	t.Log(AddrTypeName(addr))
 }
 
 func TestPrivate(t *testing.T) {
 	is := is.New(t)
 	addr, err := RandomAddrPrivate()
 	is.NoErr(err)
-	t.Log(AddressTypeName(addr))
+	t.Log(AddrTypeName(addr))
 }
 
 func TestMulticast(t *testing.T) {
 	is := is.New(t)
 	addr, err := RandomAddrMulticast()
 	is.NoErr(err)
-	t.Log(AddressTypeName(addr))
+	t.Log(AddrTypeName(addr))
 }
 
 func TestInterfaceLocalMulticast(t *testing.T) {
 	is := is.New(t)
 	addr, err := RandomAddrInterfaceLocalMulticast()
 	is.NoErr(err)
-	t.Log(AddressTypeName(addr))
+	t.Log(AddrTypeName(addr))
 }
 
 func TestLinkLocalMulticast(t *testing.T) {
 	is := is.New(t)
 	addr, err := RandomAddrLinkLocalMulticast()
 	is.NoErr(err)
-	t.Log(AddressTypeName(addr))
+	t.Log(AddrTypeName(addr))
 }
 
 func TestMakeMacAddress(t *testing.T) {

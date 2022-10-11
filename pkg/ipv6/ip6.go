@@ -43,18 +43,6 @@ func reverse[T any](s []T) {
 	}
 }
 
-// HasType is address const one of a list of candidates
-func HasType(t int, candidates ...int) (hasType bool) {
-	for _, candidate := range candidates {
-		if t == candidate {
-			hasType = true
-			break
-		}
-	}
-
-	return
-}
-
 // Use crypto/rand to generate a uint64 with value [0,max]
 // There will be no error if max is > 0
 func randUInt64(max int64) uint64 {
@@ -65,6 +53,104 @@ func randUInt64(max int64) uint64 {
 	inRange := bigInt.Uint64()
 
 	return inRange
+}
+
+// hexStringToDelimited make a string of hex digits into an ipv6 colon delimited string
+func hexStringToDelimited(input string) (hex string) {
+	input = strings.ReplaceAll(input, ":", "")
+	parts := strings.Split(input, "")
+	reverse(parts)
+
+	var sb strings.Builder
+
+	// break output into groups of 4 separated by colon
+	for i, letter := range parts {
+		sb.WriteString(letter)
+		// add colon every 4th letter unless at very end
+		if (i+1)%4 == 0 && i != len(parts)-1 {
+			sb.WriteString(":")
+		}
+	}
+
+	parts = strings.Split(sb.String(), "")
+	reverse(parts)
+
+	hex = strings.Join(parts, "")
+
+	return
+}
+
+// hexStringToBytes convert hex string to an int then to an array of bytes
+func hexStringToBytes(hex string) (rangeBytes [8]byte, err error) {
+	hex = strings.ReplaceAll(hex, ":", "")
+	value, err := strconv.ParseUint(hex, 64, 16)
+	if err != nil {
+		return
+	}
+	binary.LittleEndian.PutUint64(rangeBytes[:], value)
+
+	return
+}
+
+// bitRangeHex get hex value for a range of an IP's bits
+func bitRangeHex(addr netip.Addr, start, end int) (hex string, err error) {
+	if (end - start) > 64 {
+		err = errors.New("end-start > 64")
+		return
+	}
+	expectedLen := 10
+	startByte := start / 8
+	endByte := (end / 8) + 1
+	if endByte == 17 {
+		endByte = 16
+	}
+
+	bytes := addr.As16()
+	var arr [8]byte
+
+	if endByte == 16 {
+		copy(arr[:], bytes[startByte:])
+	} else {
+		copy(arr[:], bytes[startByte:endByte])
+	}
+
+	var dataStr string
+	copy(arr[:], bytes[startByte:])
+	data := binary.BigEndian.Uint64(arr[:])
+
+	// remainder is the part of a byte that does not start at the boundary
+	// e.g. 3
+	remainder := start % 8
+	data = data << remainder
+	// dataStr = strconv.FormatUint(data, 16)
+	data = data >> (64 - (end - start))
+
+	dataStr = strconv.FormatUint(data, 16)
+	if data == 0 {
+		zeroes := strings.Repeat("0", (end-start)/8)
+		return hexStringToDelimited(zeroes), nil
+		// don't add zeroes if the section is not at the beginning of the IP
+	} else if len(dataStr) < expectedLen && end == 48 {
+		// need at least 40 bytes/ 10 hex chars for global id
+		prefix := strings.Repeat("0", expectedLen-len(dataStr))
+		dataStr = fmt.Sprintf("%s%s", prefix, dataStr)
+	}
+
+	hex = hexStringToDelimited(dataStr)
+
+	return
+}
+
+// HasType is address const one of a list of candidates
+func HasType(t int, candidates ...int) (hasType bool) {
+	for _, candidate := range candidates {
+		if t == candidate {
+			hasType = true
+			break
+		}
+	}
+
+	return
 }
 
 // AddrDefaultGateway get IP default gateway for IP
@@ -134,7 +220,7 @@ func AddrToBitString(addr netip.Addr) (result string) {
 
 // Arpa get the IPV6 ARPA address
 func Arpa(addr netip.Addr) (addrStr string) {
-	if !HasType(AddressType(addr), GlobalUnicast) {
+	if !HasType(AddrType(addr), GlobalUnicast) {
 		return
 	}
 
@@ -164,9 +250,9 @@ func ByteSlice2Hex(bytes []byte) string {
 	return sb.String()
 }
 
-// TypePrefix the prefix for the IP type
-func TypePrefix(addr netip.Addr) (prefix netip.Prefix) {
-	kind := AddressType(addr)
+// AddrTypePrefix the prefix for the IP type
+func AddrTypePrefix(addr netip.Addr) (prefix netip.Prefix) {
+	kind := AddrType(addr)
 	var err error
 	switch kind {
 	// unique local ipv6 address prefix
@@ -220,8 +306,8 @@ func TypePrefix(addr netip.Addr) (prefix netip.Prefix) {
 	return
 }
 
-// AddressType get address type as int
-func AddressType(addr netip.Addr) int {
+// AddrType get address type as int
+func AddrType(addr netip.Addr) int {
 	switch {
 	// case strings.HasPrefix(addr.StringExpanded(), "fd00"):
 	// 	return UniqueLocal
@@ -247,10 +333,10 @@ func AddressType(addr netip.Addr) int {
 
 }
 
-// AddressTypeName the type of address for the subnet
+// AddrTypeName the type of address for the subnet
 // https://www.networkacademy.io/ccna/ipv6/ipv6-address-types
-func AddressTypeName(addr netip.Addr) string {
-	switch AddressType(addr) {
+func AddrTypeName(addr netip.Addr) string {
+	switch AddrType(addr) {
 	case UniqueLocal:
 		return "Unique local"
 	case GlobalUnicast:
@@ -276,7 +362,7 @@ func AddressTypeName(addr netip.Addr) string {
 
 // IsARPA is the address relevant to ARPA addressing?
 func IsARPA(addr netip.Addr) (is bool) {
-	if HasType(AddressType(addr), GlobalUnicast) {
+	if HasType(AddrType(addr), GlobalUnicast) {
 		is = true
 	}
 
@@ -285,7 +371,7 @@ func IsARPA(addr netip.Addr) (is bool) {
 
 // AddrLink get link for address
 func AddrLink(addr netip.Addr) (url string) {
-	if !HasType(AddressType(addr), GlobalUnicast) {
+	if !HasType(AddrType(addr), GlobalUnicast) {
 		return
 	}
 	return fmt.Sprintf("http://[%s]/", addr.String())
@@ -411,7 +497,7 @@ func randomMacBytesForInterface(local, unicast bool) (bytes [6]byte, err error) 
 
 // GlobalID get subsection of bits in network part of IP
 func GlobalID(addr netip.Addr) (hex string, err error) {
-	start := TypePrefix(addr).Bits() + 1
+	start := AddrTypePrefix(addr).Bits() + 1
 	end := 48
 	hex, err = bitRangeHex(addr, start, end)
 	// error would be from range > 64 and should not happen
@@ -446,92 +532,6 @@ func MulticastGroupID(addr netip.Addr) (hex string, err error) {
 	if err != nil {
 		return
 	}
-
-	return
-}
-
-// hexStringToDelimited make a string of hex digits into an ipv6 colon delimited string
-func hexStringToDelimited(input string) (hex string) {
-	input = strings.ReplaceAll(input, ":", "")
-	parts := strings.Split(input, "")
-	reverse(parts)
-
-	var sb strings.Builder
-
-	// break output into groups of 4 separated by colon
-	for i, letter := range parts {
-		sb.WriteString(letter)
-		// add colon every 4th letter unless at very end
-		if (i+1)%4 == 0 && i != len(parts)-1 {
-			sb.WriteString(":")
-		}
-	}
-
-	parts = strings.Split(sb.String(), "")
-	reverse(parts)
-
-	hex = strings.Join(parts, "")
-
-	return
-}
-
-// hexStringToBytes convert hex string to an int then to an array of bytes
-func hexStringToBytes(hex string) (rangeBytes [8]byte, err error) {
-	hex = strings.ReplaceAll(hex, ":", "")
-	value, err := strconv.ParseUint(hex, 64, 16)
-	if err != nil {
-		return
-	}
-	binary.LittleEndian.PutUint64(rangeBytes[:], value)
-
-	return
-}
-
-// bitRangeHex get hex value for a range of an IP's bits
-func bitRangeHex(addr netip.Addr, start, end int) (hex string, err error) {
-	if (end - start) > 64 {
-		err = errors.New("end-start > 64")
-		return
-	}
-	expectedLen := 10
-	startByte := start / 8
-	endByte := (end / 8) + 1
-	if endByte == 17 {
-		endByte = 16
-	}
-
-	bytes := addr.As16()
-	var arr [8]byte
-
-	if endByte == 16 {
-		copy(arr[:], bytes[startByte:])
-	} else {
-		copy(arr[:], bytes[startByte:endByte])
-	}
-
-	var dataStr string
-	copy(arr[:], bytes[startByte:])
-	data := binary.BigEndian.Uint64(arr[:])
-
-	// remainder is the part of a byte that does not start at the boundary
-	// e.g. 3
-	remainder := start % 8
-	data = data << remainder
-	// dataStr = strconv.FormatUint(data, 16)
-	data = data >> (64 - (end - start))
-
-	dataStr = strconv.FormatUint(data, 16)
-	if data == 0 {
-		zeroes := strings.Repeat("0", (end-start)/8)
-		return hexStringToDelimited(zeroes), nil
-		// don't add zeroes if the section is not at the beginning of the IP
-	} else if len(dataStr) < expectedLen && end == 48 {
-		// need at least 40 bytes/ 10 hex chars for global id
-		prefix := strings.Repeat("0", expectedLen-len(dataStr))
-		dataStr = fmt.Sprintf("%s%s", prefix, dataStr)
-	}
-
-	hex = hexStringToDelimited(dataStr)
 
 	return
 }
@@ -749,7 +749,7 @@ func RandomAddrInterfaceLocalMulticast() (addr netip.Addr, err error) {
 // AddrSolicitedNodeMulticast get solicited node multicast address for incoming unicast address
 // EUI-64 compliance
 func AddrSolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error) {
-	if !(HasType(AddressType(addr), GlobalUnicast, LinkLocalUnicast, UniqueLocal, Private)) {
+	if !(HasType(AddrType(addr), GlobalUnicast, LinkLocalUnicast, UniqueLocal, Private)) {
 		err = errors.New("not a unicast address")
 		return
 	}
