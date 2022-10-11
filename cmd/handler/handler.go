@@ -407,6 +407,8 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 
 // ip6SubnetDisplay describe a link local IP
 func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
+	var value string
+	var err error
 	table := simpletable.New()
 	table.SetStyle(simpletable.StyleCompactLite)
 
@@ -441,7 +443,11 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 	}
 	// Handle global id for appropriate types
 	if ipv6.HasType(ipv6.AddressType(addr), ipv6.GlobalUnicast, ipv6.Private) {
-		table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", ipv6.GlobalID(addr))))
+		value, err = ipv6.GlobalID(addr)
+		if err != nil {
+			fmt.Println(err)
+		}
+		table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", value)))
 	}
 	table.Body.Cells = append(table.Body.Cells, row("Interface ID", fmt.Sprintf("%s", ipv6.InterfaceString(addr))))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet ID", fmt.Sprintf("%s", ipv6.SubnetString(addr))))
@@ -465,6 +471,8 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 
 // ip6SubnetDisplay describe a link local IP
 func ip6SubnetDisplayBasic(addr netip.Addr, prefix netip.Prefix) {
+	var value string
+	var err error
 	table := simpletable.New()
 	table.SetStyle(simpletable.StyleCompactLite)
 
@@ -479,8 +487,16 @@ func ip6SubnetDisplayBasic(addr netip.Addr, prefix netip.Prefix) {
 	table.Body.Cells = append(table.Body.Cells, row("Type Prefix", ipv6.TypePrefix(addr).Masked()))
 	table.Body.Cells = append(table.Body.Cells, row("IP", addr.String()))
 	table.Body.Cells = append(table.Body.Cells, row("Prefix", prefix.Masked()))
-	table.Body.Cells = append(table.Body.Cells, row("Network Prefix", fmt.Sprintf("%s", ipv6.MulticastNetworkPrefix(addr))))
-	table.Body.Cells = append(table.Body.Cells, row("Group ID", fmt.Sprintf("%s", ipv6.MulticastGroupID(addr))))
+	value, err = ipv6.MulticastNetworkPrefix(addr)
+	if err != nil {
+		fmt.Println(err)
+	}
+	table.Body.Cells = append(table.Body.Cells, row("Network Prefix", fmt.Sprintf("%s", value)))
+	value, err = ipv6.MulticastGroupID(addr)
+	if err != nil {
+		fmt.Println(err)
+	}
+	table.Body.Cells = append(table.Body.Cells, row("Group ID", fmt.Sprintf("%s", value)))
 	part := strings.Split(ipv6.AddrToBitString(addr), ".")[0]
 	part = fmt.Sprintf("%s%s", strings.Repeat("0", 16-len(part)), part)
 	table.Body.Cells = append(table.Body.Cells, row("first address field binary", part))

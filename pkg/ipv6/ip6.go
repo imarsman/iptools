@@ -77,18 +77,21 @@ func AddrDefaultGateway(addr netip.Addr) []byte {
 // AddrSubnetSection get IP section for IP
 func AddrSubnetSection(addr netip.Addr) []byte {
 	bytes := addr.As16()
+
 	return bytes[6:8]
 }
 
 // AddrGeneralPrefixSection get the general prefix section for IP
 func AddrGeneralPrefixSection(addr netip.Addr) []byte {
 	bytes := addr.As16()
+
 	return bytes[:8]
 }
 
 // AddrRoutingPrefixSecion get routing prefix section for IP
 func AddrRoutingPrefixSecion(addr netip.Addr) []byte {
 	bytes := addr.As16()
+
 	return bytes[:6]
 }
 
@@ -335,12 +338,12 @@ func bytes2MacAddr(bytes [6]byte) string {
 }
 
 // Get random mac address with global bool flag
-// Using EUI-64 standard
-func randomMacBytesForInterface() (bytes [6]byte, err error) {
+// The goal here is to implement EUI-64
+// https://community.cisco.com/t5/networking-knowledge-base/understanding-ipv6-eui-64-bit-address/ta-p/3116953
+func randomMacBytesForInterface(local, unicast bool) (bytes [6]byte, err error) {
 	var mac [6]byte
 	_, err = rand.Read(mac[:])
 	if err != nil {
-		fmt.Println("error:", err)
 		return
 	}
 	// Best example using random first byte
@@ -353,12 +356,22 @@ func randomMacBytesForInterface() (bytes [6]byte, err error) {
 
 	// The first three bytes are vendor-specific and consistent across vendor
 	// For example, Cisco's OUI is 20:37:06
+	// The 7th of the first byte is 1 for local and 0 for global
+	// The 8th of the first byte is 0 for unicast and 1 for multicast
+
 	// The EUI-64 standard specifies that when converting a mac address to an IPV6 interface ID the 7th bit of the first
-	// byte of the mac address must be flipped. A 0 becomes a 1 and vice versa.
-	// This is not used currently but the flipping of the bits is part of the instructions for converting a mac address
-	// to an IPV6 interface ID.
+	// byte of the mac address must be flipped. A 0 becomes a 1 and vice versa. This is not used currently but the
+	// flipping of the bits is part of the instructions for converting a mac address to an IPV6 interface ID.
+
+	// Things I don't quite understand
+	// - the local/global bit - why flip it instead of just making it one or the other?
+	//     - this may be because vendor-produced mac addresses always have this bit set to 0, so "flipping" it
+	// 		 would always set to value to 1
+	// 	       - this algorithm does not use the first three groupings based on vendor, it uses random values
+
 	// Rules for creating an interface ID from a mac ID are
-	// - flip the 7th bit in the first byte
+	// - flip the 7th bit in the first byte (or set to 1 if the first byte is random)
+	// - set the 8th bit of the first byte to 1 to indicate unicast
 	// - between the third and fourth bytes add 0xFF and OXFe
 	//     - this is apparently a disallowed combination in a mac address and allows the fact that the interface ID
 	//       started with a mac address to be known
@@ -366,13 +379,28 @@ func randomMacBytesForInterface() (bytes [6]byte, err error) {
 
 	// fmt.Printf("%08b\n", mac[0])
 
-	// If we wanted to change bit 7 to 1 or 0
-	// if global { // set to 1
-	// 	mac[0] |= 0x2
-	// } else { // set to 0
-	// 	mac[0] &^= 0x2
-	// }
-	mac[0] ^= 0x2
+	// with local == true and unicast == true
+	// 01111010 becomes
+	// 01111010
+
+	switch local {
+	case true:
+		// Set 7th bit to 1
+		mac[0] |= 0x2
+	default:
+		// Set 7th bit to 0
+		mac[0] &^= 0x2
+	}
+
+	switch unicast {
+	case true:
+		// Set 8th bit to 0
+		mac[0] &^= 0x1
+	default:
+		// Set 8th bit to 1
+		mac[0] |= 0x1
+	}
+
 	addr := net.HardwareAddr(mac[:])
 	// fmt.Printf("%08b\n", addr[0])
 
@@ -382,27 +410,44 @@ func randomMacBytesForInterface() (bytes [6]byte, err error) {
 }
 
 // GlobalID get subsection of bits in network part of IP
-func GlobalID(addr netip.Addr) (hex string) {
+func GlobalID(addr netip.Addr) (hex string, err error) {
 	start := TypePrefix(addr).Bits() + 1
 	end := 48
+	hex, err = bitRangeHex(addr, start, end)
+	// error would be from range > 64 and should not happen
+	if err != nil {
+		return
+	}
 
-	return bitRangeHex(addr, start, end)
+	return
 }
 
 // MulticastNetworkPrefix get prefix specific to multicast (at end of IP before Group ID)
-func MulticastNetworkPrefix(addr netip.Addr) (hex string) {
+func MulticastNetworkPrefix(addr netip.Addr) (hex string, err error) {
 	start := 32
 	end := 32 + 64
 
-	return bitRangeHex(addr, start, end)
+	hex, err = bitRangeHex(addr, start, end)
+	// error would be from range > 64 and should not happen
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 // MulticastGroupID id from range for multicast addresses
-func MulticastGroupID(addr netip.Addr) (hex string) {
+func MulticastGroupID(addr netip.Addr) (hex string, err error) {
 	start := 128 - 32
 	end := 128
 
-	return bitRangeHex(addr, start, end)
+	hex, err = bitRangeHex(addr, start, end)
+	// error would be from range > 64 and should not happen
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 // hexStringToDelimited make a string of hex digits into an ipv6 colon delimited string
@@ -430,6 +475,7 @@ func hexStringToDelimited(input string) (hex string) {
 	return
 }
 
+// hexStringToBytes convert hex string to an int then to an array of bytes
 func hexStringToBytes(hex string) (rangeBytes [8]byte, err error) {
 	hex = strings.ReplaceAll(hex, ":", "")
 	value, err := strconv.ParseUint(hex, 64, 16)
@@ -441,7 +487,12 @@ func hexStringToBytes(hex string) (rangeBytes [8]byte, err error) {
 	return
 }
 
-func bitRangeHex(addr netip.Addr, start, end int) (hex string) {
+// bitRangeHex get hex value for a range of an IP's bits
+func bitRangeHex(addr netip.Addr, start, end int) (hex string, err error) {
+	if (end - start) > 64 {
+		err = errors.New("end-start > 64")
+		return
+	}
 	expectedLen := 10
 	startByte := start / 8
 	endByte := (end / 8) + 1
@@ -472,7 +523,7 @@ func bitRangeHex(addr netip.Addr, start, end int) (hex string) {
 	dataStr = strconv.FormatUint(data, 16)
 	if data == 0 {
 		zeroes := strings.Repeat("0", (end-start)/8)
-		return hexStringToDelimited(zeroes)
+		return hexStringToDelimited(zeroes), nil
 		// don't add zeroes if the section is not at the beginning of the IP
 	} else if len(dataStr) < expectedLen && end == 48 {
 		// need at least 40 bytes/ 10 hex chars for global id
@@ -494,7 +545,7 @@ func RandomSubnetID() uint16 {
 
 // RandomAddrGlobalUnicast get a global unicast random IPV6 address
 func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {
-	macAddrBytes, err := randomMacBytesForInterface()
+	macAddrBytes, err := randomMacBytesForInterface(true, true)
 	if err != nil {
 		return
 	}
@@ -528,7 +579,7 @@ func RandomAddrGlobalUnicast() (addr netip.Addr, err error) {
 
 // RandomAddrLinkLocal get a link-local random IPV6 address
 func RandomAddrLinkLocal() (addr netip.Addr, err error) {
-	macAddrBytes, err := randomMacBytesForInterface()
+	macAddrBytes, err := randomMacBytesForInterface(true, true)
 	if err != nil {
 		return
 	}
@@ -558,7 +609,7 @@ func RandomAddrLinkLocal() (addr netip.Addr, err error) {
 
 // RandomAddrPrivate get a unique local random IPV6 address
 func RandomAddrPrivate() (addr netip.Addr, err error) {
-	macAddrBytes, err := randomMacBytesForInterface()
+	macAddrBytes, err := randomMacBytesForInterface(true, true)
 	if err != nil {
 		return
 	}
@@ -707,7 +758,11 @@ func AddrSolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error)
 	end := 128
 
 	// get range hex
-	unique := bitRangeHex(addr, start, end)
+	var unique string
+	unique, err = bitRangeHex(addr, start, end)
+	if err != nil {
+		return
+	}
 	// strip colons
 	unique = strings.ReplaceAll(unique, ":", "")
 
