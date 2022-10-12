@@ -8,7 +8,6 @@ import (
 
 func main() {
 	args.InitializeCompletion()
-
 	arg.MustParse(&args.CLIArgs)
 
 	// Inspect cli args and make calls to handlers as apppropriate
