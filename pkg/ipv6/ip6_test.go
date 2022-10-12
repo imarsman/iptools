@@ -11,7 +11,7 @@ import (
 func TestSubnet(t *testing.T) {
 	is := is.New(t)
 
-	addr, err := RandomAddrGlobalUnicast()
+	addr, err := RandAddrGlobalUnicast()
 	prefix := netip.PrefixFrom(addr, 64)
 	is.NoErr(err)
 	t.Log("First in subnet", First(addr).StringExpanded())
@@ -20,8 +20,8 @@ func TestSubnet(t *testing.T) {
 	t.Log(prefix)
 	t.Log(prefix.Addr().StringExpanded())
 
-	t.Log("subnet", SubnetString(addr))
-	t.Log("interface", InterfaceString(addr))
+	t.Log("subnet", AddrSubnet(addr))
+	t.Log("interface", Interface(addr))
 	t.Log("is global unicast", addr.IsGlobalUnicast())
 	t.Log("Address type", AddrTypeName(addr))
 	t.Log("Address prefix", AddrTypePrefix(addr).Masked().String())
@@ -29,42 +29,42 @@ func TestSubnet(t *testing.T) {
 
 func TestRandomGlobalUnicast(t *testing.T) {
 	is := is.New(t)
-	addr, err := RandomAddrGlobalUnicast()
+	addr, err := RandAddrGlobalUnicast()
 	is.NoErr(err)
 	t.Log(AddrTypeName(addr))
 }
 
 func TestRandomLinkLocal(t *testing.T) {
 	is := is.New(t)
-	addr, err := RandomAddrLinkLocal()
+	addr, err := RandAddrLinkLocal()
 	is.NoErr(err)
 	t.Log(AddrTypeName(addr))
 }
 
 func TestPrivate(t *testing.T) {
 	is := is.New(t)
-	addr, err := RandomAddrPrivate()
+	addr, err := RandAddrPrivate()
 	is.NoErr(err)
 	t.Log(AddrTypeName(addr))
 }
 
 func TestMulticast(t *testing.T) {
 	is := is.New(t)
-	addr, err := RandomAddrMulticast()
+	addr, err := RandAddrMulticast()
 	is.NoErr(err)
 	t.Log(AddrTypeName(addr))
 }
 
 func TestInterfaceLocalMulticast(t *testing.T) {
 	is := is.New(t)
-	addr, err := RandomAddrInterfaceLocalMulticast()
+	addr, err := RandAddrInterfaceLocalMulticast()
 	is.NoErr(err)
 	t.Log(AddrTypeName(addr))
 }
 
 func TestLinkLocalMulticast(t *testing.T) {
 	is := is.New(t)
-	addr, err := RandomAddrLinkLocalMulticast()
+	addr, err := RandAddrLinkLocalMulticast()
 	is.NoErr(err)
 	t.Log(AddrTypeName(addr))
 }
@@ -83,7 +83,7 @@ func TestMakeMacAddress(t *testing.T) {
 }
 
 func TestRandomSubnet(t *testing.T) {
-	randSubnet := RandomSubnetID()
+	randSubnet := AddrRandSubnetID()
 
 	t.Log(strconv.FormatInt(int64(randSubnet), 16))
 }
@@ -97,7 +97,7 @@ func TestBits(t *testing.T) {
 	var toConvert [8]byte
 	copy(toConvert[:], bytes[0:7])
 
-	converted := GlobalID(ip)
+	converted := AddrGlobalID(ip)
 
 	t.Log(converted)
 }

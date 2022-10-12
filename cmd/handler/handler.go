@@ -350,37 +350,37 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 	} else {
 		var err error
 		if ip6Type == typeGlobalUnicast {
-			addr, err = ipv6.RandomAddrGlobalUnicast()
+			addr, err = ipv6.RandAddrGlobalUnicast()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
 		} else if ip6Type == typeLinkLocal {
-			addr, err = ipv6.RandomAddrLinkLocal()
+			addr, err = ipv6.RandAddrLinkLocal()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
 		} else if ip6Type == typePrivate {
-			addr, err = ipv6.RandomAddrPrivate()
+			addr, err = ipv6.RandAddrPrivate()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
 		} else if ip6Type == typeMulticast {
-			addr, err = ipv6.RandomAddrMulticast()
+			addr, err = ipv6.RandAddrMulticast()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
 		} else if ip6Type == typeLinkLocalMulticast {
-			addr, err = ipv6.RandomAddrLinkLocalMulticast()
+			addr, err = ipv6.RandAddrLinkLocalMulticast()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
 		} else if ip6Type == typeInterfaceLocalMulticast {
-			addr, err = ipv6.RandomAddrInterfaceLocalMulticast()
+			addr, err = ipv6.RandAddrInterfaceLocalMulticast()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -438,19 +438,19 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 	if ipv6.AddrType(addr) == ipv6.GlobalUnicast {
 		table.Body.Cells = append(
 			table.Body.Cells, row(
-				"Routing Prefix", fmt.Sprintf("%s", fmt.Sprintf("%s", ipv6.RoutingPrefixString(addr)))),
+				"Routing Prefix", fmt.Sprintf("%s", fmt.Sprintf("%s", ipv6.RoutingPrefix(addr)))),
 		)
 	}
 	// Handle global id for appropriate types
 	if ipv6.HasType(ipv6.AddrType(addr), ipv6.GlobalUnicast, ipv6.Private) {
-		value, err = ipv6.GlobalID(addr)
+		value, err = ipv6.AddrGlobalID(addr)
 		if err != nil {
 			fmt.Println(err)
 		}
 		table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", value)))
 	}
-	table.Body.Cells = append(table.Body.Cells, row("Interface ID", fmt.Sprintf("%s", ipv6.InterfaceString(addr))))
-	table.Body.Cells = append(table.Body.Cells, row("Subnet ID", fmt.Sprintf("%s", ipv6.SubnetString(addr))))
+	table.Body.Cells = append(table.Body.Cells, row("Interface ID", fmt.Sprintf("%s", ipv6.Interface(addr))))
+	table.Body.Cells = append(table.Body.Cells, row("Subnet ID", fmt.Sprintf("%s", ipv6.AddrSubnet(addr))))
 	if ipv6.AddrType(addr) == ipv6.LinkLocalUnicast {
 		table.Body.Cells = append(table.Body.Cells, row("Default Gateway", ipv6.LinkLocalDefaultGateway(addr)))
 	}
@@ -462,7 +462,7 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 	}
 	table.Body.Cells = append(table.Body.Cells, row("Subnet first address", ipv6.First(addr).StringExpanded()))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet last address", ipv6.Last(addr).StringExpanded()))
-	part := strings.Split(ipv6.AddrToBitString(addr), ".")[0]
+	part := strings.Split(ipv6.Addr2BitString(addr), ".")[0]
 	part = fmt.Sprintf("%s%s", strings.Repeat("0", 16-len(part)), part)
 	table.Body.Cells = append(table.Body.Cells, row("first address field binary", part))
 
@@ -487,17 +487,17 @@ func ip6SubnetDisplayBasic(addr netip.Addr, prefix netip.Prefix) {
 	table.Body.Cells = append(table.Body.Cells, row("Type Prefix", ipv6.AddrTypePrefix(addr).Masked()))
 	table.Body.Cells = append(table.Body.Cells, row("IP", addr.String()))
 	table.Body.Cells = append(table.Body.Cells, row("Prefix", prefix.Masked()))
-	value, err = ipv6.MulticastNetworkPrefix(addr)
+	value, err = ipv6.AddrMulticastNetworkPrefix(addr)
 	if err != nil {
 		fmt.Println(err)
 	}
 	table.Body.Cells = append(table.Body.Cells, row("Network Prefix", fmt.Sprintf("%s", value)))
-	value, err = ipv6.MulticastGroupID(addr)
+	value, err = ipv6.AddrMulticastGroupID(addr)
 	if err != nil {
 		fmt.Println(err)
 	}
 	table.Body.Cells = append(table.Body.Cells, row("Group ID", fmt.Sprintf("%s", value)))
-	part := strings.Split(ipv6.AddrToBitString(addr), ".")[0]
+	part := strings.Split(ipv6.Addr2BitString(addr), ".")[0]
 	part = fmt.Sprintf("%s%s", strings.Repeat("0", 16-len(part)), part)
 	table.Body.Cells = append(table.Body.Cells, row("first address field binary", part))
 
@@ -516,7 +516,7 @@ func IP6RandomIPs(ip6Type string, number int) {
 	var err error
 	if ip6Type == typeGlobalUnicast {
 		for i := 0; i < number; i++ {
-			addr, err = ipv6.RandomAddrGlobalUnicast()
+			addr, err = ipv6.RandAddrGlobalUnicast()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -525,7 +525,7 @@ func IP6RandomIPs(ip6Type string, number int) {
 		}
 	} else if ip6Type == typeLinkLocal {
 		for i := 0; i < number; i++ {
-			addr, err = ipv6.RandomAddrLinkLocal()
+			addr, err = ipv6.RandAddrLinkLocal()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -534,7 +534,7 @@ func IP6RandomIPs(ip6Type string, number int) {
 		}
 	} else if ip6Type == typePrivate {
 		for i := 0; i < number; i++ {
-			addr, err = ipv6.RandomAddrPrivate()
+			addr, err = ipv6.RandAddrPrivate()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -543,7 +543,7 @@ func IP6RandomIPs(ip6Type string, number int) {
 		}
 	} else if ip6Type == typeMulticast {
 		for i := 0; i < number; i++ {
-			addr, err = ipv6.RandomAddrMulticast()
+			addr, err = ipv6.RandAddrMulticast()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -552,7 +552,7 @@ func IP6RandomIPs(ip6Type string, number int) {
 		}
 	} else if ip6Type == typeInterfaceLocalMulticast {
 		for i := 0; i < number; i++ {
-			addr, err = ipv6.RandomAddrInterfaceLocalMulticast()
+			addr, err = ipv6.RandAddrInterfaceLocalMulticast()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -561,7 +561,7 @@ func IP6RandomIPs(ip6Type string, number int) {
 		}
 	} else if ip6Type == typeLinkLocalMulticast {
 		for i := 0; i < number; i++ {
-			addr, err = ipv6.RandomAddrLinkLocalMulticast()
+			addr, err = ipv6.RandAddrLinkLocalMulticast()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
