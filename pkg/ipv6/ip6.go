@@ -463,8 +463,9 @@ func randomMacBytesForInterface(local, unicast bool) (bytes [6]byte, err error) 
 	//       started with a mac address to be known
 	// - the result will be an 8 byte array, or 64 bits, corresponding to the interface ID length for IPV6
 
-	fmt.Printf("%08b\n", mac[0])
+	// fmt.Printf("%08b\n", mac[0])
 
+	// https://en.wikipedia.org/wiki/MAC_address#Ranges_of_group_and_locally_administered_addresses
 	// with local == true and unicast == true
 	// 01111010 becomes
 	// 01111010
@@ -488,7 +489,7 @@ func randomMacBytesForInterface(local, unicast bool) (bytes [6]byte, err error) 
 	}
 
 	addr := net.HardwareAddr(mac[:])
-	fmt.Printf("%08b\n", addr[0])
+	// fmt.Printf("%08b\n", addr[0])
 
 	copy(bytes[:], addr[:6])
 
