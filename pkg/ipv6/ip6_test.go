@@ -74,7 +74,7 @@ func TestMakeMacAddress(t *testing.T) {
 	is := is.New(t)
 	// is.NoErr(err)
 
-	bytes, err := randomMacBytesForInterface()
+	bytes, err := randomMacBytesForInterface(true, true)
 	is.NoErr(err)
 	macAddress := bytes2MacAddr(bytes)
 	// macAddress := fmt.Sprintf("%02x:%02x:%02x:%02x:%02x:%02x", bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5])
@@ -97,7 +97,8 @@ func TestBits(t *testing.T) {
 	var toConvert [8]byte
 	copy(toConvert[:], bytes[0:7])
 
-	converted := AddrGlobalID(ip)
+	converted, err := AddrGlobalID(ip)
+	is.NoErr(err)
 
 	t.Log(converted)
 }

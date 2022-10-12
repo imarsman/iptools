@@ -14,6 +14,16 @@ import (
 )
 
 const (
+	TypeGlobalUnicast           = "global-unicast"
+	TypeLinkLocal               = "link-local"
+	TypeUniqueLocal             = "unique-local"
+	TypePrivate                 = "private"
+	TypeMulticast               = "multicast"
+	TypeInterfaceLocalMulticast = "interface-local-multicast"
+	TypeLinkLocalMulticast      = "link-local-multicast"
+)
+
+const (
 	// GlobalUnicast IPV6 type
 	GlobalUnicast = iota
 	// UniqueLocal IPV6 type

@@ -319,14 +319,6 @@ func IP4SubnetDivide(ip string, bits int, secondaryBits int) {
 	}
 }
 
-const typeGlobalUnicast = "global-unicast"
-const typeLinkLocal = "link-local"
-const typeUniqueLocal = "unique-local"
-const typePrivate = "private"
-const typeMulticast = "multicast"
-const typeInterfaceLocalMulticast = "interface-local-multicast"
-const typeLinkLocalMulticast = "link-local-multicast"
-
 // IP6SubnetDescribe describe a link-local address
 func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 	if ip6Type == "" && ip == "" {
@@ -346,37 +338,37 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 		}
 	} else {
 		var err error
-		if ip6Type == typeGlobalUnicast {
+		if ip6Type == ipv6.TypeGlobalUnicast {
 			addr, err = ipv6.RandAddrGlobalUnicast()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
-		} else if ip6Type == typeLinkLocal {
+		} else if ip6Type == ipv6.TypeLinkLocal {
 			addr, err = ipv6.RandAddrLinkLocal()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
-		} else if ip6Type == typePrivate {
+		} else if ip6Type == ipv6.TypePrivate {
 			addr, err = ipv6.RandAddrPrivate()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
-		} else if ip6Type == typeMulticast {
+		} else if ip6Type == ipv6.TypeMulticast {
 			addr, err = ipv6.RandAddrMulticast()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
-		} else if ip6Type == typeLinkLocalMulticast {
+		} else if ip6Type == ipv6.TypeLinkLocalMulticast {
 			addr, err = ipv6.RandAddrLinkLocalMulticast()
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
-		} else if ip6Type == typeInterfaceLocalMulticast {
+		} else if ip6Type == ipv6.TypeInterfaceLocalMulticast {
 			addr, err = ipv6.RandAddrInterfaceLocalMulticast()
 			if err != nil {
 				fmt.Println(err)
@@ -516,7 +508,7 @@ func IP6RandomIPs(ip6Type string, number int) {
 	}
 	var addr netip.Addr
 	var err error
-	if ip6Type == typeGlobalUnicast {
+	if ip6Type == ipv6.TypeGlobalUnicast {
 		for i := 0; i < number; i++ {
 			addr, err = ipv6.RandAddrGlobalUnicast()
 			if err != nil {
@@ -525,7 +517,7 @@ func IP6RandomIPs(ip6Type string, number int) {
 			}
 			fmt.Println(addr.StringExpanded())
 		}
-	} else if ip6Type == typeLinkLocal {
+	} else if ip6Type == ipv6.TypeLinkLocal {
 		for i := 0; i < number; i++ {
 			addr, err = ipv6.RandAddrLinkLocal()
 			if err != nil {
@@ -534,7 +526,7 @@ func IP6RandomIPs(ip6Type string, number int) {
 			}
 			fmt.Println(addr.StringExpanded())
 		}
-	} else if ip6Type == typePrivate {
+	} else if ip6Type == ipv6.TypePrivate {
 		for i := 0; i < number; i++ {
 			addr, err = ipv6.RandAddrPrivate()
 			if err != nil {
@@ -543,7 +535,7 @@ func IP6RandomIPs(ip6Type string, number int) {
 			}
 			fmt.Println(addr.StringExpanded())
 		}
-	} else if ip6Type == typeMulticast {
+	} else if ip6Type == ipv6.TypeMulticast {
 		for i := 0; i < number; i++ {
 			addr, err = ipv6.RandAddrMulticast()
 			if err != nil {
@@ -552,7 +544,7 @@ func IP6RandomIPs(ip6Type string, number int) {
 			}
 			fmt.Println(addr.StringExpanded())
 		}
-	} else if ip6Type == typeInterfaceLocalMulticast {
+	} else if ip6Type == ipv6.TypeInterfaceLocalMulticast {
 		for i := 0; i < number; i++ {
 			addr, err = ipv6.RandAddrInterfaceLocalMulticast()
 			if err != nil {
@@ -561,7 +553,7 @@ func IP6RandomIPs(ip6Type string, number int) {
 			}
 			fmt.Println(addr.StringExpanded())
 		}
-	} else if ip6Type == typeLinkLocalMulticast {
+	} else if ip6Type == ipv6.TypeLinkLocalMulticast {
 		for i := 0; i < number; i++ {
 			addr, err = ipv6.RandAddrLinkLocalMulticast()
 			if err != nil {
