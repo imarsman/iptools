@@ -329,9 +329,6 @@ const typeLinkLocalMulticast = "link-local-multicast"
 
 // IP6SubnetDescribe describe a link-local address
 func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
-	if bits == 0 {
-		bits = 64
-	}
 	if ip6Type == "" && ip == "" {
 		fmt.Println("If no IP then type must be supplied")
 		os.Exit(1)
@@ -390,17 +387,18 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 			os.Exit(1)
 		}
 	}
-	// s, err := ipv6subnet.NewFromAddrAndBits(addr, bits)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	os.Exit(1)
-	// }
 
 	if !(addr.IsMulticast() || addr.IsInterfaceLocalMulticast() || addr.IsLinkLocalMulticast()) {
-		prefix := netip.PrefixFrom(addr, bits)
+		var prefix netip.Prefix
+		if bits != 0 {
+			prefix = netip.PrefixFrom(addr, bits)
+		}
 		ip6SubnetDisplay(addr, prefix)
 	} else {
-		prefix := netip.PrefixFrom(addr, bits)
+		var prefix netip.Prefix
+		if bits != 0 {
+			prefix = netip.PrefixFrom(addr, bits)
+		}
 		ip6SubnetDisplayBasic(addr, prefix)
 	}
 }
@@ -434,7 +432,9 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 		)
 	}
 
-	table.Body.Cells = append(table.Body.Cells, row("Prefix", prefix.Masked()))
+	if (prefix != netip.Prefix{}) {
+		table.Body.Cells = append(table.Body.Cells, row("Prefix", prefix.Masked()))
+	}
 	if ipv6.AddrType(addr) == ipv6.GlobalUnicast {
 		table.Body.Cells = append(
 			table.Body.Cells, row(
@@ -486,7 +486,9 @@ func ip6SubnetDisplayBasic(addr netip.Addr, prefix netip.Prefix) {
 	table.Body.Cells = append(table.Body.Cells, row("IP Type", ipv6.AddrTypeName(addr)))
 	table.Body.Cells = append(table.Body.Cells, row("Type Prefix", ipv6.AddrTypePrefix(addr).Masked()))
 	table.Body.Cells = append(table.Body.Cells, row("IP", addr.String()))
-	table.Body.Cells = append(table.Body.Cells, row("Prefix", prefix.Masked()))
+	if (prefix != netip.Prefix{}) {
+		table.Body.Cells = append(table.Body.Cells, row("Prefix", prefix.Masked()))
+	}
 	value, err = ipv6.AddrMulticastNetworkPrefix(addr)
 	if err != nil {
 		fmt.Println(err)
