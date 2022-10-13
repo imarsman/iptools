@@ -14,13 +14,20 @@ import (
 )
 
 const (
-	TypeGlobalUnicast           = "global-unicast"
-	TypeLinkLocal               = "link-local"
-	TypeUniqueLocal             = "unique-local"
-	TypePrivate                 = "private"
-	TypeMulticast               = "multicast"
-	TypeInterfaceLocalMulticast = "interface-local-multicast"
-	TypeLinkLocalMulticast      = "link-local-multicast"
+	// GlobalUnicastName name for global unicast type
+	GlobalUnicastName = "global-unicast"
+	// LinkLocalName name for link local type
+	LinkLocalName = "link-local"
+	// UniqueLocalName name for unique local type
+	UniqueLocalName = "unique-local"
+	// PrivateName name for private type
+	PrivateName = "private"
+	// MulticastName name for multicast type
+	MulticastName = "multicast"
+	// InterfaceLocalMulticastName name for interface local multicast type
+	InterfaceLocalMulticastName = "interface-local-multicast"
+	// LinkLocalMulticastName name for link local multicast type
+	LinkLocalMulticastName = "link-local-multicast"
 )
 
 const (
@@ -28,16 +35,16 @@ const (
 	GlobalUnicast = iota
 	// UniqueLocal IPV6 type
 	UniqueLocal
-	// InterfaceLocalMulticast IPV6 type
-	InterfaceLocalMulticast
-	// LinkLocalMulticast IPV6 type
-	LinkLocalMulticast
 	// LinkLocalUnicast IPV6 type
 	LinkLocalUnicast
 	// Loopback IPV6 type
 	Loopback
 	// Multicast IPV6 type
 	Multicast
+	// InterfaceLocalMulticast IPV6 type
+	InterfaceLocalMulticast
+	// LinkLocalMulticast IPV6 type
+	LinkLocalMulticast
 	// Private IPV6 type
 	Private
 	// Unspecified IPV6 type
@@ -45,6 +52,38 @@ const (
 	// Unknown IPV6 type
 	Unknown
 )
+
+var typePrefixes = make(map[int]string)
+
+func init() {
+	typePrefixes[GlobalUnicast] = "2000::/3"
+	typePrefixes[UniqueLocal] = "fd00::/8"
+	typePrefixes[LinkLocalUnicast] = "fe80::/10"
+	typePrefixes[Loopback] = "::1/128"
+	typePrefixes[Multicast] = "ff00::/8"
+	typePrefixes[InterfaceLocalMulticast] = "FF00::/8"
+	typePrefixes[LinkLocalMulticast] = "FF00::/8"
+	typePrefixes[Private] = "fc00::/7"
+}
+
+// AddrTypePrefix the prefix for the IP type
+func AddrTypePrefix(addr netip.Addr) (prefix netip.Prefix) {
+	addType := AddrType(addr)
+	p, ok := typePrefixes[addType]
+
+	switch ok {
+	case true:
+		var err error
+		prefix, err = netip.ParsePrefix(p)
+		if err != nil {
+			prefix = netip.Prefix{}
+		}
+	default:
+		prefix = netip.Prefix{}
+	}
+
+	return
+}
 
 // For fun with generics
 func reverse[T any](s []T) {
@@ -258,62 +297,6 @@ func ByteSlice2Hex(bytes []byte) string {
 		}
 	}
 	return sb.String()
-}
-
-// AddrTypePrefix the prefix for the IP type
-func AddrTypePrefix(addr netip.Addr) (prefix netip.Prefix) {
-	kind := AddrType(addr)
-	var err error
-	switch kind {
-	// unique local ipv6 address prefix
-	case UniqueLocal:
-		prefix, err = netip.ParsePrefix("fd00::/8")
-		if err != nil {
-			prefix = netip.Prefix{}
-		}
-	case GlobalUnicast:
-		prefix, err = netip.ParsePrefix("2000::/3")
-		if err != nil {
-			prefix = netip.Prefix{}
-		}
-	case InterfaceLocalMulticast:
-		prefix, err = netip.ParsePrefix("FF00::/8")
-		if err != nil {
-			prefix = netip.Prefix{}
-		}
-	case LinkLocalMulticast:
-		prefix, err = netip.ParsePrefix("ff00::/8")
-		if err != nil {
-			prefix = netip.Prefix{}
-		}
-	case LinkLocalUnicast:
-		prefix, err = netip.ParsePrefix("fe80::/10")
-		if err != nil {
-			prefix = netip.Prefix{}
-		}
-	case Loopback:
-		prefix, err = netip.ParsePrefix("::1/128")
-		if err != nil {
-			prefix = netip.Prefix{}
-		}
-	case Multicast:
-		prefix, err = netip.ParsePrefix("ff00::/8")
-		if err != nil {
-			prefix = netip.Prefix{}
-		}
-		// i.e. unique local
-	case Private:
-		prefix, err = netip.ParsePrefix("fc00::/7")
-		if err != nil {
-			prefix = netip.Prefix{}
-		}
-	case Unspecified:
-		prefix = netip.Prefix{}
-	default:
-		prefix = netip.Prefix{}
-	}
-
-	return
 }
 
 // AddrType get address type as int
