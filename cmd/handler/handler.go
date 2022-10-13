@@ -433,6 +433,7 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 				"Routing Prefix", fmt.Sprintf("%s", fmt.Sprintf("%s", ipv6.RoutingPrefix(addr)))),
 		)
 	}
+	table.Body.Cells = append(table.Body.Cells, row("Subnet ID", fmt.Sprintf("%s", ipv6.AddrSubnet(addr))))
 	// Handle global id for appropriate types
 	if ipv6.HasType(ipv6.AddrType(addr), ipv6.GlobalUnicast, ipv6.Private) {
 		value, err = ipv6.AddrGlobalID(addr)
@@ -442,7 +443,6 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 		table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", value)))
 	}
 	table.Body.Cells = append(table.Body.Cells, row("Interface ID", fmt.Sprintf("%s", ipv6.Interface(addr))))
-	table.Body.Cells = append(table.Body.Cells, row("Subnet ID", fmt.Sprintf("%s", ipv6.AddrSubnet(addr))))
 	if ipv6.AddrType(addr) == ipv6.LinkLocalUnicast {
 		table.Body.Cells = append(table.Body.Cells, row("Default Gateway", ipv6.LinkLocalDefaultGateway(addr)))
 	}
