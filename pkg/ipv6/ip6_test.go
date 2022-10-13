@@ -83,7 +83,7 @@ func TestMakeMacAddress(t *testing.T) {
 }
 
 func TestRandomSubnet(t *testing.T) {
-	randSubnet := AddrRandSubnetID()
+	randSubnet := addrRandSubnetID()
 
 	t.Log(strconv.FormatInt(int64(randSubnet), 16))
 }

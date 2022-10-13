@@ -69,6 +69,7 @@ func init() {
 // AddrTypePrefix the prefix for the IP type
 func AddrTypePrefix(addr netip.Addr) (prefix netip.Prefix) {
 	addType := AddrType(addr)
+
 	p, ok := typePrefixes[addType]
 
 	switch ok {
@@ -202,29 +203,29 @@ func HasType(t int, candidates ...int) (hasType bool) {
 	return
 }
 
-// AddrDefaultGateway get IP default gateway for IP
-func AddrDefaultGateway(addr netip.Addr) []byte {
+// addrDefaultGateway get IP default gateway for IP
+func addrDefaultGateway(addr netip.Addr) []byte {
 	bytes := addr.As16()
 
 	return bytes[:6]
 }
 
-// AddrSubnetSection get IP section for IP
-func AddrSubnetSection(addr netip.Addr) []byte {
+// addrSubnetSection get IP section for IP
+func addrSubnetSection(addr netip.Addr) []byte {
 	bytes := addr.As16()
 
 	return bytes[6:8]
 }
 
-// AddrGeneralPrefixSection get the general prefix section for IP
-func AddrGeneralPrefixSection(addr netip.Addr) []byte {
+// addrGeneralPrefixSection get the general prefix section for IP
+func addrGeneralPrefixSection(addr netip.Addr) []byte {
 	bytes := addr.As16()
 
 	return bytes[:8]
 }
 
-// AddrRoutingPrefixSecion get routing prefix section for IP
-func AddrRoutingPrefixSecion(addr netip.Addr) []byte {
+// addrRoutingPrefixSecion get routing prefix section for IP
+func addrRoutingPrefixSecion(addr netip.Addr) []byte {
 	bytes := addr.As16()
 
 	return bytes[:6]
@@ -232,16 +233,16 @@ func AddrRoutingPrefixSecion(addr netip.Addr) []byte {
 
 // RoutingPrefix get the routing prefix as a hex string
 func RoutingPrefix(addr netip.Addr) string {
-	return fmt.Sprintf("%s::/%d", ByteSlice2Hex(AddrRoutingPrefixSecion(addr)), 48)
+	return fmt.Sprintf("%s::/%d", byteSlice2Hex(addrRoutingPrefixSecion(addr)), 48)
 }
 
 // Interface get the string representation in hex of the interface bits
 func Interface(addr netip.Addr) string {
-	return ByteSlice2Hex(AddrInterfaceSection(addr))
+	return byteSlice2Hex(addrInterfaceSection(addr))
 }
 
-// AddrInterfaceSection get interface section for IP
-func AddrInterfaceSection(addr netip.Addr) []byte {
+// addrInterfaceSection get interface section for IP
+func addrInterfaceSection(addr netip.Addr) []byte {
 	bytes := addr.As16()
 	return bytes[8:]
 }
@@ -283,8 +284,8 @@ func Arpa(addr netip.Addr) (addrStr string) {
 	return
 }
 
-// ByteSlice2Hex get string with two byte sets delimited by colon
-func ByteSlice2Hex(bytes []byte) string {
+// byteSlice2Hex get string with two byte sets delimited by colon
+func byteSlice2Hex(bytes []byte) string {
 	var sb strings.Builder
 	for i, byte := range bytes {
 		part := fmt.Sprintf("%x", byte)
@@ -372,12 +373,12 @@ func AddrLink(addr netip.Addr) (url string) {
 
 // AddrSubnet get the string subnet section as a hex string
 func AddrSubnet(addr netip.Addr) string {
-	return ByteSlice2Hex(AddrSubnetSection(addr))
+	return byteSlice2Hex(addrSubnetSection(addr))
 }
 
 // LinkLocalDefaultGateway get default gateway for link local
 func LinkLocalDefaultGateway(addr netip.Addr) string {
-	gateway := fmt.Sprintf("%s::%d", ByteSlice2Hex(AddrDefaultGateway(addr)), 1)
+	gateway := fmt.Sprintf("%s::%d", byteSlice2Hex(addrDefaultGateway(addr)), 1)
 	gateway = strings.ReplaceAll(gateway, "0000:", "")
 
 	return gateway
@@ -530,8 +531,8 @@ func AddrMulticastGroupID(addr netip.Addr) (hex string, err error) {
 	return
 }
 
-// AddrRandSubnetID get a random subnet for IPV6
-func AddrRandSubnetID() uint16 {
+// addrRandSubnetID get a random subnet for IPV6
+func addrRandSubnetID() uint16 {
 	rand := randUInt64(65_536)
 
 	return uint16(rand)
