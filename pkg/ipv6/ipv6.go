@@ -86,6 +86,18 @@ func AddrTypePrefix(addr netip.Addr) (prefix netip.Prefix) {
 	return
 }
 
+// HasType is address const one of a list of candidates
+func HasType(t int, candidates ...int) (hasType bool) {
+	for _, candidate := range candidates {
+		if t == candidate {
+			hasType = true
+			break
+		}
+	}
+
+	return
+}
+
 // For fun with generics
 func reverse[T any](s []T) {
 	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
@@ -103,6 +115,292 @@ func randUInt64(max int64) uint64 {
 	inRange := bigInt.Uint64()
 
 	return inRange
+}
+
+// RandAddrGlobalUnicast get a global unicast random IPV6 address
+func RandAddrGlobalUnicast() (addr netip.Addr, err error) {
+	macAddrBytes, err := randomMacBytesForInterface(true, true)
+	if err != nil {
+		return
+	}
+	macAddr := bytes2MacAddr(macAddrBytes)
+	var mac net.HardwareAddr
+	mac, err = net.ParseMAC(macAddr)
+	if err != nil {
+		return
+	}
+
+	inRange := randUInt64(63-32) + 32
+
+	addrBytes := [16]byte{
+		byte(inRange), 0x01,
+		0xd, 0xb8,
+		0xca, 0xfe,
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		mac[0], mac[1],
+		mac[2], 0xff,
+		0xfe, mac[3],
+		mac[4], mac[5],
+	}
+
+	addr = netip.AddrFrom16(addrBytes)
+
+	return
+}
+
+// RandAddrLinkLocal get a link-local random IPV6 address
+func RandAddrLinkLocal() (addr netip.Addr, err error) {
+	macAddrBytes, err := randomMacBytesForInterface(true, true)
+	if err != nil {
+		return
+	}
+	macAddr := bytes2MacAddr(macAddrBytes)
+	mac, err := net.ParseMAC(macAddr)
+	if err != nil {
+		return
+	}
+
+	// link local has prefix FE80::/10
+	addrBytes := [16]byte{
+		0xfe, 0x80,
+		0x0, 0x0,
+		0x0, 0x0,
+		0x0, 0x0,
+		mac[0], mac[1],
+		mac[2], 0xff,
+		0xfe, mac[3],
+		mac[4], mac[5],
+	}
+	addr = netip.AddrFrom16(addrBytes)
+
+	return
+}
+
+// RandAddrPrivate get a unique local random IPV6 address
+func RandAddrPrivate() (addr netip.Addr, err error) {
+	macAddrBytes, err := randomMacBytesForInterface(true, true)
+	if err != nil {
+		return
+	}
+	macAddr := bytes2MacAddr(macAddrBytes)
+	var mac net.HardwareAddr
+	mac, err = net.ParseMAC(macAddr)
+	if err != nil {
+		return
+	}
+
+	// Setting last bit (called the L bit) to 1 ensures 0xfd, which is supported
+	// The L bit needs to be 1
+	first := byte(0xfc)
+	first |= 0x1
+
+	// fc00::/7 is currently not defined
+	addrBytes := [16]byte{
+		first, byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)), // prepend with fd00::
+		mac[0], mac[1],
+		mac[2], 0xff,
+		0xfe, mac[3],
+		mac[4], mac[5],
+	}
+	addr = netip.AddrFrom16(addrBytes)
+
+	return
+}
+
+// RandAddrMulticast get a random multicast address
+func RandAddrMulticast() (addr netip.Addr, err error) {
+	// flag for 0 is reserved currently
+	flags := []string{"1", "2", "3"}
+	element := randUInt64(int64(len(flags))) + 1
+	flagStr := flags[element-1]
+
+	// scope 1 is interface-local and defined in interfaceLocalMulticast
+	// scope 2 is link-local multicast defined in randomLinkLocalMulticast
+	scopes := []string{"3", "4", "5", "8", "e", "f"}
+	element = randUInt64(int64(len(scopes))) + 1
+	scopeStr := scopes[element-1]
+
+	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
+
+	// multicast has prefix ff00::/8
+	addrBytes := [16]byte{
+		0xff, byte(flagAndScope),
+		0x0, 0x0,
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+	}
+	addr = netip.AddrFrom16(addrBytes)
+
+	return
+}
+
+// RandAddrLinkLocalMulticast get a random link local multicast address
+func RandAddrLinkLocalMulticast() (addr netip.Addr, err error) {
+	// flag for 0 is reserved currently
+	flags := []string{"1", "2", "3"}
+	element := randUInt64(int64(len(flags))) + 1
+	flagStr := flags[element-1]
+
+	// a single scope applies to link local
+	scopes := []string{"2"}
+	element = randUInt64(int64(len(scopes))) + 1
+	scopeStr := scopes[element-1]
+
+	var flagAndScope int64
+	flagAndScope, err = strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
+	if err != nil {
+		return
+	}
+
+	addrBytes := [16]byte{
+		0xff, byte(flagAndScope),
+		0x0, 0x0,
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+	}
+	addr = netip.AddrFrom16(addrBytes)
+
+	return
+}
+
+// RandAddrInterfaceLocalMulticast get a random interface local multicast address
+func RandAddrInterfaceLocalMulticast() (addr netip.Addr, err error) {
+	// flag for 0 is reserved currently
+	flags := []string{"1", "2", "3"}
+	element := randUInt64(int64(len(flags))) + 1
+	flagStr := flags[element-1]
+
+	// a single scope applies to interface local
+	scopes := []string{"1"}
+	element = randUInt64(int64(len(scopes))) + 1
+	scopeStr := scopes[element-1]
+
+	// get hex value for flag plus scope
+	var flagAndScope int64
+	flagAndScope, err = strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
+	if err != nil {
+		return
+	}
+
+	addrBytes := [16]byte{
+		0xff, byte(flagAndScope),
+		0x0, 0x0,
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+		byte(randUInt64(256)), byte(randUInt64(256)),
+	}
+	addr = netip.AddrFrom16(addrBytes)
+
+	return
+}
+
+// AddrSolicitedNodeMulticast get solicited node multicast address for incoming unicast address
+// EUI-64 compliance
+func AddrSolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error) {
+	if !(HasType(AddrType(addr), GlobalUnicast, LinkLocalUnicast, UniqueLocal, Private)) {
+		err = errors.New("not a unicast address")
+		return
+	}
+	// we need the last six characters from the address or 24 bits or 3 bytes
+	start := 104
+	end := 128
+
+	// get range hex
+	var lowOrder24Bits string
+	lowOrder24Bits, err = bitRangeHex(addr, start, end)
+	if err != nil {
+		return
+	}
+	// strip colons
+	lowOrder24Bits = strings.ReplaceAll(lowOrder24Bits, ":", "")
+
+	// hex.DecodeString requires an even number of characters to make bytes
+	// and we definitely need 6 characters/3 bytes
+	if len(lowOrder24Bits) < 6 {
+		lowOrder24Bits = fmt.Sprintf("%s%s", strings.Repeat("0", 6-len(lowOrder24Bits)), lowOrder24Bits)
+	}
+
+	// get bytes for decoded string - it will be up to 3 bytes
+	rangeBytes, err := hex.DecodeString(lowOrder24Bits)
+	if err != nil {
+		return
+	}
+
+	// copy bytes in range to an array of length 3
+	var source [3]byte
+	copy(source[:], rangeBytes)
+
+	// Create the IP based on the rule for solicited node multicast
+	// ff02::1:ffca:2fdf
+	addrBytes := [16]byte{
+		0xff, 0x2,
+		0x0, 0x0,
+		0x0, 0x0,
+		0x0, 0x0,
+		0x0, 0x0,
+		0x0, 0x1,
+		0xff, source[0],
+		source[1], source[2],
+	}
+
+	newAddr = netip.AddrFrom16(addrBytes)
+
+	return
+}
+
+// AddrGlobalID get subsection of bits in network part of IP
+func AddrGlobalID(addr netip.Addr) (hex string, err error) {
+	start := AddrTypePrefix(addr).Bits() + 1
+	end := 48
+	hex, err = bitRangeHex(addr, start, end)
+	// error would be from range > 64 and should not happen
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// AddrMulticastNetworkPrefix get prefix specific to multicast (at end of IP before Group ID)
+func AddrMulticastNetworkPrefix(addr netip.Addr) (hex string, err error) {
+	start := 32
+	end := 32 + 64
+
+	hex, err = bitRangeHex(addr, start, end)
+	// error would be from range > 64 and should not happen
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// AddrMulticastGroupID id from range for multicast addresses
+func AddrMulticastGroupID(addr netip.Addr) (hex string, err error) {
+	start := 128 - 32
+	end := 128
+
+	hex, err = bitRangeHex(addr, start, end)
+	// error would be from range > 64 and should not happen
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 // hex2Delimited make a string of hex digits into an ipv6 colon delimited string
@@ -187,18 +485,6 @@ func bitRangeHex(addr netip.Addr, start, end int) (hex string, err error) {
 	}
 
 	hex = hex2Delimited(dataStr)
-
-	return
-}
-
-// HasType is address const one of a list of candidates
-func HasType(t int, candidates ...int) (hasType bool) {
-	for _, candidate := range candidates {
-		if t == candidate {
-			hasType = true
-			break
-		}
-	}
 
 	return
 }
@@ -490,295 +776,9 @@ func randomMacBytesForInterface(local, unicast bool) (bytes [6]byte, err error) 
 	return
 }
 
-// AddrGlobalID get subsection of bits in network part of IP
-func AddrGlobalID(addr netip.Addr) (hex string, err error) {
-	start := AddrTypePrefix(addr).Bits() + 1
-	end := 48
-	hex, err = bitRangeHex(addr, start, end)
-	// error would be from range > 64 and should not happen
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-// AddrMulticastNetworkPrefix get prefix specific to multicast (at end of IP before Group ID)
-func AddrMulticastNetworkPrefix(addr netip.Addr) (hex string, err error) {
-	start := 32
-	end := 32 + 64
-
-	hex, err = bitRangeHex(addr, start, end)
-	// error would be from range > 64 and should not happen
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-// AddrMulticastGroupID id from range for multicast addresses
-func AddrMulticastGroupID(addr netip.Addr) (hex string, err error) {
-	start := 128 - 32
-	end := 128
-
-	hex, err = bitRangeHex(addr, start, end)
-	// error would be from range > 64 and should not happen
-	if err != nil {
-		return
-	}
-
-	return
-}
-
 // addrRandSubnetID get a random subnet for IPV6
 func addrRandSubnetID() uint16 {
 	rand := randUInt64(65_536)
 
 	return uint16(rand)
-}
-
-// RandAddrGlobalUnicast get a global unicast random IPV6 address
-func RandAddrGlobalUnicast() (addr netip.Addr, err error) {
-	macAddrBytes, err := randomMacBytesForInterface(true, true)
-	if err != nil {
-		return
-	}
-	macAddr := bytes2MacAddr(macAddrBytes)
-	var mac net.HardwareAddr
-	mac, err = net.ParseMAC(macAddr)
-	if err != nil {
-		return
-	}
-
-	inRange := randUInt64(63-32) + 32
-
-	addrBytes := [16]byte{
-		byte(inRange), 0x01,
-		0xd, 0xb8,
-		0xca, 0xfe,
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		mac[0], mac[1],
-		mac[2], 0xff,
-		0xfe, mac[3],
-		mac[4], mac[5],
-	}
-
-	addr = netip.AddrFrom16(addrBytes)
-
-	return
-}
-
-// RandAddrLinkLocal get a link-local random IPV6 address
-func RandAddrLinkLocal() (addr netip.Addr, err error) {
-	macAddrBytes, err := randomMacBytesForInterface(true, true)
-	if err != nil {
-		return
-	}
-	macAddr := bytes2MacAddr(macAddrBytes)
-	mac, err := net.ParseMAC(macAddr)
-	if err != nil {
-		return
-	}
-
-	// link local has prefix FE80::/10
-	addrBytes := [16]byte{
-		0xfe, 0x80,
-		0x0, 0x0,
-		0x0, 0x0,
-		0x0, 0x0,
-		mac[0], mac[1],
-		mac[2], 0xff,
-		0xfe, mac[3],
-		mac[4], mac[5],
-	}
-	addr = netip.AddrFrom16(addrBytes)
-
-	return
-}
-
-// RandAddrPrivate get a unique local random IPV6 address
-func RandAddrPrivate() (addr netip.Addr, err error) {
-	macAddrBytes, err := randomMacBytesForInterface(true, true)
-	if err != nil {
-		return
-	}
-	macAddr := bytes2MacAddr(macAddrBytes)
-	var mac net.HardwareAddr
-	mac, err = net.ParseMAC(macAddr)
-	if err != nil {
-		return
-	}
-
-	// Setting last bit (called the L bit) to 1 ensures 0xfd, which is supported
-	// The L bit needs to be 1
-	first := byte(0xfc)
-	first |= 0x1
-
-	// fc00::/7 is currently not defined
-	addrBytes := [16]byte{
-		first, byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)), // prepend with fd00::
-		mac[0], mac[1],
-		mac[2], 0xff,
-		0xfe, mac[3],
-		mac[4], mac[5],
-	}
-	addr = netip.AddrFrom16(addrBytes)
-
-	return
-}
-
-// RandAddrMulticast get a random multicast address
-func RandAddrMulticast() (addr netip.Addr, err error) {
-	// flag for 0 is reserved currently
-	flags := []string{"1", "2", "3"}
-	element := randUInt64(int64(len(flags))) + 1
-	flagStr := flags[element-1]
-
-	// scope 1 is interface-local and defined in interfaceLocalMulticast
-	// scope 2 is link-local multicast defined in randomLinkLocalMulticast
-	scopes := []string{"3", "4", "5", "8", "e", "f"}
-	element = randUInt64(int64(len(scopes))) + 1
-	scopeStr := scopes[element-1]
-
-	flagAndScope, err := strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
-
-	// multicast has prefix ff00::/8
-	addrBytes := [16]byte{
-		0xff, byte(flagAndScope),
-		0x0, 0x0,
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-	}
-	addr = netip.AddrFrom16(addrBytes)
-
-	return
-}
-
-// RandAddrLinkLocalMulticast get a random link local multicast address
-func RandAddrLinkLocalMulticast() (addr netip.Addr, err error) {
-	// flag for 0 is reserved currently
-	flags := []string{"1", "2", "3"}
-	element := randUInt64(int64(len(flags))) + 1
-	flagStr := flags[element-1]
-
-	// a single scope applies to link local
-	scopes := []string{"2"}
-	element = randUInt64(int64(len(scopes))) + 1
-	scopeStr := scopes[element-1]
-
-	var flagAndScope int64
-	flagAndScope, err = strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
-	if err != nil {
-		return
-	}
-
-	addrBytes := [16]byte{
-		0xff, byte(flagAndScope),
-		0x0, 0x0,
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-	}
-	addr = netip.AddrFrom16(addrBytes)
-
-	return
-}
-
-// RandAddrInterfaceLocalMulticast get a random interface local multicast address
-func RandAddrInterfaceLocalMulticast() (addr netip.Addr, err error) {
-	// flag for 0 is reserved currently
-	flags := []string{"1", "2", "3"}
-	element := randUInt64(int64(len(flags))) + 1
-	flagStr := flags[element-1]
-
-	// a single scope applies to interface local
-	scopes := []string{"1"}
-	element = randUInt64(int64(len(scopes))) + 1
-	scopeStr := scopes[element-1]
-
-	// get hex value for flag plus scope
-	var flagAndScope int64
-	flagAndScope, err = strconv.ParseInt(fmt.Sprintf("%s%s", flagStr, scopeStr), 16, 64)
-	if err != nil {
-		return
-	}
-
-	addrBytes := [16]byte{
-		0xff, byte(flagAndScope),
-		0x0, 0x0,
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-		byte(randUInt64(256)), byte(randUInt64(256)),
-	}
-	addr = netip.AddrFrom16(addrBytes)
-
-	return
-}
-
-// AddrSolicitedNodeMulticast get solicited node multicast address for incoming unicast address
-// EUI-64 compliance
-func AddrSolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error) {
-	if !(HasType(AddrType(addr), GlobalUnicast, LinkLocalUnicast, UniqueLocal, Private)) {
-		err = errors.New("not a unicast address")
-		return
-	}
-	// we need the last six characters from the address or 24 bits or 3 bytes
-	start := 104
-	end := 128
-
-	// get range hex
-	var lowOrder24Bits string
-	lowOrder24Bits, err = bitRangeHex(addr, start, end)
-	if err != nil {
-		return
-	}
-	// strip colons
-	lowOrder24Bits = strings.ReplaceAll(lowOrder24Bits, ":", "")
-
-	// hex.DecodeString requires an even number of characters to make bytes
-	// and we definitely need 6 characters/3 bytes
-	if len(lowOrder24Bits) < 6 {
-		lowOrder24Bits = fmt.Sprintf("%s%s", strings.Repeat("0", 6-len(lowOrder24Bits)), lowOrder24Bits)
-	}
-
-	// get bytes for decoded string - it will be up to 3 bytes
-	rangeBytes, err := hex.DecodeString(lowOrder24Bits)
-	if err != nil {
-		return
-	}
-
-	// copy bytes in range to an array of length 3
-	var source [3]byte
-	copy(source[:], rangeBytes)
-
-	// Create the IP based on the rule for solicited node multicast
-	// ff02::1:ffca:2fdf
-	addrBytes := [16]byte{
-		0xff, 0x2,
-		0x0, 0x0,
-		0x0, 0x0,
-		0x0, 0x0,
-		0x0, 0x0,
-		0x0, 0x1,
-		0xff, source[0],
-		source[1], source[2],
-	}
-
-	newAddr = netip.AddrFrom16(addrBytes)
-
-	return
 }
