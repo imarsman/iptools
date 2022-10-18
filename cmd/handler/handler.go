@@ -79,7 +79,8 @@ func IP4SubnetDescribe(ip string, bits int, secondaryBits int) {
 	table.Body.Cells = append(table.Body.Cells, row("Binary Subnet Mask", s.BinaryMask()))
 	table.Body.Cells = append(table.Body.Cells, row("Binary ID", s.BinaryID()))
 
-	table.Body.Cells = append(table.Body.Cells, row("in-addr.arpa", ipv4util.InAddrArpa(s.Prefix().Addr())))
+	table.Body.Cells = append(table.Body.Cells, row("in-addr.arpa", ipv4util.Arpa(s.Prefix().Addr())))
+	// table.Body.Cells = append(table.Body.Cells, row("in-addr.arpa", ipv4util.InAddrArpa(s.Prefix().Addr())))
 
 	if secondaryBits != 0 {
 		table.Body.Cells = append(table.Body.Cells, row("Secondary Subnet", s2.CIDR()))
@@ -456,7 +457,7 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 	table.Body.Cells = append(table.Body.Cells, row("Subnet last address", ipv6.Last(addr).StringExpanded()))
 	part := strings.Split(ipv6.Addr2BitString(addr), ".")[0]
 	part = fmt.Sprintf("%s%s", strings.Repeat("0", 16-len(part)), part)
-	table.Body.Cells = append(table.Body.Cells, row("first address field binary", part))
+	table.Body.Cells = append(table.Body.Cells, row("1st address field binary", part))
 
 	fmt.Println(table.String())
 }

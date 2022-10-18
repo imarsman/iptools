@@ -103,8 +103,8 @@ func reverse[T any](s []T) {
 	}
 }
 
-// InAddrArpa get the InAddrArpa version of an IP
-func InAddrArpa(ip netip.Addr) string {
+// Arpa get the Arpa version of an IP
+func Arpa(ip netip.Addr) string {
 	if !ip.Is4() {
 		return ""
 	}
