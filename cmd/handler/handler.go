@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"math"
 	"net/netip"
 	"os"
 	"strings"
@@ -453,6 +454,10 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 	if ipv6.IsARPA(addr) {
 		table.Body.Cells = append(table.Body.Cells, row("ip6.arpa", fmt.Sprintf("%s", ipv6.Arpa(addr))))
 	}
+	if ipv6.HasType(ipv6.AddrType(addr), ipv6.GlobalUnicast, ipv6.Private) {
+		number := printer.Sprintf("%.0f", math.Exp2(64))
+		table.Body.Cells = append(table.Body.Cells, row("Addresses", number))
+	}
 	table.Body.Cells = append(table.Body.Cells, row("Subnet first address", ipv6.First(addr).StringExpanded()))
 	table.Body.Cells = append(table.Body.Cells, row("Subnet last address", ipv6.Last(addr).StringExpanded()))
 	part := strings.Split(ipv6.Addr2BitString(addr), ".")[0]
@@ -492,6 +497,10 @@ func ip6SubnetDisplayBasic(addr netip.Addr, prefix netip.Prefix) {
 		fmt.Println(err)
 	}
 	table.Body.Cells = append(table.Body.Cells, row("Group ID", fmt.Sprintf("%s", value)))
+	if ipv6.HasType(ipv6.AddrType(addr), ipv6.Multicast, ipv6.LinkLocalMulticast, ipv6.InterfaceLocalMulticast) {
+		number := printer.Sprintf("%.0f", math.Exp2(32))
+		table.Body.Cells = append(table.Body.Cells, row("Groups", number))
+	}
 	part := strings.Split(ipv6.Addr2BitString(addr), ".")[0]
 	part = fmt.Sprintf("%s%s", strings.Repeat("0", 16-len(part)), part)
 	table.Body.Cells = append(table.Body.Cells, row("first address field binary", part))

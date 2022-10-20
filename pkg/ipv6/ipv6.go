@@ -88,6 +88,7 @@ func AddrTypePrefix(addr netip.Addr) (prefix netip.Prefix) {
 
 // HasType is address const one of a list of candidates
 func HasType(t int, candidates ...int) (hasType bool) {
+	fmt.Println("here")
 	for _, candidate := range candidates {
 		if t == candidate {
 			hasType = true
