@@ -185,59 +185,61 @@ $ iptools subnetip4 describe -ip 10.32.0.0 -bits 16 -secondary-bits 18
 
 ```
 $ iptools ip6 describe -random -type global-unicast
-          Category                                             Value
----------------------------- --------------------------------------------------------------------------
- IP Type                      Global unicast
- Type Prefix                  2000::/3
- IP                           2501:db8:cafe:4232:c544:2fff:fe1e:331d
- Solicited node multicast     ff02::1:ff1e:331d
- Prefix                       2501:db8:cafe:4232::/64
- Routing Prefix               2501:0db8:cafe::/48
- Global ID                    501:0db8:cafe
- Interface ID                 c544:2fff:fe1e:331d
- Subnet ID                    4232
- Link                         http://[2501:db8:cafe:4232:c544:2fff:fe1e:331d]/
- ip6.arpa                     d.1.3.3.e.1.e.f.f.f.f.2.4.4.5.c.2.3.2.4.e.f.a.c.8.b.d.0.1.0.5.2.ip6.arpa
- Subnet first address         2501:0db8:cafe:4232:0000:0000:0000:0000
- Subnet last address          2501:0db8:cafe:4232:ffff:ffff:ffff:ffff
- first address field binary   0010010100000001
+         Category                                            Value
+-------------------------- --------------------------------------------------------------------------
+ IP Type                    Global unicast
+ Type Prefix                2000::/3
+ IP                         2301:db8:cafe:bd9e:72f4:92ff:fe5b:a76
+ Solicited node multicast   ff02::1:ff5b:a76
+ Routing Prefix             2301:0db8:cafe::/48
+ Subnet ID                  bd9e
+ Subnets                    65,536
+ Global ID                  301:0db8:cafe
+ Interface ID               72f4:92ff:fe5b:0a76
+ Addresses                  18,446,744,073,709,551,616
+ Link                       http://[2301:db8:cafe:bd9e:72f4:92ff:fe5b:a76]/
+ ip6.arpa                   6.7.a.0.b.5.e.f.f.f.2.9.4.f.2.7.e.9.d.b.e.f.a.c.8.b.d.0.1.0.3.2.ip6.arpa
+ Subnet first address       2301:0db8:cafe:bd9e:0000:0000:0000:0000
+ Subnet last address        2301:0db8:cafe:bd9e:ffff:ffff:ffff:ffff
+ 1st address field binary   0010001100000001
 ```
 
 ### IPV6 Link local address
 ```
 $ iptools ip6 describe -random -type link-local
-          Category                             Value
----------------------------- -----------------------------------------
- IP Type                      Link local unicast
- Type Prefix                  fe80::/10
- IP                           fe80::1eaa:72ff:fefa:b575
- Solicited node multicast     ff02::1:fffa:b575
- Prefix                       fe80::/64
- Interface ID                 1eaa:72ff:fefa:b575
- Subnet ID                    0000
- Default Gateway              fe80::1
- Link                         http://[fe80::1eaa:72ff:fefa:b575]/
- Subnet first address         fe80:0000:0000:0000:0000:0000:0000:0000
- Subnet last address          fe80:0000:0000:0000:ffff:ffff:ffff:ffff
- first address field binary   1111111010000000
+         Category                            Value
+-------------------------- -----------------------------------------
+ IP Type                    Link local unicast
+ Type Prefix                fe80::/10
+ IP                         fe80::3aff:afff:feab:9edc
+ Solicited node multicast   ff02::1:ffab:9edc
+ Subnet ID                  0000
+ Subnets                    65,536
+ Interface ID               3aff:afff:feab:9edc
+ Addresses                  18,446,744,073,709,551,616
+ Default Gateway            fe80::1
+ Subnet first address       fe80:0000:0000:0000:0000:0000:0000:0000
+ Subnet last address        fe80:0000:0000:0000:ffff:ffff:ffff:ffff
+ 1st address field binary   1111111010000000
  ```
 
 ### IPV6 private address
 ```
 $ iptools ip6 describe -random -type private
-          Category                                 Value
----------------------------- --------------------------------------------------
- IP Type                      Private
- Type Prefix                  fc00::/7
- IP                           fd00:cb8e:e4a4:2708:2e2b:2ff:fe22:b549
- Solicited node multicast     ff02::1:ff22:b549
- Prefix                       fd00:cb8e:e4a4:2708::/64
- Interface ID                 2e2b:02ff:fe22:b549
- Subnet ID                    2708
- Link                         http://[fd00:cb8e:e4a4:2708:2e2b:2ff:fe22:b549]/
- Subnet first address         fd00:cb8e:e4a4:2708:0000:0000:0000:0000
- Subnet last address          fd00:cb8e:e4a4:2708:ffff:ffff:ffff:ffff
- first address field binary   1111110100000000
+         Category                            Value
+-------------------------- -----------------------------------------
+ IP Type                    Private
+ Type Prefix                fc00::/7
+ IP                         fdfc:3ae0:b79f:413c:b2f5:7dff:fe8a:fcd
+ Solicited node multicast   ff02::1:ff8a:fcd
+ Subnet ID                  413c
+ Subnets                    65,536
+ Global ID                  fc:3ae0:b79f
+ Interface ID               b2f5:7dff:fe8a:0fcd
+ Addresses                  18,446,744,073,709,551,616
+ Subnet first address       fdfc:3ae0:b79f:413c:0000:0000:0000:0000
+ Subnet last address        fdfc:3ae0:b79f:413c:ffff:ffff:ffff:ffff
+ 1st address field binary   1111110111111100
 ```
 
 ### IPV6 multicast
@@ -247,10 +249,11 @@ $ iptools ip6 describe -bits 64 -random -type multicast
 ---------------------------- --------------------------------------
  IP Type                      Multicast
  Type Prefix                  ff00::/8
- IP                           ff1f:0:5419:9893:cba3:6592:2aa9:dc95
- Network Prefix               5419:9893:cba3:6592
- Group ID                     00:2aa9:dc95
- first address field binary   1111111100011111
+ IP                           ff13:0:8be8:1642:be9a:d38f:4fc3:aecb
+ Network Prefix               8be8:1642:be9a:d38f
+ Group ID                     4fc3:aecb
+ Groups                       4,294,967,296
+ first address field binary   1111111100010011
 ```
 
 ### IPV6 Interface local multicast
@@ -260,23 +263,25 @@ $ iptools ip6 describe -bits 64 -random -type interface-local-multicast
 ---------------------------- --------------------------------------
  IP Type                      Interface local multicast
  Type Prefix                  ff00::/8
- IP                           ff31:0:3907:4492:6c5a:cc21:5397:1259
- Network Prefix               3907:4492:6c5a:cc21
- Group ID                     00:5397:1259
- first address field binary   1111111100110001
+ IP                           ff11:0:d1fb:979f:5ff6:56eb:4a3d:a793
+ Network Prefix               d1fb:979f:5ff6:56eb
+ Group ID                     4a3d:a793
+ Groups                       4,294,967,296
+ first address field binary   1111111100010001
 ```
 
 ### IPV6 Link local multicast
 ```
 $ iptools ip6 describe -bits 64 -random -type link-local-multicast
           Category                           Value
----------------------------- -------------------------------------
+---------------------------- --------------------------------------
  IP Type                      Link local muticast
  Type Prefix                  ff00::/8
- IP                           ff02:0:3c06:5f2b:1959:e37d:5a4b:8f6
- Network Prefix               3c06:5f2b:1959:e37d
- Group ID                     00:5a4b:08f6
- first address field binary   1111111100000010
+ IP                           ff12:0:c957:512a:f0fe:bbed:3d57:9c0b
+ Network Prefix               c957:512a:f0fe:bbed
+ Group ID                     3d57:9c0b
+ Groups                       4,294,967,296
+ first address field binary   1111111100010010
 ```
 
 ### Generate random IPs
@@ -365,9 +370,9 @@ $ gocloc pkg cmd README.md
 -------------------------------------------------------------------------------
 Language                     files          blank        comment           code
 -------------------------------------------------------------------------------
-Go                              12            400            252           2122
-Markdown                         1             53              0            322
+Go                              10            367            265           1976
+Markdown                         1             53              0            320
 -------------------------------------------------------------------------------
-TOTAL                           13            453            252           2444
+TOTAL                           11            420            265           2296
 -------------------------------------------------------------------------------
 ```
