@@ -454,7 +454,7 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 	if ipv6.IsARPA(addr) {
 		table.Body.Cells = append(table.Body.Cells, row("ip6.arpa", fmt.Sprintf("%s", ipv6.Arpa(addr))))
 	}
-	if ipv6.HasType(ipv6.AddrType(addr), ipv6.GlobalUnicast, ipv6.Private) {
+	if ipv6.HasType(ipv6.AddrType(addr), ipv6.GlobalUnicast, ipv6.Private, ipv6.LinkLocalUnicast) {
 		number := printer.Sprintf("%.0f", math.Exp2(64))
 		table.Body.Cells = append(table.Body.Cells, row("Addresses", number))
 	}
