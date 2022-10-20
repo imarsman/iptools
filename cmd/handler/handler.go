@@ -436,6 +436,10 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 		)
 	}
 	table.Body.Cells = append(table.Body.Cells, row("Subnet ID", fmt.Sprintf("%s", ipv6.AddrSubnet(addr))))
+	if ipv6.HasType(ipv6.AddrType(addr), ipv6.GlobalUnicast, ipv6.Private, ipv6.LinkLocalUnicast) {
+		number := printer.Sprintf("%.0f", math.Exp2(16))
+		table.Body.Cells = append(table.Body.Cells, row("Subnets", number))
+	}
 	// Handle global id for appropriate types
 	if ipv6.HasType(ipv6.AddrType(addr), ipv6.GlobalUnicast, ipv6.Private) {
 		value, err = ipv6.AddrGlobalID(addr)
