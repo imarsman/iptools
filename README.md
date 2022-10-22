@@ -299,6 +299,23 @@ fd00:a954:b6c1:3e94:c070:e3ff:fe9c:42ea
 fd00:6df2:ea4f:5d05:52cb:feff:fe81:e3b1
 ```
 
+## Utilities
+
+### Lookup of IPs by domain
+
+```
+$ iptools utilities lookup-domains -domains cisco.com ibm.com
+ Type           Address
+------ -------------------------
+        cisco.com
+ ipv4   72.163.4.185
+ ipv6   2001:420:1101:1::185
+        ibm.com
+ ipv4   104.67.113.240
+ ipv6   2607:f798:d04:283::3831
+ ipv6   2607:f798:d04:289::3831
+```
+
 ### Top level help
 
 ```
