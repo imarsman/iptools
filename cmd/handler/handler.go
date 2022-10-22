@@ -33,8 +33,6 @@ func row(label string, value any) (r []*simpletable.Cell) {
 func LookupDomain(domains []string) {
 	table := simpletable.New()
 	for _, domain := range domains {
-		fmt.Println("domain", domain)
-
 		table.Header = &simpletable.Header{
 			Cells: []*simpletable.Cell{
 				{Align: simpletable.AlignCenter, Text: "Type"},
