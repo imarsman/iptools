@@ -87,8 +87,8 @@ func LookupDomain(domains []string, mxLookup bool, toJSON, toYAML bool) {
 
 				table.Body.Cells = append(table.Body.Cells, row(mx.Host, fmt.Sprintf("%d", mx.Pref)))
 			}
-			ipsForDomains.Domains = append(ipsForDomains.Domains, domainInfo)
 		}
+		ipsForDomains.Domains = append(ipsForDomains.Domains, domainInfo)
 	}
 	table.SetStyle(simpletable.StyleCompactLite)
 

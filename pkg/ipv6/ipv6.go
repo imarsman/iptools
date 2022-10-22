@@ -68,8 +68,6 @@ func NewDomainInfo() DomainInfo {
 
 func NewIPForDomain() IPForDomain {
 	ipForDomain := IPForDomain{}
-	domainInfo := DomainInfo{}
-	ipForDomain.Domains = append(ipForDomain.Domains, domainInfo)
 
 	return ipForDomain
 }
