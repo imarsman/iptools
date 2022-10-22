@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"net/netip"
@@ -9,6 +10,7 @@ import (
 
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
+	"gopkg.in/yaml.v3"
 
 	"github.com/alexeyco/simpletable"
 	"github.com/imarsman/iptools/cmd/args"
@@ -30,7 +32,9 @@ func row(label string, value any) (r []*simpletable.Cell) {
 }
 
 // LookupDomain look up IPs for a domain
-func LookupDomain(domains []string, mxLookup bool) {
+func LookupDomain(domains []string, mxLookup bool, toJSON, toYAML bool) {
+	ipsForDomains := ipv6.NewIPForDomain()
+
 	table := simpletable.New()
 	for _, domain := range domains {
 		table.Header = &simpletable.Header{
@@ -39,6 +43,9 @@ func LookupDomain(domains []string, mxLookup bool) {
 				{Align: simpletable.AlignCenter, Text: "Address/MX Pref"},
 			},
 		}
+		domainInfo := ipv6.NewDomainInfo()
+		domainInfo.Domain = domain
+
 		domainRow := []*simpletable.Cell{
 			{},
 			{Align: simpletable.AlignLeft, Text: domain},
@@ -56,8 +63,13 @@ func LookupDomain(domains []string, mxLookup bool) {
 			if addr.Is6() {
 				addressType = "ipv6"
 			}
+			addressInfo := ipv6.AddressInfo{}
+			addressInfo.Type = addressType
+			addressInfo.Address = addr.String()
+			domainInfo.AddressInfo = append(domainInfo.AddressInfo, addressInfo)
 			table.Body.Cells = append(table.Body.Cells, row(addressType, addr.String()))
 		}
+
 		if mxLookup {
 			mxRecods, err := util.GetMXRecods(domain)
 			if len(mxRecods) > 0 && err == nil {
@@ -68,12 +80,37 @@ func LookupDomain(domains []string, mxLookup bool) {
 				table.Body.Cells = append(table.Body.Cells, mxRecordRow)
 			}
 			for _, mx := range mxRecods {
+				mxRecord := ipv6.MXRecord{}
+				mxRecord.Domain = mx.Host
+				mxRecord.Pref = mx.Pref
+				domainInfo.MXRecords = append(domainInfo.MXRecords, mxRecord)
+
 				table.Body.Cells = append(table.Body.Cells, row(mx.Host, fmt.Sprintf("%d", mx.Pref)))
 			}
+			ipsForDomains.Domains = append(ipsForDomains.Domains, domainInfo)
 		}
 	}
 	table.SetStyle(simpletable.StyleCompactLite)
-	fmt.Println(table.String())
+
+	if toJSON {
+		bytes, err := json.MarshalIndent(&ipsForDomains, "", "  ")
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		fmt.Println(string(bytes))
+	} else if toYAML {
+		bytes, err := yaml.Marshal(&ipsForDomains)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		fmt.Println(string(bytes))
+	} else {
+		fmt.Println(table.String())
+	}
+
+	// fmt.Println(table.String())
 }
 
 // IP4SubnetDescribe describe a subnet
@@ -370,7 +407,7 @@ func IP4SubnetDivide(ip string, bits int, secondaryBits int) {
 }
 
 // IP6SubnetDescribe describe a link-local address
-func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
+func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string, json, yaml bool) {
 	if ip6Type == "" && ip == "" {
 		fmt.Println("If no IP then type must be supplied")
 		os.Exit(1)
@@ -435,18 +472,20 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string) {
 		if bits != 0 {
 			prefix = netip.PrefixFrom(addr, bits)
 		}
-		ip6SubnetDisplay(addr, prefix)
+		ip6SubnetDisplay(addr, prefix, json, yaml)
 	} else {
 		var prefix netip.Prefix
 		if bits != 0 {
 			prefix = netip.PrefixFrom(addr, bits)
 		}
-		ip6SubnetDisplayBasic(addr, prefix)
+		ip6SubnetDisplayBasic(addr, prefix, json, yaml)
 	}
 }
 
 // ip6SubnetDisplay describe a link local IP
-func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
+func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix, toJSON, toYAML bool) {
+	var ipSummary = ipv6.IPSummary{}
+
 	var value string
 	var err error
 	table := simpletable.New()
@@ -459,14 +498,18 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 		},
 	}
 
+	ipSummary.IPType = ipv6.AddrTypeName(addr)
 	table.Body.Cells = append(table.Body.Cells, row("IP Type", ipv6.AddrTypeName(addr)))
+	ipSummary.TypePrefix = ipv6.AddrTypePrefix(addr).Masked().String()
 	table.Body.Cells = append(table.Body.Cells, row("Type Prefix", ipv6.AddrTypePrefix(addr).Masked()))
+	ipSummary.IP = addr.String()
 	table.Body.Cells = append(table.Body.Cells, row("IP", addr.String()))
 	if ipv6.HasType(ipv6.AddrType(addr), ipv6.GlobalUnicast, ipv6.LinkLocalUnicast, ipv6.UniqueLocal, ipv6.Private) {
 		solicitedNodeAddr, err := ipv6.AddrSolicitedNodeMulticast(addr)
 		if err != nil {
 			panic(err)
 		}
+		ipSummary.SolicitedNodeMulticast = solicitedNodeAddr.String()
 		table.Body.Cells = append(table.Body.Cells,
 			row(
 				"Solicited node multicast", solicitedNodeAddr.String(),
@@ -475,17 +518,21 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 	}
 
 	if (prefix != netip.Prefix{}) {
+		ipSummary.Prefix = prefix.Masked().String()
 		table.Body.Cells = append(table.Body.Cells, row("Prefix", prefix.Masked()))
 	}
 	if ipv6.AddrType(addr) == ipv6.GlobalUnicast {
+		ipSummary.RoutingPrefix = ipv6.RoutingPrefix(addr)
 		table.Body.Cells = append(
 			table.Body.Cells, row(
 				"Routing Prefix", fmt.Sprintf("%s", fmt.Sprintf("%s", ipv6.RoutingPrefix(addr)))),
 		)
 	}
+	ipSummary.SubnetID = ipv6.AddrSubnet(addr)
 	table.Body.Cells = append(table.Body.Cells, row("Subnet ID", fmt.Sprintf("%s", ipv6.AddrSubnet(addr))))
 	if ipv6.HasType(ipv6.AddrType(addr), ipv6.GlobalUnicast, ipv6.Private, ipv6.LinkLocalUnicast) {
 		number := printer.Sprintf("%.0f", math.Exp2(16))
+		ipSummary.Subnets = int64(math.Exp2(16))
 		table.Body.Cells = append(table.Body.Cells, row("Subnets", number))
 	}
 	// Handle global id for appropriate types
@@ -494,33 +541,61 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 		if err != nil {
 			fmt.Println(err)
 		}
+		ipSummary.GlobalID = value
 		table.Body.Cells = append(table.Body.Cells, row("Global ID", fmt.Sprintf("%s", value)))
 	}
+	ipSummary.InterfaceID = ipv6.Interface(addr)
 	table.Body.Cells = append(table.Body.Cells, row("Interface ID", fmt.Sprintf("%s", ipv6.Interface(addr))))
 	if ipv6.HasType(ipv6.AddrType(addr), ipv6.GlobalUnicast, ipv6.Private, ipv6.LinkLocalUnicast) {
 		number := printer.Sprintf("%.0f", math.Exp2(64))
+		ipSummary.Addresses = int64(math.Exp2(64))
 		table.Body.Cells = append(table.Body.Cells, row("Addresses", number))
 	}
 	if ipv6.AddrType(addr) == ipv6.LinkLocalUnicast {
+		ipSummary.DefaultGateway = ipv6.LinkLocalDefaultGateway(addr)
 		table.Body.Cells = append(table.Body.Cells, row("Default Gateway", ipv6.LinkLocalDefaultGateway(addr)))
 	}
 	if ipv6.HasType(ipv6.AddrType(addr), ipv6.GlobalUnicast) {
+		ipSummary.Link = ipv6.AddrLink(addr)
 		table.Body.Cells = append(table.Body.Cells, row("Link", ipv6.AddrLink(addr)))
 	}
 	if ipv6.HasType(ipv6.AddrType(addr), ipv6.GlobalUnicast) {
+		ipSummary.IPV6Arpa = ipv6.Arpa(addr)
 		table.Body.Cells = append(table.Body.Cells, row("ip6.arpa", fmt.Sprintf("%s", ipv6.Arpa(addr))))
 	}
+	ipSummary.SubnetFirstAddress = ipv6.First(addr).StringExpanded()
 	table.Body.Cells = append(table.Body.Cells, row("Subnet first address", ipv6.First(addr).StringExpanded()))
+	ipSummary.SubnetLastAddress = ipv6.Last(addr).StringExpanded()
 	table.Body.Cells = append(table.Body.Cells, row("Subnet last address", ipv6.Last(addr).StringExpanded()))
 	part := strings.Split(ipv6.Addr2BitString(addr), ".")[0]
 	part = fmt.Sprintf("%s%s", strings.Repeat("0", 16-len(part)), part)
+	ipSummary.FirstAddressFieldBinary = part
 	table.Body.Cells = append(table.Body.Cells, row("1st address field binary", part))
 
-	fmt.Println(table.String())
+	if toJSON {
+		bytes, err := json.MarshalIndent(&ipSummary, "", "  ")
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		fmt.Println(string(bytes))
+	} else if toYAML {
+		bytes, err := yaml.Marshal(&ipSummary)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		fmt.Println(string(bytes))
+	} else {
+		fmt.Println(table.String())
+	}
+
 }
 
 // ip6SubnetDisplay describe a link local IP
-func ip6SubnetDisplayBasic(addr netip.Addr, prefix netip.Prefix) {
+func ip6SubnetDisplayBasic(addr netip.Addr, prefix netip.Prefix, toJSON, toYAML bool) {
+	var ipSummary = ipv6.IPSummary{}
+
 	var value string
 	var err error
 	table := simpletable.New()
@@ -533,8 +608,11 @@ func ip6SubnetDisplayBasic(addr netip.Addr, prefix netip.Prefix) {
 		},
 	}
 
+	ipSummary.IPType = ipv6.AddrTypeName(addr)
 	table.Body.Cells = append(table.Body.Cells, row("IP Type", ipv6.AddrTypeName(addr)))
+	ipSummary.TypePrefix = ipv6.AddrTypePrefix(addr).Masked().String()
 	table.Body.Cells = append(table.Body.Cells, row("Type Prefix", ipv6.AddrTypePrefix(addr).Masked()))
+	ipSummary.IP = addr.String()
 	table.Body.Cells = append(table.Body.Cells, row("IP", addr.String()))
 	if (prefix != netip.Prefix{}) {
 		table.Body.Cells = append(table.Body.Cells, row("Prefix", prefix.Masked()))
@@ -543,21 +621,42 @@ func ip6SubnetDisplayBasic(addr netip.Addr, prefix netip.Prefix) {
 	if err != nil {
 		fmt.Println(err)
 	}
+	ipSummary.NetworkPrefix = fmt.Sprintf("%s", value)
 	table.Body.Cells = append(table.Body.Cells, row("Network Prefix", fmt.Sprintf("%s", value)))
 	value, err = ipv6.AddrMulticastGroupID(addr)
 	if err != nil {
 		fmt.Println(err)
 	}
+	ipSummary.GroupID = fmt.Sprintf("%s", value)
 	table.Body.Cells = append(table.Body.Cells, row("Group ID", fmt.Sprintf("%s", value)))
 	if ipv6.HasType(ipv6.AddrType(addr), ipv6.Multicast, ipv6.LinkLocalMulticast, ipv6.InterfaceLocalMulticast) {
 		number := printer.Sprintf("%.0f", math.Exp2(32))
+		ipSummary.Groups = int64(math.Exp2(32))
 		table.Body.Cells = append(table.Body.Cells, row("Groups", number))
 	}
 	part := strings.Split(ipv6.Addr2BitString(addr), ".")[0]
 	part = fmt.Sprintf("%s%s", strings.Repeat("0", 16-len(part)), part)
+	ipSummary.FirstAddressFieldBinary = part
+
 	table.Body.Cells = append(table.Body.Cells, row("first address field binary", part))
 
-	fmt.Println(table.String())
+	if toJSON {
+		bytes, err := json.MarshalIndent(&ipSummary, "", "  ")
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		fmt.Println(string(bytes))
+	} else if toYAML {
+		bytes, err := yaml.Marshal(&ipSummary)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		fmt.Println(string(bytes))
+	} else {
+		fmt.Println(table.String())
+	}
 }
 
 // IP6RandomIPs produce list of random IPs

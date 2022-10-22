@@ -85,6 +85,8 @@ type IP6SubnetDescribe struct {
 	Random bool   `arg:"-r,--random" help:"generate random IP"`
 	Bits   int    `arg:"-b,--bits" help:"subnet bits"`
 	Type   string `arg:"-t,--type" help:"global-unicast, link-local, private, multicast, interface-local-multicast, link-local-multicast"`
+	JSON   bool   `arg:"-j,--json" help:"shwo JSON output"`
+	YAML   bool   `arg:"-y,--yaml" help:"shwo YAML output"`
 }
 
 // IP6Subnet IP6 calls
@@ -110,6 +112,8 @@ type Utilities struct {
 type UtilsDomainLookup struct {
 	Domains  []string `arg:"-d,--domains" help:"Look up by domain name"`
 	MXLookup bool     `arg:"-m,--mxrecords" help:"Look up MX records for domain"`
+	YAML     bool     `arg:"-y,--yaml" help:"YAML output"`
+	JSON     bool     `arg:"-j,--json" help:"JSON output"`
 }
 
 // Args container for cli pargs

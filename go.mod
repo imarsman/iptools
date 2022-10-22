@@ -9,6 +9,7 @@ require (
 	github.com/posener/complete/v2 v2.0.1-alpha.13
 	golang.org/x/text v0.3.7
 	gopkg.in/yaml.v2 v2.4.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (

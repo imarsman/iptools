@@ -13,6 +13,67 @@ import (
 	"strings"
 )
 
+// IPSummary summary of properties for an IP
+type IPSummary struct {
+	IPType                  string `yaml:"iptype,omitempty" json:"iptype,omitempty"`
+	TypePrefix              string `yaml:"typeprefix,omitempty" json:"typeprefix,omitempty"`
+	IP                      string `yaml:"ip,omitempty" json:"ip,omitempty"`
+	SolicitedNodeMulticast  string `yaml:"solicitednodemulticast,omitempty" json:"solicitednodemulticast,omitempty"`
+	Prefix                  string `yaml:"prefix,omitempty" json:"prefix,omitempty"`
+	NetworkPrefix           string `yaml:"networkprefix,omitempty" json:"networkprefix,omitempty"`
+	RoutingPrefix           string `yaml:"routingprefix,omitempty" json:"routingprefix,omitempty"`
+	SubnetID                string `yaml:"subnetid,omitempty" json:"subnetid,omitempty"`
+	Subnets                 int64  `yaml:"subnets,omitempty" json:"subnets,omitempty"`
+	GlobalID                string `yaml:"globalid,omitempty" json:"globalid,omitempty"`
+	GroupID                 string `yaml:"groupid,omitempty" json:"groupid,omitempty"`
+	Groups                  int64  `yaml:"groups,omitempty" json:"groups,omitempty"`
+	InterfaceID             string `yaml:"interfaceid,omitempty" json:"interfaceid,omitempty"`
+	Addresses               int64  `yaml:"addresses,omitempty" json:"addresses,omitempty"`
+	DefaultGateway          string `yaml:"defaultgateway,omitempty" json:"defaultgateway,omitempty"`
+	Link                    string `yaml:"link,omitempty" json:"link,omitempty"`
+	IPV6Arpa                string `yaml:"ipv6arpa,omitempty" json:"ipv6arpa,omitempty"`
+	SubnetFirstAddress      string `yaml:"subnetfirstaddress,omitempty" json:"subnetfirstaddress,omitempty"`
+	SubnetLastAddress       string `yaml:"subnetlastaddress,omitempty" json:"subnetlastaddress,omitempty"`
+	FirstAddressFieldBinary string `yaml:"firstaddressbinary,omitempty" json:"firstaddressbinary,omitempty"`
+}
+
+type AddressInfo struct {
+	Type    string `yaml:"type,omitempty" json:"type,omitempty"`
+	Address string `yaml:"address,omitempty" json:"address,omitempty"`
+}
+
+type DomainInfo struct {
+	Domain string `yaml:"domain,omitempty" json:"domain,omitempty"`
+	// Type        string        `yaml:"type,omitempty" json:"type,omitempty"`
+	AddressInfo []AddressInfo `yaml:"addresses,omitempty" json:"addresses,omitempty"`
+	MXRecords   []MXRecord    `yaml:"mxrecords,omitempty" json:"mxrecords,omitempty"`
+}
+
+type MXRecord struct {
+	Domain string `yaml:"domain,omitempty" json:"domain,omitempty"`
+	Pref   uint16 `yaml:"pref,omitempty" json:"pref,omitempty"`
+}
+
+type IPForDomain struct {
+	Domains []DomainInfo `yaml:"domains,omitempty" json:"domains,omitempty"`
+}
+
+func NewDomainInfo() DomainInfo {
+	domainInfo := DomainInfo{}
+	mxRecords := []MXRecord{}
+	domainInfo.MXRecords = mxRecords
+
+	return domainInfo
+}
+
+func NewIPForDomain() IPForDomain {
+	ipForDomain := IPForDomain{}
+	domainInfo := DomainInfo{}
+	ipForDomain.Domains = append(ipForDomain.Domains, domainInfo)
+
+	return ipForDomain
+}
+
 const (
 	// GlobalUnicastName name for global unicast type
 	GlobalUnicastName = "global-unicast"

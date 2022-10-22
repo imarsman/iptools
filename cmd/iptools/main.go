@@ -15,7 +15,10 @@ func main() {
 
 	if args.CLIArgs.Utilities != nil {
 		if len(args.CLIArgs.Utilities.Lookup.Domains) != 0 {
-			handler.LookupDomain(args.CLIArgs.Utilities.Lookup.Domains, args.CLIArgs.Utilities.Lookup.MXLookup)
+			handler.LookupDomain(
+				args.CLIArgs.Utilities.Lookup.Domains, args.CLIArgs.Utilities.Lookup.MXLookup,
+				args.CLIArgs.Utilities.Lookup.JSON, args.CLIArgs.Utilities.Lookup.YAML,
+			)
 		} else {
 			fmt.Println("No valid utilities option selected")
 			os.Exit(1)
@@ -56,6 +59,8 @@ func main() {
 				args.CLIArgs.IP6Subnet.IP6SubnetDescribe.Bits,
 				args.CLIArgs.IP6Subnet.IP6SubnetDescribe.Random,
 				args.CLIArgs.IP6Subnet.IP6SubnetDescribe.Type,
+				args.CLIArgs.IP6Subnet.IP6SubnetDescribe.JSON,
+				args.CLIArgs.IP6Subnet.IP6SubnetDescribe.YAML,
 			)
 		}
 		if args.CLIArgs.IP6Subnet.IP6RandomIPs != nil {

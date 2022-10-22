@@ -63,6 +63,8 @@ var cmd = &complete.Command{
 						"bits":   predict.Set(ip6PrefixBits),
 						"random": predict.Nothing,
 						"type":   predict.Set(ip6Types),
+						"json":   predict.Nothing,
+						"yaml":   predict.Nothing,
 					},
 				},
 				"random-ips": {
@@ -79,6 +81,8 @@ var cmd = &complete.Command{
 					Flags: map[string]complete.Predictor{
 						"domains":   predict.Set(domains),
 						"mxrecords": predict.Nothing,
+						"yaml":      predict.Nothing,
+						"json":      predict.Nothing,
 					},
 				},
 			},
