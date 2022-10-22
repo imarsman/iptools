@@ -101,10 +101,21 @@ type IP4Subnet struct {
 	SubnetDescribe *IP4SubnetDescribe `arg:"subcommand:describe" help:"describe a subnet"`
 }
 
+// Utilities utilities
+type Utilities struct {
+	Lookup *UtilsDomainLookup `arg:"subcommand:lookup-domains" help:"Look up by domain name"`
+}
+
+// UtilsDomainLookup look up by domain name
+type UtilsDomainLookup struct {
+	LookupDomains []string `arg:"-d,--domain" help:"Look up by domain name"`
+}
+
 // Args container for cli pargs
 type Args struct {
 	IP4Subnet *IP4Subnet `arg:"subcommand:subnetip4" help:"Get networks for subnet"`
 	IP6Subnet *IP6Subnet `arg:"subcommand:ip6" help:"Get IP6 address information"`
+	Utilities *Utilities `arg:"subcommand:utilities" help:"Utilities"`
 }
 
 // CLIArgs the args structure to be filled at runtime

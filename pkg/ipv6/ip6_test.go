@@ -1,12 +1,35 @@
 package ipv6
 
 import (
+	"net"
 	"net/netip"
 	"strconv"
 	"testing"
 
 	"github.com/matryer/is"
 )
+
+func TestLookup(t *testing.T) {
+	ipList, err := net.LookupIP("cisco.com")
+
+	if err == nil {
+		for _, ip := range ipList {
+
+			addr, err := netip.ParseAddr(ip.String())
+			is := is.New(t)
+			is.NoErr(err)
+
+			if addr.Is4() {
+				t.Log("ip4: ", addr)
+			} else if addr.Is6() {
+				t.Log("ip6: ", addr)
+			}
+		}
+
+	} else {
+		t.Error("IP lookup failed. Error is: ", err)
+	}
+}
 
 func TestSubnet(t *testing.T) {
 	is := is.New(t)

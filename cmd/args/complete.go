@@ -11,6 +11,8 @@ var ip4ips = []string{"99.236.32.0", "10.32.0.0", "192.168.1.1"}
 // ip6PrefixBits number of bits for prefix
 var ip6PrefixBits = []string{"64", "48", "10", "8"}
 
+var domains = []string{"cisco.com", "workday.cisco.com", "ibm.com", "java.com"}
+
 // ip6Types IP6 address types
 var ip6Types = []string{
 	"global-unicast",
@@ -67,6 +69,15 @@ var cmd = &complete.Command{
 					Flags: map[string]complete.Predictor{
 						"number": predict.Nothing,
 						"type":   predict.Set(ip6Types),
+					},
+				},
+			},
+		},
+		"utilities": {
+			Sub: map[string]*complete.Command{
+				"lookup-domains": {
+					Flags: map[string]complete.Predictor{
+						"domain": predict.Set(domains),
 					},
 				},
 			},

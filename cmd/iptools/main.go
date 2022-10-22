@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/alexflint/go-arg"
 	"github.com/imarsman/iptools/cmd/args"
 	"github.com/imarsman/iptools/cmd/handler"
@@ -9,6 +12,15 @@ import (
 func main() {
 	args.InitializeCompletion()
 	arg.MustParse(&args.CLIArgs)
+
+	if args.CLIArgs.Utilities != nil {
+		if len(args.CLIArgs.Utilities.Lookup.LookupDomains) != 0 {
+			handler.LookupDomain(args.CLIArgs.Utilities.Lookup.LookupDomains)
+		} else {
+			fmt.Println("No valid utilities option selected")
+			os.Exit(1)
+		}
+	}
 
 	// Inspect cli args and make calls to handlers as apppropriate
 	if args.CLIArgs.IP4Subnet != nil {

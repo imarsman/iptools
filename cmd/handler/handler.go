@@ -16,6 +16,7 @@ import (
 	"github.com/imarsman/iptools/pkg/ipv4subnet"
 	"github.com/imarsman/iptools/pkg/ipv4subnet/ipv4util"
 	"github.com/imarsman/iptools/pkg/ipv6"
+	"github.com/imarsman/iptools/pkg/util"
 )
 
 var printer = message.NewPrinter(language.English)
@@ -26,6 +27,42 @@ func row(label string, value any) (r []*simpletable.Cell) {
 		{Align: simpletable.AlignLeft, Text: fmt.Sprintf("%v", value)},
 	}
 	return
+}
+
+// LookupDomain look up IPs for a domain
+func LookupDomain(domains []string) {
+	table := simpletable.New()
+	for _, domain := range domains {
+		fmt.Println("domain", domain)
+
+		table.Header = &simpletable.Header{
+			Cells: []*simpletable.Cell{
+				{Align: simpletable.AlignCenter, Text: "Type"},
+				{Align: simpletable.AlignCenter, Text: "Address"},
+			},
+		}
+		domainRow := []*simpletable.Cell{
+			{},
+			{Align: simpletable.AlignLeft, Text: domain},
+		}
+		table.Body.Cells = append(table.Body.Cells, domainRow)
+		addresses, err := util.GetAddresses(domain)
+		if err != nil {
+			domainRow = []*simpletable.Cell{
+				{Align: simpletable.AlignLeft, Span: 2, Text: err.Error()},
+			}
+			table.Body.Cells = append(table.Body.Cells, domainRow)
+		}
+		for _, addr := range addresses {
+			var addressType string = "ipv4"
+			if addr.Is6() {
+				addressType = "ipv6"
+			}
+			table.Body.Cells = append(table.Body.Cells, row(addressType, addr.String()))
+		}
+	}
+	table.SetStyle(simpletable.StyleCompactLite)
+	fmt.Println(table.String())
 }
 
 // IP4SubnetDescribe describe a subnet
@@ -459,7 +496,7 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix) {
 	if ipv6.HasType(ipv6.AddrType(addr), ipv6.GlobalUnicast) {
 		table.Body.Cells = append(table.Body.Cells, row("Link", ipv6.AddrLink(addr)))
 	}
-	if ipv6.IsARPA(addr) {
+	if ipv6.HasType(ipv6.AddrType(addr), ipv6.GlobalUnicast) {
 		table.Body.Cells = append(table.Body.Cells, row("ip6.arpa", fmt.Sprintf("%s", ipv6.Arpa(addr))))
 	}
 	table.Body.Cells = append(table.Body.Cells, row("Subnet first address", ipv6.First(addr).StringExpanded()))
