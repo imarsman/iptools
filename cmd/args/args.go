@@ -108,7 +108,8 @@ type Utilities struct {
 
 // UtilsDomainLookup look up by domain name
 type UtilsDomainLookup struct {
-	LookupDomains []string `arg:"-d,--domains" help:"Look up by domain name"`
+	Domains  []string `arg:"-d,--domains" help:"Look up by domain name"`
+	MXLookup bool     `arg:"-m,--mxrecords" help:"Look up MX records for domain"`
 }
 
 // Args container for cli pargs

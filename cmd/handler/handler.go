@@ -30,13 +30,13 @@ func row(label string, value any) (r []*simpletable.Cell) {
 }
 
 // LookupDomain look up IPs for a domain
-func LookupDomain(domains []string) {
+func LookupDomain(domains []string, mxLookup bool) {
 	table := simpletable.New()
 	for _, domain := range domains {
 		table.Header = &simpletable.Header{
 			Cells: []*simpletable.Cell{
-				{Align: simpletable.AlignCenter, Text: "Type"},
-				{Align: simpletable.AlignCenter, Text: "Address"},
+				{Align: simpletable.AlignCenter, Text: "Type/MX Domain"},
+				{Align: simpletable.AlignCenter, Text: "Address/MX Pref"},
 			},
 		}
 		domainRow := []*simpletable.Cell{
@@ -57,6 +57,19 @@ func LookupDomain(domains []string) {
 				addressType = "ipv6"
 			}
 			table.Body.Cells = append(table.Body.Cells, row(addressType, addr.String()))
+		}
+		if mxLookup {
+			mxRecods, err := util.GetMXRecods(domain)
+			if len(mxRecods) > 0 && err == nil {
+				mxRecordRow := []*simpletable.Cell{
+					{},
+					{Align: simpletable.AlignLeft, Text: "MX Records"},
+				}
+				table.Body.Cells = append(table.Body.Cells, mxRecordRow)
+			}
+			for _, mx := range mxRecods {
+				table.Body.Cells = append(table.Body.Cells, row(mx.Host, fmt.Sprintf("%d", mx.Pref)))
+			}
 		}
 	}
 	table.SetStyle(simpletable.StyleCompactLite)

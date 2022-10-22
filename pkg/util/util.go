@@ -28,3 +28,10 @@ func GetAddresses(domain string) (addresses []netip.Addr, err error) {
 
 	return
 }
+
+// GetMXRecods get MX records for a domain
+func GetMXRecods(domain string) (mxRecods []*net.MX, err error) {
+	mxRecods, err = net.LookupMX(domain)
+
+	return
+}

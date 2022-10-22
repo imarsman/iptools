@@ -14,8 +14,8 @@ func main() {
 	arg.MustParse(&args.CLIArgs)
 
 	if args.CLIArgs.Utilities != nil {
-		if len(args.CLIArgs.Utilities.Lookup.LookupDomains) != 0 {
-			handler.LookupDomain(args.CLIArgs.Utilities.Lookup.LookupDomains)
+		if len(args.CLIArgs.Utilities.Lookup.Domains) != 0 {
+			handler.LookupDomain(args.CLIArgs.Utilities.Lookup.Domains, args.CLIArgs.Utilities.Lookup.MXLookup)
 		} else {
 			fmt.Println("No valid utilities option selected")
 			os.Exit(1)
