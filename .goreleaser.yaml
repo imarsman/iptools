@@ -36,6 +36,9 @@ release:
 
     iptools is a set of IP and network tools
 
+    v0.1.33
+    Added IPs for domain lookup
+
     v0.1.32
     Work to properly implement EUI-64
 
