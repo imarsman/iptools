@@ -77,7 +77,7 @@ var cmd = &complete.Command{
 			Sub: map[string]*complete.Command{
 				"lookup-domains": {
 					Flags: map[string]complete.Predictor{
-						"domain": predict.Set(domains),
+						"domains": predict.Set(domains),
 					},
 				},
 			},
