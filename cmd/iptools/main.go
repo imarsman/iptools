@@ -3,27 +3,34 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/alexflint/go-arg"
 	"github.com/imarsman/iptools/cmd/args"
 	"github.com/imarsman/iptools/cmd/handler"
 )
 
+func remove[T any](s []T, i int) []T {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+
+func dedup[T any](slice []T) []T {
+	m := make(map[any]bool)
+	for i := 0; i < len(slice); i++ {
+		current := slice[i]
+		if m[current] {
+			slice = remove(slice, i)
+		} else {
+			m[current] = true
+		}
+	}
+	return slice
+}
+
 func main() {
 	args.InitializeCompletion()
 	arg.MustParse(&args.CLIArgs)
-
-	if args.CLIArgs.Utilities != nil {
-		if len(args.CLIArgs.Utilities.Lookup.Domains) != 0 {
-			handler.LookupDomain(
-				args.CLIArgs.Utilities.Lookup.Domains, args.CLIArgs.Utilities.Lookup.MXLookup,
-				args.CLIArgs.Utilities.Lookup.JSON, args.CLIArgs.Utilities.Lookup.YAML,
-			)
-		} else {
-			fmt.Println("No valid utilities option selected")
-			os.Exit(1)
-		}
-	}
 
 	// Inspect cli args and make calls to handlers as apppropriate
 	if args.CLIArgs.IP4Subnet != nil {
@@ -70,4 +77,21 @@ func main() {
 			)
 		}
 	}
+	if args.CLIArgs.Utilities != nil {
+		if len(args.CLIArgs.Utilities.Lookup.Domains) != 0 {
+			domains := args.CLIArgs.Utilities.Lookup.Domains
+			sort.Strings(domains)
+			domains = dedup(domains)
+
+			args.CLIArgs.Utilities.Lookup.Domains = domains
+			handler.LookupDomain(
+				args.CLIArgs.Utilities.Lookup.Domains, args.CLIArgs.Utilities.Lookup.MXLookup,
+				args.CLIArgs.Utilities.Lookup.JSON, args.CLIArgs.Utilities.Lookup.YAML,
+			)
+		} else {
+			fmt.Println("No valid utilities option selected")
+			os.Exit(1)
+		}
+	}
+
 }

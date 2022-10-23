@@ -36,11 +36,11 @@ func LookupDomain(domains []string, mxLookup bool, toJSON, toYAML bool) {
 	ipsForDomains := ipv6.NewDomainInfoSet()
 
 	table := simpletable.New()
-	for _, domain := range domains {
+	for i, domain := range domains {
 		table.Header = &simpletable.Header{
 			Cells: []*simpletable.Cell{
-				{Align: simpletable.AlignCenter, Text: "Type/MX Domain"},
-				{Align: simpletable.AlignCenter, Text: "Address/MX Pref"},
+				{Align: simpletable.AlignCenter, Text: "Type/MX"},
+				{Align: simpletable.AlignCenter, Text: "Address/Pref"},
 			},
 		}
 		domainInfo := ipv6.NewDomainInfo()
@@ -89,6 +89,13 @@ func LookupDomain(domains []string, mxLookup bool, toJSON, toYAML bool) {
 			}
 		}
 		ipsForDomains.DomainInfo = append(ipsForDomains.DomainInfo, domainInfo)
+		if i+1 < len(domains) {
+			r := []*simpletable.Cell{
+				{},
+				{},
+			}
+			table.Body.Cells = append(table.Body.Cells, r)
+		}
 	}
 	table.SetStyle(simpletable.StyleCompactLite)
 
@@ -109,8 +116,6 @@ func LookupDomain(domains []string, mxLookup bool, toJSON, toYAML bool) {
 	} else {
 		fmt.Println(table.String())
 	}
-
-	// fmt.Println(table.String())
 }
 
 // IP4SubnetDescribe describe a subnet
