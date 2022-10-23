@@ -6,8 +6,8 @@ import (
 	"net/netip"
 )
 
-// GetDomainAddresses get addresses for a domain
-func GetDomainAddresses(domain string) (addresses []netip.Addr, err error) {
+// DomainAddresses get addresses for a domain
+func DomainAddresses(domain string) (addresses []netip.Addr, err error) {
 	ipList, err := net.LookupIP(domain)
 
 	if err == nil {
@@ -25,8 +25,8 @@ func GetDomainAddresses(domain string) (addresses []netip.Addr, err error) {
 	return
 }
 
-// GetDomainMXRecods get MX records for a domain
-func GetDomainMXRecods(domain string) (mxRecods []*net.MX, err error) {
+// DomainMXRecods get MX records for a domain
+func DomainMXRecods(domain string) (mxRecods []*net.MX, err error) {
 	mxRecods, err = net.LookupMX(domain)
 
 	return

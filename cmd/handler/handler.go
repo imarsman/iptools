@@ -51,7 +51,7 @@ func LookupDomain(domains []string, mxLookup bool, toJSON, toYAML bool) {
 			{Align: simpletable.AlignLeft, Text: domain},
 		}
 		table.Body.Cells = append(table.Body.Cells, domainRow)
-		addresses, err := util.GetDomainAddresses(domain)
+		addresses, err := util.DomainAddresses(domain)
 		if err != nil {
 			domainRow = []*simpletable.Cell{
 				{Align: simpletable.AlignLeft, Span: 2, Text: err.Error()},
@@ -71,7 +71,7 @@ func LookupDomain(domains []string, mxLookup bool, toJSON, toYAML bool) {
 		}
 
 		if mxLookup {
-			mxRecods, err := util.GetDomainMXRecods(domain)
+			mxRecods, err := util.DomainMXRecods(domain)
 			if len(mxRecods) > 0 && err == nil {
 				mxRecordRow := []*simpletable.Cell{
 					{},
