@@ -10,9 +10,10 @@ import (
 	"github.com/imarsman/iptools/cmd/handler"
 )
 
-func remove[T any](s []T, i int) []T {
-	s[i] = s[len(s)-1]
-	return s[:len(s)-1]
+func remove[T any](slice []T, position int) []T {
+	slice[position] = slice[len(slice)-1]
+
+	return slice[:len(slice)-1]
 }
 
 func dedup[T any](slice []T) []T {
