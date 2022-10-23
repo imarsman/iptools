@@ -1,36 +1,32 @@
 package util
 
 import (
+	"fmt"
 	"net"
 	"net/netip"
 )
 
-// GetAddresses get addresses for a domain
-func GetAddresses(domain string) (addresses []netip.Addr, err error) {
+// GetDomainAddresses get addresses for a domain
+func GetDomainAddresses(domain string) (addresses []netip.Addr, err error) {
 	ipList, err := net.LookupIP(domain)
 
 	if err == nil {
 		for _, ip := range ipList {
-			var addr netip.Addr
-			addr, err = netip.ParseAddr(ip.String())
-			if err != nil {
+			// ip will be either 4 or 16 bytes. net.IP is an alias for a byte slice
+			addr, ok := netip.AddrFromSlice(ip)
+			if !ok {
+				err = fmt.Errorf("could not obtain address from %s", ip.String())
 				return
 			}
 			addresses = append(addresses, addr)
-
-			addr, err = netip.ParseAddr(ip.String())
-			if err != nil {
-				return
-			}
 		}
-
 	}
 
 	return
 }
 
-// GetMXRecods get MX records for a domain
-func GetMXRecods(domain string) (mxRecods []*net.MX, err error) {
+// GetDomainMXRecods get MX records for a domain
+func GetDomainMXRecods(domain string) (mxRecods []*net.MX, err error) {
 	mxRecods, err = net.LookupMX(domain)
 
 	return

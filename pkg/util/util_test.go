@@ -11,7 +11,7 @@ func TestLookup(t *testing.T) {
 	var domains = []string{`cisco.com`, `ibm.com`, `microsoft.com`}
 
 	for _, domain := range domains {
-		addresses, err := GetAddresses(domain)
+		addresses, err := GetDomainAddresses(domain)
 		is.NoErr(err)
 		for _, addr := range addresses {
 			t.Logf("Domain %s", domain)
