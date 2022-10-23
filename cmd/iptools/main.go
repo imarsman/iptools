@@ -10,23 +10,22 @@ import (
 	"github.com/imarsman/iptools/cmd/handler"
 )
 
-func remove[T any](slice []T, position int) []T {
-	slice[position] = slice[len(slice)-1]
-
-	return slice[:len(slice)-1]
+// the new comparable package is not there in 1.18
+type comparable interface {
+	~string | ~int | ~int64 | float64
 }
 
-func dedup[T any](slice []T) []T {
-	m := make(map[any]bool)
+// dedup de-duplicate a generic slice
+func dedup[T comparable](slice []T) (result []T) {
+	m := make(map[T]bool)
 	for i := 0; i < len(slice); i++ {
-		current := slice[i]
-		if m[current] {
-			slice = remove(slice, i)
-		} else {
-			m[current] = true
+		if !m[slice[i]] {
+			result = append(result, slice[i])
+			m[slice[i]] = true
 		}
 	}
-	return slice
+
+	return
 }
 
 func main() {
