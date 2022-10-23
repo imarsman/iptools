@@ -33,7 +33,7 @@ func row(label string, value any) (r []*simpletable.Cell) {
 
 // LookupDomain look up IPs for a domain
 func LookupDomain(domains []string, mxLookup bool, toJSON, toYAML bool) {
-	ipsForDomains := ipv6.NewIPForDomain()
+	ipsForDomains := ipv6.NewDomainInfoSet()
 
 	table := simpletable.New()
 	for _, domain := range domains {
@@ -79,16 +79,16 @@ func LookupDomain(domains []string, mxLookup bool, toJSON, toYAML bool) {
 				}
 				table.Body.Cells = append(table.Body.Cells, mxRecordRow)
 			}
-			for _, mx := range mxRecods {
-				mxRecord := ipv6.MXRecord{}
-				mxRecord.Domain = mx.Host
-				mxRecord.Pref = mx.Pref
+			for _, mxR := range mxRecods {
+				mxRecord := ipv6.MXRecordInfo{}
+				mxRecord.Domain = mxR.Host
+				mxRecord.Pref = mxR.Pref
 				domainInfo.MXRecords = append(domainInfo.MXRecords, mxRecord)
 
-				table.Body.Cells = append(table.Body.Cells, row(mx.Host, fmt.Sprintf("%d", mx.Pref)))
+				table.Body.Cells = append(table.Body.Cells, row(mxR.Host, fmt.Sprintf("%d", mxR.Pref)))
 			}
 		}
-		ipsForDomains.Domains = append(ipsForDomains.Domains, domainInfo)
+		ipsForDomains.DomainInfo = append(ipsForDomains.DomainInfo, domainInfo)
 	}
 	table.SetStyle(simpletable.StyleCompactLite)
 

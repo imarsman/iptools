@@ -37,39 +37,45 @@ type IPSummary struct {
 	FirstAddressFieldBinary string `yaml:"firstaddressbinary,omitempty" json:"firstaddressbinary,omitempty"`
 }
 
-type AddressInfo struct {
-	Type    string `yaml:"type,omitempty" json:"type,omitempty"`
-	Address string `yaml:"address,omitempty" json:"address,omitempty"`
+// NewDomainInfoSet get new domain info list
+func NewDomainInfoSet() DomainInfoSet {
+	ipForDomain := DomainInfoSet{}
+
+	return ipForDomain
 }
 
-type DomainInfo struct {
-	Domain string `yaml:"domain,omitempty" json:"domain,omitempty"`
-	// Type        string        `yaml:"type,omitempty" json:"type,omitempty"`
-	AddressInfo []AddressInfo `yaml:"addresses,omitempty" json:"addresses,omitempty"`
-	MXRecords   []MXRecord    `yaml:"mxrecords,omitempty" json:"mxrecords,omitempty"`
+// DomainInfoSet a set of information for domains
+type DomainInfoSet struct {
+	DomainInfo []DomainInfo `yaml:"domains,omitempty" json:"domains,omitempty"`
 }
 
-type MXRecord struct {
-	Domain string `yaml:"domain,omitempty" json:"domain,omitempty"`
-	Pref   uint16 `yaml:"pref,omitempty" json:"pref,omitempty"`
-}
-
-type IPForDomain struct {
-	Domains []DomainInfo `yaml:"domains,omitempty" json:"domains,omitempty"`
-}
-
+// NewDomainInfo get new domain info for a single domain
 func NewDomainInfo() DomainInfo {
 	domainInfo := DomainInfo{}
-	mxRecords := []MXRecord{}
+	mxRecords := []MXRecordInfo{}
 	domainInfo.MXRecords = mxRecords
 
 	return domainInfo
 }
 
-func NewIPForDomain() IPForDomain {
-	ipForDomain := IPForDomain{}
+// DomainInfo a set of properties for a domain including addresses and MX records
+type DomainInfo struct {
+	Domain string `yaml:"domain,omitempty" json:"domain,omitempty"`
+	// Type        string        `yaml:"type,omitempty" json:"type,omitempty"`
+	AddressInfo []AddressInfo  `yaml:"addresses,omitempty" json:"addresses,omitempty"`
+	MXRecords   []MXRecordInfo `yaml:"mxrecords,omitempty" json:"mxrecords,omitempty"`
+}
 
-	return ipForDomain
+// AddressInfo information about an address
+type AddressInfo struct {
+	Type    string `yaml:"type,omitempty" json:"type,omitempty"`
+	Address string `yaml:"address,omitempty" json:"address,omitempty"`
+}
+
+// MXRecordInfo an MX record
+type MXRecordInfo struct {
+	Domain string `yaml:"domain,omitempty" json:"domain,omitempty"`
+	Pref   uint16 `yaml:"pref,omitempty" json:"pref,omitempty"`
 }
 
 const (
