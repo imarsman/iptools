@@ -36,6 +36,9 @@ release:
 
     iptools is a set of IP and network tools
 
+    v0.1.35
+    Added auto complete setup info
+
     v0.1.34
     Added MX lookup for domain lookup
 
