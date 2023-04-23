@@ -183,6 +183,54 @@ $ iptools subnetip4 describe -ip 10.32.0.0 -bits 16 -secondary-bits 18
 
 ### IPV6 Global unicast address
 
+Parse an ip with prefix
+```
+$ iptools ip6 describe -ip 2001:0db8:85a3:0000:0000:8a2e:0370:7334/64
+
+         Category                                            Value
+-------------------------- --------------------------------------------------------------------------
+-------------------------- --------------------------------------------------------------------------
+ IP Type                    Global unicast
+ Type Prefix                2000::/3
+ IP                         2001:db8:85a3::8a2e:370:7334
+ Solicited node multicast   ff02::1:ff70:7334
+ Prefix                     2001:db8:85a3::/64
+ Routing Prefix             2001:0db8:85a3::/48
+ Subnet ID                  0000
+ Subnets                    65,536
+ Global ID                  01:0db8:85a3
+ Interface ID               0000:8a2e:0370:7334
+ Addresses                  18,446,744,073,709,551,616
+ Link                       http://[2001:db8:85a3::8a2e:370:7334]/
+ ip6.arpa                   4.3.3.7.0.7.3.0.e.2.a.8.0.0.0.0.0.0.0.0.3.a.5.8.8.b.d.0.1.0.0.2.ip6.arpa
+ Subnet first address       2001:0db8:85a3:0000:0000:0000:0000:0000
+ Subnet last address        2001:0db8:85a3:0000:ffff:ffff:ffff:ffff
+ 1st address field binary   0010000000000001
+```
+
+Parse an IP and supply bits separately
+```
+$ iptools ip6 describe -ip 2001:0db8:85a3:0000:0000:8a2e:0370:7334 -bits 64
+         Category                                            Value
+-------------------------- --------------------------------------------------------------------------
+ IP Type                    Global unicast
+ Type Prefix                2000::/3
+ IP                         2001:db8:85a3::8a2e:370:7334
+ Solicited node multicast   ff02::1:ff70:7334
+ Prefix                     2001:db8:85a3::/64
+ Routing Prefix             2001:0db8:85a3::/48
+ Subnet ID                  0000
+ Subnets                    65,536
+ Global ID                  01:0db8:85a3
+ Interface ID               0000:8a2e:0370:7334
+ Addresses                  18,446,744,073,709,551,616
+ Link                       http://[2001:db8:85a3::8a2e:370:7334]/
+ ip6.arpa                   4.3.3.7.0.7.3.0.e.2.a.8.0.0.0.0.0.0.0.0.3.a.5.8.8.b.d.0.1.0.0.2.ip6.arpa
+ Subnet first address       2001:0db8:85a3:0000:0000:0000:0000:0000
+ Subnet last address        2001:0db8:85a3:0000:ffff:ffff:ffff:ffff
+ 1st address field binary   0010000000000001
+```
+
 ```
 $ iptools ip6 describe -random -type global-unicast
          Category                                            Value
