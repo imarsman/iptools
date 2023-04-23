@@ -122,8 +122,17 @@ func LookupDomain(domains []string, mxLookup bool, toJSON, toYAML bool) {
 func IP4SubnetDescribe(ip string, bits int, secondaryBits int) {
 	var err error
 	var s *ipv4subnet.Subnet
-	prefix := fmt.Sprintf("%s/%d", ip, bits)
-	s, err = ipv4subnet.NewFromPrefix(prefix)
+
+	var prefixStr string
+	prefix, err := netip.ParsePrefix(ip)
+	if err == nil {
+		bits = prefix.Bits()
+		prefixStr = prefix.String()
+	} else {
+		prefixStr = fmt.Sprintf("%s/%d", ip, bits)
+	}
+
+	s, err = ipv4subnet.NewFromPrefix(prefixStr)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -207,8 +216,18 @@ func IP4SubnetDescribe(ip string, bits int, secondaryBits int) {
 func IP4SubnetRanges(ip string, bits int, secondaryBits int) {
 	var err error
 	var s *ipv4subnet.Subnet
-	prefix := fmt.Sprintf("%s/%d", ip, bits)
-	s, err = ipv4subnet.NewFromPrefix(prefix)
+
+	prefixStr := fmt.Sprintf("%s/%d", ip, bits)
+
+	prefix, err := netip.ParsePrefix(ip)
+	if err == nil {
+		bits = prefix.Bits()
+		prefixStr = prefix.String()
+	} else {
+		prefixStr = fmt.Sprintf("%s/%d", ip, bits)
+	}
+
+	s, err = ipv4subnet.NewFromPrefix(prefixStr)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -309,8 +328,17 @@ func IP4SubnetRanges(ip string, bits int, secondaryBits int) {
 func IP4SubnetDivide(ip string, bits int, secondaryBits int) {
 	var err error
 	var s *ipv4subnet.Subnet
-	prefix := fmt.Sprintf("%s/%d", ip, bits)
-	s, err = ipv4subnet.NewFromPrefix(prefix)
+
+	var prefixStr string
+	prefix, err := netip.ParsePrefix(ip)
+	if err == nil {
+		bits = prefix.Bits()
+		prefixStr = prefix.String()
+	} else {
+		prefixStr = fmt.Sprintf("%s/%d", ip, bits)
+	}
+
+	s, err = ipv4subnet.NewFromPrefix(prefixStr)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -420,55 +448,66 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string, json, y
 		fmt.Println("No type supplied and -random is false")
 		os.Exit(1)
 	}
+
 	var addr netip.Addr
-	if !random {
-		var err error
-		addr, err = netip.ParseAddr(ip)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+
+	prefix, err := netip.ParsePrefix(ip)
+	if err == nil {
+		addr = prefix.Addr()
+		bits = prefix.Bits()
 	} else {
-		var err error
-		if ip6Type == ipv6.GlobalUnicastName {
-			addr, err = ipv6.RandAddrGlobalUnicast()
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-		} else if ip6Type == ipv6.LinkLocalName {
-			addr, err = ipv6.RandAddrLinkLocal()
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-		} else if ip6Type == ipv6.PrivateName {
-			addr, err = ipv6.RandAddrPrivate()
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-		} else if ip6Type == ipv6.MulticastName {
-			addr, err = ipv6.RandAddrMulticast()
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-		} else if ip6Type == ipv6.LinkLocalMulticastName {
-			addr, err = ipv6.RandAddrLinkLocalMulticast()
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-		} else if ip6Type == ipv6.InterfaceLocalMulticastName {
-			addr, err = ipv6.RandAddrInterfaceLocalMulticast()
+		if bits == 0 {
+			bits = 64
+		}
+		if !random {
+			var err error
+			addr, err = netip.ParseAddr(ip)
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
 			}
 		} else {
-			fmt.Println("No valid type specified")
-			os.Exit(1)
+			var err error
+			if ip6Type == ipv6.GlobalUnicastName {
+				addr, err = ipv6.RandAddrGlobalUnicast()
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+			} else if ip6Type == ipv6.LinkLocalName {
+				addr, err = ipv6.RandAddrLinkLocal()
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+			} else if ip6Type == ipv6.PrivateName {
+				addr, err = ipv6.RandAddrPrivate()
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+			} else if ip6Type == ipv6.MulticastName {
+				addr, err = ipv6.RandAddrMulticast()
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+			} else if ip6Type == ipv6.LinkLocalMulticastName {
+				addr, err = ipv6.RandAddrLinkLocalMulticast()
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+			} else if ip6Type == ipv6.InterfaceLocalMulticastName {
+				addr, err = ipv6.RandAddrInterfaceLocalMulticast()
+				if err != nil {
+					fmt.Println(err)
+					os.Exit(1)
+				}
+			} else {
+				fmt.Println("No valid type specified")
+				os.Exit(1)
+			}
 		}
 	}
 
