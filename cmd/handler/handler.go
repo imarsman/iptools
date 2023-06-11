@@ -120,18 +120,21 @@ func LookupDomain(domains []string, mxLookup bool, toJSON, toYAML bool) {
 
 // IP4SubnetDescribe describe a subnet
 // Needs review and cleanup
-// Investigate iptools subnetip4 describe -ip 10.32.0.0 -bits 23 -secondary-bits 24
+// Investigate iptools subnetip4 describe -ip 10.32.0.0 -bits 23 -secondary-bits
+// 24
+// Consider working with a prefix and not an ip string
 func IP4SubnetDescribe(ip string, bits int, secondaryBits int) {
+	var prefix netip.Prefix
+	var prefixStr string
 	var err error
-	var s *ipv4subnet.Subnet
 
 	// Default to 24 bits
 	if bits == 0 {
 		bits = 24
 	}
 
-	var prefixStr string
-	prefix, err := netip.ParsePrefix(ip)
+	// Try for prefix with bits (alternative is IP)
+	prefix, err = netip.ParsePrefix(ip)
 	if err == nil {
 		bits = prefix.Bits()
 		prefixStr = prefix.String()
@@ -143,15 +146,15 @@ func IP4SubnetDescribe(ip string, bits int, secondaryBits int) {
 		}
 	}
 
+	var s *ipv4subnet.Subnet
+
 	s, err = ipv4subnet.NewFromPrefix(prefixStr)
 	if err != nil {
 		os.Exit(1)
 	}
 	var s2 *ipv4subnet.Subnet
 	if secondaryBits != 0 {
-		// need to redefine ip since it would have primary bits already.
-		ip = prefix.Addr().String()
-		prefixStr := fmt.Sprintf("%s/%d", ip, secondaryBits)
+		prefixStr := fmt.Sprintf("%s/%d", prefix.Addr().String(), secondaryBits)
 		s2, err = ipv4subnet.NewFromPrefix(prefixStr)
 		if err != nil {
 			fmt.Println(err)
@@ -227,18 +230,31 @@ func IP4SubnetDescribe(ip string, bits int, secondaryBits int) {
 
 // IP4SubnetRanges divide a subnet into ranges
 func IP4SubnetRanges(ip string, bits int, secondaryBits int) {
+	var prefix netip.Prefix
+	var prefixStr string
 	var err error
-	var s *ipv4subnet.Subnet
 
-	prefixStr := fmt.Sprintf("%s/%d", ip, bits)
+	// Default to 24 bits
+	if bits == 0 {
+		bits = 24
+	}
 
-	prefix, err := netip.ParsePrefix(ip)
+	// Try for prefix with bits (alternative is IP)
+	prefix, err = netip.ParsePrefix(ip)
 	if err == nil {
 		bits = prefix.Bits()
 		prefixStr = prefix.String()
 	} else {
 		prefixStr = fmt.Sprintf("%s/%d", ip, bits)
+		prefix, err = netip.ParsePrefix(prefixStr)
+		if err != nil {
+
+		}
 	}
+
+	var s *ipv4subnet.Subnet
+
+	prefixStr = fmt.Sprintf("%s/%d", ip, bits)
 
 	s, err = ipv4subnet.NewFromPrefix(prefixStr)
 	if err != nil {
@@ -339,11 +355,31 @@ func IP4SubnetRanges(ip string, bits int, secondaryBits int) {
 
 // IP4SubnetDivide divide a subnet into ranges
 func IP4SubnetDivide(ip string, bits int, secondaryBits int) {
-	var err error
-	var s *ipv4subnet.Subnet
-
+	var prefix netip.Prefix
 	var prefixStr string
-	prefix, err := netip.ParsePrefix(ip)
+	var err error
+
+	// Default to 24 bits
+	if bits == 0 {
+		bits = 24
+	}
+
+	// Try for prefix with bits (alternative is IP)
+	prefix, err = netip.ParsePrefix(ip)
+	if err == nil {
+		bits = prefix.Bits()
+		prefixStr = prefix.String()
+	} else {
+		prefixStr = fmt.Sprintf("%s/%d", ip, bits)
+		prefix, err = netip.ParsePrefix(prefixStr)
+		if err != nil {
+
+		}
+	}
+
+	prefixStr = fmt.Sprintf("%s/%d", ip, bits)
+
+	prefix, err = netip.ParsePrefix(ip)
 	if err == nil {
 		bits = prefix.Bits()
 		prefixStr = prefix.String()
@@ -351,6 +387,7 @@ func IP4SubnetDivide(ip string, bits int, secondaryBits int) {
 		prefixStr = fmt.Sprintf("%s/%d", ip, bits)
 	}
 
+	var s *ipv4subnet.Subnet
 	s, err = ipv4subnet.NewFromPrefix(prefixStr)
 	if err != nil {
 		fmt.Println(err)
@@ -454,6 +491,10 @@ func IP4SubnetDivide(ip string, bits int, secondaryBits int) {
 
 // IP6SubnetDescribe describe a link-local address
 func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string, json, yaml bool) {
+	var prefix netip.Prefix
+	var err error
+	var addr netip.Addr
+
 	if ip6Type == "" && ip == "" {
 		fmt.Println("If no IP then type must be supplied")
 		os.Exit(1)
@@ -462,9 +503,7 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string, json, y
 		os.Exit(1)
 	}
 
-	var addr netip.Addr
-
-	prefix, err := netip.ParsePrefix(ip)
+	prefix, err = netip.ParsePrefix(ip)
 	if err == nil {
 		addr = prefix.Addr()
 		bits = prefix.Bits()
