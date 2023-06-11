@@ -467,6 +467,7 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string, json, y
 	if !random {
 		prefix := parsePrefix(ip, bits)
 		addr = prefix.Addr()
+		bits = prefix.Bits()
 	} else {
 		var err error
 		if ip6Type == ipv6.GlobalUnicastName {
