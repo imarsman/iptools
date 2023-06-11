@@ -11,6 +11,8 @@ import (
 	"net/netip"
 	"strconv"
 	"strings"
+
+	"github.com/imarsman/iptools/pkg/util"
 )
 
 // IPSummary summary of properties for an IP
@@ -133,7 +135,7 @@ func init() {
 
 // AddrTypePrefix the prefix for the IP type
 func AddrTypePrefix(addr netip.Addr) (prefix netip.Prefix) {
-	addType := AddrType(addr)
+	addType := util.AddrType(addr)
 
 	p, ok := typePrefixes[addType]
 
@@ -376,7 +378,7 @@ func RandAddrInterfaceLocalMulticast() (addr netip.Addr, err error) {
 // AddrSolicitedNodeMulticast get solicited node multicast address for incoming unicast address
 // EUI-64 compliance
 func AddrSolicitedNodeMulticast(addr netip.Addr) (newAddr netip.Addr, err error) {
-	if !(HasType(AddrType(addr), GlobalUnicast, LinkLocalUnicast, UniqueLocal, Private)) {
+	if !(HasType(util.AddrType(addr), GlobalUnicast, LinkLocalUnicast, UniqueLocal, Private)) {
 		err = errors.New("not a unicast address")
 		return
 	}
@@ -621,7 +623,7 @@ func Addr2BitString(addr netip.Addr) (result string) {
 
 // Arpa get the IPV6 ARPA address
 func Arpa(addr netip.Addr) (addrStr string) {
-	if !HasType(AddrType(addr), GlobalUnicast) {
+	if !HasType(util.AddrType(addr), GlobalUnicast) {
 		return
 	}
 
@@ -651,63 +653,9 @@ func byteSlice2Hex(bytes []byte) string {
 	return sb.String()
 }
 
-// AddrType get address type as int
-func AddrType(addr netip.Addr) int {
-	switch {
-	// case strings.HasPrefix(addr.StringExpanded(), "fd00"):
-	// 	return UniqueLocal
-	case addr.IsInterfaceLocalMulticast(): // fe80::/10
-		return InterfaceLocalMulticast
-	case addr.IsLinkLocalMulticast(): // ff00::/8 ff02
-		return LinkLocalMulticast
-	case addr.IsLinkLocalUnicast(): // fe80::/10
-		return LinkLocalUnicast
-	case addr.IsLoopback(): // ::1/128
-		return Loopback
-	case addr.IsPrivate(): // fc00::/7
-		return Private
-	case addr.IsGlobalUnicast(): // 2001
-		return GlobalUnicast
-	case addr.IsMulticast(): // ff00::/8
-		return Multicast
-	case addr.IsUnspecified():
-		return Unspecified
-	default:
-		return Unknown
-	}
-
-}
-
-// AddrTypeName the type of address for the subnet
-// https://www.networkacademy.io/ccna/ipv6/ipv6-address-types
-func AddrTypeName(addr netip.Addr) string {
-	switch AddrType(addr) {
-	case UniqueLocal:
-		return "Unique local"
-	case GlobalUnicast:
-		return "Global unicast"
-	case InterfaceLocalMulticast:
-		return "Interface local multicast"
-	case LinkLocalMulticast:
-		return "Link local muticast"
-	case LinkLocalUnicast:
-		return "Link local unicast"
-	case Loopback:
-		return "Loopback"
-	case Multicast:
-		return "Multicast"
-	case Private:
-		return "Private"
-	case Unspecified:
-		return "Unspecified"
-	default:
-		return "Unknown"
-	}
-}
-
 // IsARPA is the address relevant to ARPA addressing?
 func IsARPA(addr netip.Addr) (is bool) {
-	if HasType(AddrType(addr), GlobalUnicast) {
+	if HasType(util.AddrType(addr), GlobalUnicast) {
 		is = true
 	}
 
@@ -716,7 +664,7 @@ func IsARPA(addr netip.Addr) (is bool) {
 
 // AddrLink get link for address
 func AddrLink(addr netip.Addr) (url string) {
-	if !HasType(AddrType(addr), GlobalUnicast) {
+	if !HasType(util.AddrType(addr), GlobalUnicast) {
 		return
 	}
 	return fmt.Sprintf("http://[%s]/", addr.String())

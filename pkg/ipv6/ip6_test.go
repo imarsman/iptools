@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/imarsman/iptools/pkg/util"
 	"github.com/matryer/is"
 )
 
@@ -46,7 +47,7 @@ func TestSubnet(t *testing.T) {
 	t.Log("subnet", AddrSubnet(addr))
 	t.Log("interface", Interface(addr))
 	t.Log("is global unicast", addr.IsGlobalUnicast())
-	t.Log("Address type", AddrTypeName(addr))
+	t.Log("Address type", util.AddrTypeName(addr))
 	t.Log("Address prefix", AddrTypePrefix(addr).Masked().String())
 }
 
@@ -54,42 +55,42 @@ func TestRandomGlobalUnicast(t *testing.T) {
 	is := is.New(t)
 	addr, err := RandAddrGlobalUnicast()
 	is.NoErr(err)
-	t.Log(AddrTypeName(addr))
+	t.Log(util.AddrTypeName(addr))
 }
 
 func TestRandomLinkLocal(t *testing.T) {
 	is := is.New(t)
 	addr, err := RandAddrLinkLocal()
 	is.NoErr(err)
-	t.Log(AddrTypeName(addr))
+	t.Log(util.AddrTypeName(addr))
 }
 
 func TestPrivate(t *testing.T) {
 	is := is.New(t)
 	addr, err := RandAddrPrivate()
 	is.NoErr(err)
-	t.Log(AddrTypeName(addr))
+	t.Log(util.AddrTypeName(addr))
 }
 
 func TestMulticast(t *testing.T) {
 	is := is.New(t)
 	addr, err := RandAddrMulticast()
 	is.NoErr(err)
-	t.Log(AddrTypeName(addr))
+	t.Log(util.AddrTypeName(addr))
 }
 
 func TestInterfaceLocalMulticast(t *testing.T) {
 	is := is.New(t)
 	addr, err := RandAddrInterfaceLocalMulticast()
 	is.NoErr(err)
-	t.Log(AddrTypeName(addr))
+	t.Log(util.AddrTypeName(addr))
 }
 
 func TestLinkLocalMulticast(t *testing.T) {
 	is := is.New(t)
 	addr, err := RandAddrLinkLocalMulticast()
 	is.NoErr(err)
-	t.Log(AddrTypeName(addr))
+	t.Log(util.AddrTypeName(addr))
 }
 
 func TestMakeMacAddress(t *testing.T) {
