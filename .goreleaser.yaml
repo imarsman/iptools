@@ -36,6 +36,9 @@ release:
 
     iptools is a set of IP and network tools
 
+    v0.1.39
+    Cleanup and consolidation
+
     v0.1.38
     Some cleanup and standardization
 
