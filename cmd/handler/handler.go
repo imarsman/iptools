@@ -465,14 +465,9 @@ func IP6SubnetDescribe(ip string, bits int, random bool, ip6Type string, json, y
 	var addr netip.Addr
 
 	if !random {
-		var err error
-		addr, err = netip.ParseAddr(ip)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		prefix := parsePrefix(ip, bits)
+		addr = prefix.Addr()
 	} else {
-		fmt.Println("random")
 		var err error
 		if ip6Type == ipv6.GlobalUnicastName {
 			addr, err = ipv6.RandAddrGlobalUnicast()
