@@ -304,7 +304,7 @@ func IP4SubnetRanges(ip string, bits int, secondaryBits int) {
 		}
 		if secondaryBits == 0 {
 			table.Body.Cells = append(table.Body.Cells, row("Networks", s.Networks()))
-			table.Body.Cells = append(table.Body.Cells, row("Network Hosts", printer.Sprintf("%d", printer.Sprintf("%d", s.Hosts()))))
+			table.Body.Cells = append(table.Body.Cells, row("Network Hosts", printer.Sprintf("%d", s.Hosts())))
 		} else {
 			table.Body.Cells = append(table.Body.Cells, row("Networks", s.Networks()))
 			table.Body.Cells = append(table.Body.Cells, row("Secondary Networks", s2.Networks()))
@@ -538,7 +538,6 @@ func ip6SubnetDisplay(addr netip.Addr, prefix netip.Prefix, toJSON, toYAML bool)
 	}
 
 	ipSummary.IPType = util.AddrTypeName(addr)
-	fmt.Println("addr", addr.String())
 	table.Body.Cells = append(table.Body.Cells, row("IP Type", util.AddrTypeName(addr)))
 	ipSummary.TypePrefix = ipv6.AddrTypePrefix(addr).Masked().String()
 	table.Body.Cells = append(table.Body.Cells, row("Type Prefix", ipv6.AddrTypePrefix(addr).Masked()))
