@@ -87,12 +87,14 @@ $ iptools subnetip4 ranges -ip 99.236.32.0 -bits 16 -pretty
 
      Category            Value
 ------------------- ----------------
+ IP Type             Public
  Subnet              99.236.0.0/16
  Subnet IP           99.236.0.0
  Broadcast Address   99.236.255.255
  Subnet Mask         255.255.0.0
+ Wildcard Mask       0.0.255.255
  Networks            1
- Network Hosts       65536
+ Network Hosts       65,536
 
    Start           End
 ------------ ----------------
@@ -106,6 +108,7 @@ $ iptools subnetip4 ranges -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
 
               Category                    Value
 ------------------------------------ ----------------
+ IP Type                              Public
  Subnet                               99.236.0.0/16
  Subnet IP                            99.236.0.0
  Broadcast Address                    99.236.255.255
@@ -135,9 +138,9 @@ $ iptools subnetip4 ranges -ip 99.236.32.0 -bits 16 -secondary-bits 18 -pretty
 
 ```
 $ iptools subnetip4 describe -ip 10.32.0.0 -bits 23
-
          Category                          Value
 -------------------------- -------------------------------------
+ IP Type                    Private
  Subnet                     10.32.0.0/23
  Subnet IP                  10.32.0.0
  Broadcast Address          10.32.1.255
@@ -157,9 +160,9 @@ $ iptools subnetip4 describe -ip 10.32.0.0 -bits 23
 
 ```
 $ iptools subnetip4 describe -ip 10.32.0.0 -bits 16 -secondary-bits 18
-
               Category                               Value
 ------------------------------------ -------------------------------------
+ IP Type                              Private
  Subnet                               10.32.0.0/16
  Subnet IP                            10.32.0.0
  Broadcast Address                    10.32.255.255
