@@ -32,15 +32,16 @@ I would be surprised if there were not errors due to coding or to a lack of unde
 ```
 $ iptools subnetip4 ranges -ip 10.32.0.0 -bits 16 -pretty
 
-     Category              Value
-------------------- --------------------
+
+     Category            Value
+------------------- ---------------
  Subnet              10.32.0.0/16
  Subnet IP           10.32.0.0
  Broadcast Address   10.32.255.255
  Subnet Mask         255.255.0.0
  Wildcard Mask       0.0.255.255
  Networks            1
- Network Hosts       %!d(string=65,536)
+ Network Hosts       65,536
 
    Start          End
 ----------- ---------------
@@ -50,7 +51,8 @@ $ iptools subnetip4 ranges -ip 10.32.0.0 -bits 16 -pretty
 ### Subnet divisions split into non-default sized networks
 
 ```
-$ iptools subnetip4 divide -ip 10.32.0.0 -bits 16 -secondary-bits 18 -pretty
+ iptools subnetip4 divide -ip 10.32.0.0 -bits 16 -secondary-bits 18 -pretty
+
 
               Category                    Value
 ------------------------------------ ---------------
@@ -64,11 +66,11 @@ $ iptools subnetip4 divide -ip 10.32.0.0 -bits 16 -secondary-bits 18 -pretty
  Secondary Subnet Broadcast Address   10.32.63.255
  Secondary Subnet Mask                255.255.192.0
  Secondary Subnet Wildcard Mask       0.0.63.255
- Networks                             1
+ Netorks                              1
  Secondary Networks                   4
  Effective Networks                   4
- Network Hosts                        65536
- Sub Network Hosts                    16384
+ Network Hosts                        65,536
+ Secondary Network Hosts              16,384
 
     Subnets
 ----------------
@@ -236,20 +238,21 @@ $ iptools ip6 describe -random -type global-unicast
 -------------------------- --------------------------------------------------------------------------
  IP Type                    Global unicast
  Type Prefix                2000::/3
- IP                         2301:db8:cafe:bd9e:72f4:92ff:fe5b:a76
- Solicited node multicast   ff02::1:ff5b:a76
- Routing Prefix             2301:0db8:cafe::/48
- Subnet ID                  bd9e
+ IP                         3701:db8:cafe:b8cb:72cf:8aff:fe3a:fa69
+ Solicited node multicast   ff02::1:ff3a:fa69
+ Prefix                     3701:db8:cafe:b8cb::/64
+ Routing Prefix             3701:0db8:cafe::/48
+ Subnet ID                  b8cb
  Subnets                    65,536
- Global ID                  301:0db8:cafe
- Interface ID               72f4:92ff:fe5b:0a76
+ Global ID                  701:0db8:cafe
+ Interface ID               72cf:8aff:fe3a:fa69
  Addresses                  18,446,744,073,709,551,616
- Link                       http://[2301:db8:cafe:bd9e:72f4:92ff:fe5b:a76]/
- ip6.arpa                   6.7.a.0.b.5.e.f.f.f.2.9.4.f.2.7.e.9.d.b.e.f.a.c.8.b.d.0.1.0.3.2.ip6.arpa
- Subnet first address       2301:0db8:cafe:bd9e:0000:0000:0000:0000
- Subnet last address        2301:0db8:cafe:bd9e:ffff:ffff:ffff:ffff
- 1st address field binary   0010001100000001
-```
+ Link                       http://[3701:db8:cafe:b8cb:72cf:8aff:fe3a:fa69]/
+ ip6.arpa                   9.6.a.f.a.3.e.f.f.f.a.8.f.c.2.7.b.c.8.b.e.f.a.c.8.b.d.0.1.0.7.3.ip6.arpa
+ Subnet first address       3701:0db8:cafe:b8cb:0000:0000:0000:0000
+ Subnet last address        3701:0db8:cafe:b8cb:ffff:ffff:ffff:ffff
+ 1st address field binary   0011011100000001
+ ```
 
 ### IPV6 Link local address
 ```
@@ -258,11 +261,12 @@ $ iptools ip6 describe -random -type link-local
 -------------------------- -----------------------------------------
  IP Type                    Link local unicast
  Type Prefix                fe80::/10
- IP                         fe80::3aff:afff:feab:9edc
- Solicited node multicast   ff02::1:ffab:9edc
+ IP                         fe80::7263:80ff:fe2e:d2ff
+ Solicited node multicast   ff02::1:ff2e:d2ff
+ Prefix                     fe80::/64
  Subnet ID                  0000
  Subnets                    65,536
- Interface ID               3aff:afff:feab:9edc
+ Interface ID               7263:80ff:fe2e:d2ff
  Addresses                  18,446,744,073,709,551,616
  Default Gateway            fe80::1
  Subnet first address       fe80:0000:0000:0000:0000:0000:0000:0000
@@ -277,58 +281,62 @@ $ iptools ip6 describe -random -type private
 -------------------------- -----------------------------------------
  IP Type                    Private
  Type Prefix                fc00::/7
- IP                         fdfc:3ae0:b79f:413c:b2f5:7dff:fe8a:fcd
- Solicited node multicast   ff02::1:ff8a:fcd
- Subnet ID                  413c
+ IP                         fd14:761a:1f7a:e2e9:1af6:97ff:fe1b:1342
+ Solicited node multicast   ff02::1:ff1b:1342
+ Prefix                     fd14:761a:1f7a:e2e9::/64
+ Subnet ID                  e2e9
  Subnets                    65,536
- Global ID                  fc:3ae0:b79f
- Interface ID               b2f5:7dff:fe8a:0fcd
+ Global ID                  14:761a:1f7a
+ Interface ID               1af6:97ff:fe1b:1342
  Addresses                  18,446,744,073,709,551,616
- Subnet first address       fdfc:3ae0:b79f:413c:0000:0000:0000:0000
- Subnet last address        fdfc:3ae0:b79f:413c:ffff:ffff:ffff:ffff
- 1st address field binary   1111110111111100
+ Subnet first address       fd14:761a:1f7a:e2e9:0000:0000:0000:0000
+ Subnet last address        fd14:761a:1f7a:e2e9:ffff:ffff:ffff:ffff
+ 1st address field binary   1111110100010100
 ```
 
 ### IPV6 multicast
 ```
 $ iptools ip6 describe -bits 64 -random -type multicast
           Category                           Value
----------------------------- --------------------------------------
+---------------------------- -------------------------------------
  IP Type                      Multicast
  Type Prefix                  ff00::/8
- IP                           ff13:0:8be8:1642:be9a:d38f:4fc3:aecb
- Network Prefix               8be8:1642:be9a:d38f
- Group ID                     4fc3:aecb
+ IP                           ff14:0:5a1c:9ae:ef85:33ae:737e:6bd6
+ Prefix                       ff14:0:5a1c:9ae::/64
+ Network Prefix               5a1c:09ae:ef85:33ae
+ Group ID                     737e:6bd6
  Groups                       4,294,967,296
- first address field binary   1111111100010011
+ first address field binary   1111111100010100
 ```
 
 ### IPV6 Interface local multicast
 ```
 $ iptools ip6 describe -bits 64 -random -type interface-local-multicast
           Category                           Value
----------------------------- --------------------------------------
+---------------------------- -------------------------------------
  IP Type                      Interface local multicast
  Type Prefix                  ff00::/8
- IP                           ff11:0:d1fb:979f:5ff6:56eb:4a3d:a793
- Network Prefix               d1fb:979f:5ff6:56eb
- Group ID                     4a3d:a793
+ IP                           ff31:0:8e37:805a:438e:ee6c:3f0d:4e8
+ Prefix                       ff31:0:8e37:805a::/64
+ Network Prefix               8e37:805a:438e:ee6c
+ Group ID                     3f0d:04e8
  Groups                       4,294,967,296
- first address field binary   1111111100010001
+ first address field binary   1111111100110001
 ```
 
 ### IPV6 Link local multicast
 ```
 $ iptools ip6 describe -bits 64 -random -type link-local-multicast
           Category                           Value
----------------------------- --------------------------------------
+---------------------------- -------------------------------------
  IP Type                      Link local muticast
  Type Prefix                  ff00::/8
- IP                           ff12:0:c957:512a:f0fe:bbed:3d57:9c0b
- Network Prefix               c957:512a:f0fe:bbed
- Group ID                     3d57:9c0b
+ IP                           ff22:0:e57f:db8:a927:3bbc:49d4:91b4
+ Prefix                       ff22:0:e57f:db8::/64
+ Network Prefix               e57f:0db8:a927:3bbc
+ Group ID                     49d4:91b4
  Groups                       4,294,967,296
- first address field binary   1111111100010010
+ first address field binary   1111111100100010
 ```
 
 ### Generate random IPs
