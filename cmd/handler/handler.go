@@ -277,6 +277,11 @@ func IP4SubnetRanges(ip string, bits int, secondaryBits int) {
 				{Align: simpletable.AlignCenter, Text: "Value"},
 			},
 		}
+		ipType := "Public"
+		if s.IP().IsPrivate() {
+			ipType = "Private"
+		}
+		table.Body.Cells = append(table.Body.Cells, row("IP Type", ipType))
 		table.Body.Cells = append(table.Body.Cells, row("Subnet", s.CIDR()))
 		table.Body.Cells = append(table.Body.Cells, row("Subnet IP", s.IP().String()))
 
@@ -384,6 +389,11 @@ func IP4SubnetDivide(ip string, bits int, secondaryBits int) {
 				{Align: simpletable.AlignCenter, Text: "Value"},
 			},
 		}
+		ipType := "Public"
+		if s.IP().IsPrivate() {
+			ipType = "Private"
+		}
+		table.Body.Cells = append(table.Body.Cells, row("IP Type", ipType))
 		table.Body.Cells = append(table.Body.Cells, row("Subnet", s.Prefix().String()))
 		table.Body.Cells = append(table.Body.Cells, row("Subnet IP", s.IP().String()))
 
